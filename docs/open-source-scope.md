@@ -2,13 +2,13 @@
 
 ## Goal
 
-Build a generic email automation engine that can create, manage, activate, and execute event-driven workflows for contacts or other user-defined subjects.
+Build an email automation engine that can create, manage, activate, and execute event-driven workflows for contacts or other user-defined subjects.
 
-The project must be TypeScript-first, open-source-safe, and independent from any private company product, naming, infrastructure, URLs, secrets, customer data, or business-specific assumptions.
+The project is TypeScript-first and independent from any private product, infrastructure, URLs, secrets, customer data, or business-specific assumptions.
 
 ## Product Boundary
 
-The engine should provide:
+The engine includes:
 
 - Workflow creation and management.
 - Tenant creation and management.
@@ -27,7 +27,7 @@ The engine should provide:
 - Terraform for deployable AWS infrastructure.
 - Test coverage for workflow behavior, queue contracts, frontend builder behavior, and Terraform validation.
 
-The engine should not assume:
+The engine does not assume:
 
 - A specific SaaS product.
 - A specific tenant name such as brand/account/customer.
@@ -37,9 +37,9 @@ The engine should not assume:
 
 The first public version is AWS SES-only for email delivery and tracking. Multi-provider email support is intentionally deferred.
 
-## Generic Domain Language
+## Domain Language
 
-Use these generic terms:
+Use these terms consistently:
 
 - `tenant`: owner namespace for workflows and contacts.
 - `contact`: subject moving through a workflow.
@@ -52,18 +52,18 @@ Use these generic terms:
 
 Avoid company-specific or product-specific terms in public code, docs, and examples.
 
-## Open-Source Safety Rules
+## Public Repository Rules
 
 - Do not copy private source files.
 - Do not copy private docs verbatim.
 - Do not include company names, private service names, URLs, domains, Git remote names, account IDs, ARNs, S3 buckets, database names, or secret names.
-- Use generic examples such as `example.com`, `tenant_123`, and `us-east-1`.
+- Use neutral examples such as `example.com`, `tenant_123`, and `us-east-1`.
 - Include example Terraform only; users must provide their own backend, cloud account, and variables.
 - Convert required behavior into generic tests and acceptance criteria instead of copying private implementation details.
 
 ## Strict Behavior
 
-The automation engine spans API behavior, frontend builder behavior, and asynchronous worker behavior. The project should implement these behaviors strictly, with generic names and clean TypeScript code.
+The automation engine spans API behavior, frontend builder behavior, and asynchronous worker behavior. These behaviors need to stay consistent across the codebase.
 
 Strictly preserve:
 
@@ -82,7 +82,7 @@ Do not preserve private naming, private infrastructure identifiers, private prod
 
 ## First Public Version
 
-The first public version should prove the email automation engine before adding advanced product features.
+The first public version focuses on the automation engine before broader product features.
 
 Include:
 

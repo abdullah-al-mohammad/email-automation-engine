@@ -1,6 +1,6 @@
 # Auth and Permissions
 
-The project should include simple authentication and modular tenant permissions. The design should be generic, open-source-safe, and permission-based.
+Authentication is intentionally small in the first release. Tenant access is permission-based and built around configurable roles.
 
 ## Goals
 
@@ -12,12 +12,12 @@ The project should include simple authentication and modular tenant permissions.
 - API routes can require authentication and tenant-level permissions.
 - Frontend routes and actions can hide or block features based on the user's tenant role.
 - Roles are built from a modular permission catalog.
-- The product should create a full-permission role during tenant setup so the creator has a clear starting point.
+- Tenant setup creates a full-permission role for the creator.
 - Authorization must never depend on hardcoded role names.
 
 ## Authentication Model
 
-Use simple user-based authentication for the first release.
+Use simple user-based authentication.
 
 Initial capabilities:
 
@@ -64,23 +64,23 @@ Suggested membership statuses:
 
 ## Tenant Creator
 
-The tenant record should store the creator user ID. This follows the existing brand-creator style without adding a separate root flag to memberships.
+The tenant record stores the creator user ID. This avoids a separate root flag on memberships while preserving a clear ownership model.
 
 Creator behavior:
 
 - The creator still has a normal tenant membership and role.
 - The creator receives the initial full-permission role during tenant creation.
 - The creator can recover or reconfigure roles, permissions, memberships, and tenant ownership settings if role permissions are misconfigured.
-- Creator-level recovery should be limited to tenant access recovery and tenant administration.
-- Creator-level recovery should not bypass unrelated runtime validation such as workflow activation rules, tenant ownership checks, or input validation.
+- Creator-level recovery is limited to tenant access recovery and tenant administration.
+- Creator-level recovery does not bypass unrelated runtime validation such as workflow activation rules, tenant ownership checks, or input validation.
 - A tenant must always have a valid creator user.
 - Transferring tenant creator ownership should require the current creator.
 
 ## Roles
 
-Roles are tenant-scoped records built from the permission catalog. The first tenant role should be a full-permission role so the creator can manage the tenant immediately and see what complete access means.
+Roles are tenant-scoped records built from the permission catalog. The first tenant role has every permission so the creator can manage the tenant immediately.
 
-Do not hardcode authorization to a fixed role name such as owner, editor, or viewer. A generated full-permission role is allowed, but only as data. Permission checks must still use the role's assigned permissions.
+Do not hardcode authorization to a fixed role name such as owner, editor, or viewer. The initial full-permission role is only data. Permission checks must still use the role's assigned permissions.
 
 Suggested table:
 
@@ -137,7 +137,7 @@ settings.manage
 reports.read
 ```
 
-The role management UI should show the full permission catalog grouped by module. From there, users can keep the generated full-permission role, clone it, reduce permissions, or create narrower custom roles.
+The role management UI shows the full permission catalog grouped by module. Users can keep the initial full-permission role, clone it, reduce permissions, or create narrower custom roles.
 
 Suggested permission modules:
 
@@ -152,11 +152,11 @@ settings
 reports
 ```
 
-Tenant setup must create an initial full-permission role for the creator. The role can have a normal display name such as "Full Access", but the implementation must never check this role by name.
+Tenant setup creates an initial full-permission role for the creator. The role can use a normal display name such as "Full Access", but the implementation must never check this role by name.
 
 ## Tenant Invitations
 
-Tenant invitations should be included because team access is part of multi-tenant permission management.
+Tenant invitations are part of multi-tenant permission management.
 
 Suggested table:
 
@@ -190,7 +190,7 @@ Invitation tokens must not be returned in normal list responses.
 
 ## Backend Guards
 
-NestJS should provide:
+NestJS provides:
 
 - `AuthGuard`: verifies signed-in user.
 - `TenantMembershipGuard`: verifies the user belongs to the tenant.
@@ -214,9 +214,9 @@ Follow the project's NestJS style:
 
 ## Frontend Permission Use
 
-The frontend should receive the user's current tenant role and permissions with tenant context.
+The frontend receives the user's current tenant role and permissions with tenant context.
 
-Tenant context should also include whether the current user is the tenant creator so the UI can show recovery/administration controls only where appropriate. Normal feature access should still be rendered from permissions.
+Tenant context also includes whether the current user is the tenant creator so the UI can show recovery and administration controls only where appropriate. Normal feature access still renders from permissions.
 
 Use permissions to:
 
@@ -231,7 +231,7 @@ Do not rely on frontend permission checks for security.
 
 Users can create tenants from the UI. Tenant creation must also create the creator's first role and membership.
 
-Tenant creation should:
+Tenant creation:
 
 - Create tenant.
 - Create an initial tenant-scoped role with all available permissions.
@@ -239,7 +239,7 @@ Tenant creation should:
 - Create membership for creator with that role.
 - Set the created tenant as current tenant in the frontend.
 
-Role management should:
+Role management:
 
 - List all roles in the tenant.
 - Show each role's assigned permissions.
@@ -249,9 +249,9 @@ Role management should:
 - Prevent removing or blocking the tenant creator's last active membership.
 - Prevent removing every role path that can manage tenant roles unless creator recovery remains available.
 
-## Open-Source Safety
+## Public Repository Safety
 
-- Use generic names: user, tenant, membership, role, permission.
+- Use product-neutral names: user, tenant, membership, role, permission.
 - Do not include private auth code.
 - Do not include private email templates, messages, URLs, or token secrets.
 - Use tests to preserve required behavior.

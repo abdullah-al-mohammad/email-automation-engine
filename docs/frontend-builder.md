@@ -81,7 +81,7 @@ Initial version:
 
 ## API Integration
 
-Use a typed API client generated from or aligned with backend DTOs.
+Use a typed API client derived from or aligned with backend DTOs.
 
 Important calls:
 
