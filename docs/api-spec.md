@@ -1,6 +1,6 @@
 # API Spec
 
-The API should be implemented with NestJS and TypeScript.
+The API uses NestJS and TypeScript.
 
 ## Principles
 
@@ -36,7 +36,7 @@ modules/<domain>/
   constants/
 ```
 
-Controllers should stay thin. Business rules belong in application services and domain helpers. Persistence access goes through repository interfaces injected by tokens.
+Controllers stay thin. Business rules belong in application services and domain helpers. Persistence access goes through repository interfaces injected by tokens.
 
 ## Workflow Endpoints
 
@@ -97,7 +97,7 @@ Example request:
 }
 ```
 
-The API should:
+The API:
 
 - Validate the event.
 - Find matching active triggers.
@@ -106,7 +106,7 @@ The API should:
 
 ## SES Tracking Webhook
 
-Email tracking should be included in the first implementation through AWS SES configuration sets and SES event notifications. The application should not add its own tracking pixel, rewrite email links, or expose app-owned click redirect endpoints for tracking.
+Email tracking uses AWS SES configuration sets and SES event notifications. The application does not add its own tracking pixel, rewrite email links, or expose app-owned click redirect endpoints for tracking.
 
 ```text
 POST /webhooks/ses

@@ -31,7 +31,7 @@ The API owns workflow definition and management:
 - Accept SES tracking webhooks.
 - Enqueue matching events to the workflow event queue.
 
-The API should follow a NestJS Clean Architecture / DDD layout:
+The API follows a NestJS Clean Architecture / DDD layout:
 
 ```text
 apps/api/src/
@@ -61,7 +61,7 @@ apps/api/src/
       constants/
 ```
 
-Each domain module should keep HTTP controllers in `interface`, use cases/services in `application`, aggregates/entities and repository contracts in `domain`, and TypeORM repository implementations in `infrastructure`.
+Each domain module keeps HTTP controllers in `interface`, use cases and services in `application`, aggregates/entities and repository contracts in `domain`, and TypeORM repository implementations in `infrastructure`.
 
 ### Web
 
@@ -117,7 +117,7 @@ External app or API client
 - Dependency injection belongs in `apps/api` and `apps/worker`, where infrastructure services are wired.
 - Queue messages are versioned contracts, not ad hoc objects.
 - SQS is the production queue.
-- Redis is optional at runtime but planned for trigger cache, idempotency assistance, and lightweight coordination.
+- Redis is optional at runtime and reserved for trigger cache, idempotency assistance, and lightweight coordination.
 - Workers are idempotent.
 - State changes use transactions where consistency matters.
 - Active workflows are immutable except explicit deactivation and operational metadata.

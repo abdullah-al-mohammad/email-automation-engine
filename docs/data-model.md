@@ -1,6 +1,6 @@
 # Data Model
 
-The data model should be generic and open-source-safe. Names should describe automation concepts, not any private product.
+The data model uses product-neutral names that describe automation concepts.
 
 ## Naming Convention
 
@@ -19,7 +19,7 @@ Application property: createdAt
 Database column:      created_at
 ```
 
-TypeORM should handle this mapping through naming strategy and explicit column names where needed. Do not use snake_case property names in TypeScript code.
+TypeORM handles this mapping through naming strategy and explicit column names where needed. Do not use snake_case property names in TypeScript code.
 
 ## Core Tables
 
@@ -65,7 +65,7 @@ Suggested fields:
 - `createdAt`
 - `updatedAt`
 
-The tenant creator should still have a normal membership row with the initial full-permission role.
+The tenant creator still has a normal membership row with the initial full-permission role.
 
 ### tenantInvitations
 
@@ -196,7 +196,7 @@ Suggested fields:
 - `createdAt`
 - `updatedAt`
 
-Action-specific configuration should live in `config` unless a field is needed for indexed queries.
+Action-specific configuration lives in `config` unless a field is needed for indexed queries.
 
 ### workflowStepConditions
 
@@ -354,7 +354,7 @@ Use PostgreSQL with TypeORM by default.
 
 Reasons:
 
-- It matches the planned NestJS Clean Architecture / DDD backend style.
+- It matches the NestJS Clean Architecture / DDD backend style.
 - Entity classes can live near domain aggregates.
 - Repository interfaces can be injected with TypeORM implementations.
 - Migration generation and execution are well supported.
@@ -363,7 +363,7 @@ Reasons:
 Rules:
 
 - `synchronize` must be `false`.
-- `migrationsRun` should be explicit per environment, not hidden.
+- `migrationsRun` is explicit per environment, not hidden.
 - Use TypeORM migrations for all schema changes.
 - Use camelCase in TypeScript entities and DTOs.
 - Use snake_case database table and column names.
@@ -372,7 +372,7 @@ Rules:
 
 ## NestJS Module Placement
 
-Entities and repository contracts should be placed inside the owning domain module:
+Entities and repository contracts live inside the owning domain module:
 
 ```text
 apps/api/src/modules/workflow/
@@ -383,7 +383,7 @@ apps/api/src/modules/workflow/
     repositories/typeorm-workflow.repository.ts
 ```
 
-Database setup, migration data source, and TypeORM config should live in:
+Database setup, migration data source, and TypeORM config live in:
 
 ```text
 apps/api/src/infrastructure/database/

@@ -4,7 +4,7 @@
 
 The queue implementation should be AWS SQS because the automation runtime is AWS-first and designed around queue-triggered workers, dead-letter queues, visibility timeouts, partial batch failures, and Terraform-managed AWS infrastructure.
 
-Redis should be included in the architecture as an optional but first-class cache/coordination dependency. The first implementation can run without Redis by using database reads and constraints, but the interfaces should leave room for Redis-backed trigger caching and lightweight locks.
+Redis is an optional but first-class cache and coordination dependency. The first implementation can run without Redis by using database reads and constraints, while still leaving room for Redis-backed trigger caching and lightweight locks.
 
 ## Queue Abstraction
 
@@ -22,9 +22,9 @@ packages/shared/
       message-version.ts
 ```
 
-SQS senders/parsers should live in `apps/api` and `apps/worker` infrastructure code. They should use the message contracts from `packages/shared`.
+SQS senders and parsers live in `apps/api` and `apps/worker` infrastructure code. They use message contracts from `packages/shared`.
 
-The SQS helpers should support:
+SQS helpers support:
 
 - Send one message.
 - Send batch messages.
@@ -60,14 +60,14 @@ Every production queue must have:
 
 ## Redis Usage
 
-Redis should be planned for:
+Redis is used for:
 
 - Active trigger cache by `tenantId` and event.
 - Short-lived idempotency keys for high-volume event ingestion.
 - Lightweight distributed locks for scheduler/workers when needed.
 - Optional rate limiting or throttling state.
 
-Redis should not be the source of truth. The database remains authoritative.
+Redis is not the source of truth. The database remains authoritative.
 
 ## Trigger Cache
 
@@ -118,7 +118,7 @@ TTL must be short and configurable.
 
 ## Testing Support
 
-Testing should support:
+Testing support:
 
 - Unit tests for message builders and parsers.
 - Integration tests for SQS message shape and partial failure behavior.
