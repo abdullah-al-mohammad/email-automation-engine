@@ -1,10 +1,10 @@
 # Development Workflow
 
-This project should be implemented in small, well-tested increments. The workflow below is intended for all contributors, including contributors using assisted coding tools. It keeps work resumable when development stops midway and another contributor continues later.
+Development happens in small, tested increments. The workflow below keeps work easy to review and safe to resume when someone else continues later.
 
 ## Core Rule
 
-Implement small vertical slices with tests, documentation updates, and explicit completion markers. Do not generate broad untested code across many modules at once.
+Implement small vertical slices with tests, documentation updates, and explicit completion markers. Avoid broad untested changes across many modules.
 
 ## Working Style
 
@@ -67,7 +67,7 @@ A task is complete only when:
 - Tests exist for important failure paths.
 - Typecheck passes for touched package/app.
 - Lint/format passes for touched files.
-- Public names are generic and open-source-safe.
+- Public names are product-neutral.
 - Queue/DTO contracts are versioned if applicable.
 - `project-status.md` is updated.
 

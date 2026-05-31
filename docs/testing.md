@@ -8,7 +8,7 @@ Testing is a core requirement for this project. The automation engine coordinate
 - Protect workflow graph invariants.
 - Catch queue message contract drift.
 - Verify worker idempotency and partial failure behavior.
-- Preserve strict automation behavior while using generic open-source-safe names.
+- Preserve strict automation behavior with product-neutral names.
 
 ## Test Types
 
@@ -58,7 +58,7 @@ Required for:
 - `webhook-step`.
 - `call-webhook`.
 
-Workers should be testable as plain functions with mocked queue adapters and real database transactions where useful.
+Workers are testable as plain functions with mocked queue adapters and real database transactions where useful.
 
 ### Contract Tests
 
@@ -97,7 +97,7 @@ Required checks:
 
 ## Behavior Acceptance
 
-The project should strictly implement automation behavior through open-source-safe acceptance tests.
+Acceptance tests define the expected automation behavior.
 
 Acceptance areas:
 

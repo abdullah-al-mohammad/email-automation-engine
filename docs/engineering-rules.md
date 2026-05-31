@@ -1,20 +1,22 @@
 # Engineering Rules
 
-This project should preserve strict automation behavior and engineering discipline while using a clean TypeScript, NestJS, React, and AWS worker architecture. It must not depend on any private project or include private project files.
+This project uses TypeScript, NestJS, React, and AWS workers with strict workflow behavior and clear module boundaries. Public code must not depend on private repositories or include private project files.
 
 ## Global Rules
 
 - Use TypeScript strict mode everywhere.
-- Use generic open-source-safe naming.
+- Use product-neutral naming.
 - Do not include private company names, domains, account IDs, ARNs, buckets, or secret names.
 - Do not log personally identifiable information.
+- Write documentation, comments, names, and error messages as maintained project artifacts. Keep wording direct, specific, and professional.
+- Avoid boilerplate narration, filler comments, and vague implementation notes.
 - Validate environment variables at startup.
 - Keep shared workflow constants, DTO schemas, and queue message contracts in `packages/shared`.
 - Keep `packages/shared` pure: no NestJS, database, AWS SDK, Redis, side effects, or dependency injection.
 - Keep queue message contracts versioned.
 - Prefer explicit domain services over controller-heavy logic.
 - Tests are mandatory for every workflow behavior, queue contract, and cross-app integration.
-- Reference automation behavior must be encoded as generic acceptance tests.
+- Automation behavior must be captured in acceptance tests.
 
 ## Backend Rules
 
@@ -80,7 +82,7 @@ This project should preserve strict automation behavior and engineering discipli
 - No hardcoded AWS account IDs, regions, backend state buckets, or private names.
 - Provide examples, not production values.
 
-## Planned Scaffolding Helpers
+## Scaffolding Helpers
 
 Create project-specific scaffolding helpers after the initial scaffold:
 

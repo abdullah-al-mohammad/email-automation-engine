@@ -37,7 +37,7 @@ Reasons:
 - Widely used in TypeScript monorepos.
 - Less runtime risk than choosing a newer JavaScript runtime as the production execution environment.
 
-`packages/shared` is private and internal. It is used only to share contracts, schemas, and constants inside the monorepo and is not planned for npm publishing.
+`packages/shared` is private and internal. It only shares contracts, schemas, and constants inside the monorepo and is not published to npm.
 
 ## Monorepo Orchestration
 
@@ -77,4 +77,4 @@ pnpm typecheck
 pnpm format:check
 ```
 
-This gives the monorepo caching benefits without making the project dependent on Turborepo-specific magic.
+This keeps Turborepo useful without making it part of the application architecture.
