@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 0: Planning.
+Phase 1: Scaffold completed.
 
 ## Completed
 
@@ -40,10 +40,24 @@ Phase 0: Planning.
 - Confirmed Terraform will not create PostgreSQL/Redis by default; it will accept externally managed connection values.
 - Confirmed Node.js 24 runtime, pnpm package manager, and bounded Turborepo task orchestration.
 - Completed final documentation consistency pass before scaffolding.
+- Cleaned public documentation tone so it reads like maintained project documentation, not draft planning notes.
+- Scaffolded pnpm workspace with Node.js 24 configuration.
+- Added Turborepo task orchestration for build, test, lint, format check, integration test, and typecheck.
+- Added root TypeScript, ESLint, Prettier, ignore, and package manager configuration.
+- Created `apps/api`, `apps/web`, `apps/worker`, `packages/shared`, and `infra/terraform`.
+- Added a NestJS API skeleton with infrastructure, config, database, pipe, and workflow module boundaries.
+- Added Joi environment validation and PostgreSQL TypeORM config with snake_case naming and schema sync disabled.
+- Added a shared Zod validation pipe for API DTO validation.
+- Added `packages/shared` as a private internal workspace package with pure shared constants, schemas, and versioned queue envelope contract.
+- Added a minimal worker package with typed health scaffold.
+- Added a minimal Vite React web package scaffold.
+- Added Terraform foundation files with product-neutral variables and provider constraints.
+- Added initial unit/contract tests for shared queue envelopes, API health, worker health, and web scaffold.
+- Generated `pnpm-lock.yaml`.
 
 ## In Progress
 
-- Ready for monorepo scaffold.
+- Ready for the next implementation slice.
 
 ## Blockers
 
@@ -51,11 +65,18 @@ Phase 0: Planning.
 
 ## Last Test Commands
 
-- Not applicable yet. No implementation code exists.
+- `pnpm build`
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm test`
+- `pnpm format:check`
+- Open-source safety scan over scaffold files for private identifiers, cloud account identifiers, secrets, and unsafe infrastructure examples.
+
+`terraform fmt -check -recursive infra/terraform` was attempted, but the Terraform CLI is not installed in this environment.
 
 ## Known Failing Tests
 
-- None. No implementation code exists.
+- None.
 
 ## Files Touched In Current Planning Task
 
@@ -78,7 +99,25 @@ Phase 0: Planning.
 - `docs/engineering-rules.md`
 - `docs/roadmap.md`
 - `docs/project-status.md`
+- `.gitignore`
+- `.node-version`
+- `.npmrc`
+- `.nvmrc`
+- `.prettierignore`
+- `.prettierrc.json`
+- `eslint.config.mjs`
+- `package.json`
+- `pnpm-lock.yaml`
+- `pnpm-workspace.yaml`
+- `tsconfig.base.json`
+- `tsconfig.json`
+- `turbo.json`
+- `apps/api`
+- `apps/web`
+- `apps/worker`
+- `packages/shared`
+- `infra/terraform`
 
 ## Next Exact Task
 
-Scaffold the monorepo structure with pnpm, Turborepo, Node.js 24, `apps/api`, `apps/web`, `apps/worker`, `packages/shared`, and `infra/terraform`.
+Add the first API domain slice for tenant creation and management: define shared DTO schemas, NestJS module boundaries, TypeORM entities/migration, repository interfaces, service/controller tests, and permission-neutral validation rules.
