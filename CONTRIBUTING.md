@@ -1,6 +1,6 @@
 # Contributing
 
-Email Automation Engine is currently in the planning phase. Contributions should preserve the project goals: generic email automation behavior, open-source-safe naming, strong tests, and clean TypeScript architecture.
+Email Automation Engine is currently in the planning phase. Contributions should preserve the project goals: product-neutral naming, strong tests, and clean TypeScript architecture.
 
 ## Before Contributing
 

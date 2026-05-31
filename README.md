@@ -1,12 +1,12 @@
 # Email Automation Engine
 
-Email Automation Engine is a planned open-source platform for building, managing, and running event-driven email automations.
+Email Automation Engine is an open-source platform for building, managing, and running event-driven email automations.
 
-It is designed for teams that need a generic email automation layer: receive events, match triggers, move contacts through automation steps, run delayed actions, branch with conditions, call webhooks, and send workflow emails through AWS SES.
+It receives events, matches workflow triggers, moves contacts through automation steps, runs delayed actions, branches on conditions, calls webhooks, and sends workflow emails through AWS SES.
 
 ## Status
 
-This project is currently in the planning phase. The repository contains architecture, API, worker, infrastructure, testing, and contribution workflow documents. Implementation should begin only after the planning docs are reviewed and approved.
+This project is currently in the planning phase. The repository contains architecture, API, worker, infrastructure, testing, and contribution workflow documents.
 
 See [Project Status](docs/project-status.md) for the current phase and next task.
 
@@ -16,7 +16,7 @@ See [Project Status](docs/project-status.md) for the current phase and next task
 - Tenant creation and management.
 - User authentication and tenant permissions.
 - React workflow builder.
-- Generic event ingestion.
+- Event ingestion.
 - Trigger matching.
 - Workflow activation validation.
 - Queue-driven workflow execution.
@@ -29,9 +29,9 @@ See [Project Status](docs/project-status.md) for the current phase and next task
 - PostgreSQL persistence with TypeORM.
 - Optional Redis cache and coordination layer.
 - AWS SQS/Lambda deployment with Terraform.
-- Strict test coverage for API, worker, queue contract, frontend, and infrastructure behavior.
+- Required test coverage for API, worker, queue contract, frontend, and infrastructure behavior.
 
-## Planned Architecture
+## Repository Layout
 
 ```text
 email-automation-engine/
@@ -46,7 +46,7 @@ email-automation-engine/
   docs/
 ```
 
-## Technology Direction
+## Technology
 
 - **Language:** TypeScript.
 - **Runtime:** Node.js 24.
@@ -89,12 +89,12 @@ email-automation-engine/
 
 ## Development Principles
 
-- Keep public code and documentation generic and open-source-safe.
+- Keep public code and documentation product-neutral.
 - Do not include private product names, domains, account IDs, ARNs, buckets, secrets, or customer data.
 - Implement behavior in small, tested vertical slices.
 - Keep domain logic independent from queue, cache, and cloud-provider details.
 - Treat tests as required implementation artifacts, not follow-up work.
-- Maintain [Project Status](docs/project-status.md) so contributors and assisted coding sessions can resume safely.
+- Maintain [Project Status](docs/project-status.md) so work can resume cleanly after handoff.
 
 ## License
 
