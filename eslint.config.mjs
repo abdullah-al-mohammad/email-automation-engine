@@ -8,8 +8,9 @@ export default tseslint.config(
     ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**', '**/.turbo/**'],
   },
   js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
   {
+    files: ['**/*.ts', '**/*.tsx'],
+    extends: [...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
         projectService: true,
