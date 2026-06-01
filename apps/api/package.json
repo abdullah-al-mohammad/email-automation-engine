@@ -1,0 +1,37 @@
+{
+  "name": "@email-automation-engine/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "nest start --watch",
+    "lint": "eslint src --ignore-pattern \"**/*.spec.ts\"",
+    "format:check": "prettier --check package.json tsconfig.json nest-cli.json vitest.config.ts src",
+    "start": "node dist/main.js",
+    "test": "vitest run",
+    "test:integration": "vitest run --passWithNoTests",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@email-automation-engine/shared": "workspace:*",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/typeorm": "^11.0.0",
+    "joi": "^18.0.2",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^0.3.28",
+    "typeorm-naming-strategies": "^4.1.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/testing": "^11.1.9",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  }
+}
