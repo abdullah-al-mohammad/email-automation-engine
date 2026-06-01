@@ -25,5 +25,12 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
     },
   },
+  {
+    files: ['**/*.spec.ts', '**/*.spec.tsx'],
+    extends: [tseslint.configs.disableTypeChecked],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
+    },
+  },
   eslintConfigPrettier,
 );
