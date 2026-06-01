@@ -1,0 +1,29 @@
+{
+  "name": "@email-automation-engine/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "lint": "eslint src --ignore-pattern \"**/*.spec.ts\" --ignore-pattern \"**/*.spec.tsx\"",
+    "format:check": "prettier --check package.json tsconfig.json vite.config.ts vitest.config.ts index.html src",
+    "test": "vitest run",
+    "test:integration": "vitest run --passWithNoTests",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@email-automation-engine/shared": "workspace:*",
+    "@vitejs/plugin-react": "^5.1.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "vite": "^7.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^27.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  }
+}
