@@ -1,1 +1,0 @@
-export const WORKFLOW_REPOSITORY = Symbol('WORKFLOW_REPOSITORY');
