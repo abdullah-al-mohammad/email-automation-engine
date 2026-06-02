@@ -5,6 +5,7 @@ describe('Config Validation', () => {
   it('should validate successfully in development mode when required fields are provided', () => {
     const result = validationSchema.validate({
       NODE_ENV: 'development',
+      DATABASE_URL: 'postgres://localhost:5432/dev',
       JWT_SECRET: 'dev-secret',
       JWT_ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
     });
