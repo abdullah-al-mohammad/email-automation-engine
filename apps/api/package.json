@@ -10,15 +10,22 @@
     "start": "node dist/main.js",
     "test": "vitest run",
     "test:integration": "vitest run --passWithNoTests",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "pnpm typeorm migration:generate -d src/infrastructure/database/data-source.ts",
+    "migration:run": "pnpm typeorm migration:run -d src/infrastructure/database/data-source.ts",
+    "migration:revert": "pnpm typeorm migration:revert -d src/infrastructure/database/data-source.ts"
   },
   "dependencies": {
     "@email-automation-engine/shared": "workspace:*",
     "@nestjs/common": "^11.1.9",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.1.9",
     "@nestjs/typeorm": "^11.0.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.4.5",
     "joi": "^18.0.2",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
@@ -30,7 +37,9 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
     "@nestjs/testing": "^11.1.9",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
   }

@@ -54,6 +54,13 @@ Phase 1: Scaffold completed.
 - Added Terraform foundation files with product-neutral variables and provider constraints.
 - Added initial unit/contract tests for shared queue envelopes, API health, worker health, and web scaffold.
 - Generated `pnpm-lock.yaml`.
+- Implemented the first API domain slice for tenant creation and management:
+  - Created TypeORM-backed repository implementations for User, Tenant, Role, and TenantMembership.
+  - Implemented AuthController and TenantController endpoints with shared Zod schema parsing.
+  - Created AuthGuard, TenantMembershipGuard, and PermissionsGuard with @RequirePermissions and @CurrentTenant/CurrentUser decorators.
+  - Bundled all components into a clean IamModule registered in the root AppModule.
+  - Added unit tests for AuthService, TenantService, AuthController, TenantController, AuthGuard, TenantMembershipGuard, and PermissionsGuard.
+  - Resolved strict compiler checks and ESLint issues for type safety.
 
 ## In Progress
 
@@ -120,4 +127,4 @@ Phase 1: Scaffold completed.
 
 ## Next Exact Task
 
-Add the first API domain slice for tenant creation and management: define shared DTO schemas, NestJS module boundaries, TypeORM entities/migration, repository interfaces, service/controller tests, and permission-neutral validation rules.
+Add the core workflow management slice: define Workflow, Trigger, and Step domain aggregates/entities, TypeORM schemas, repository interfaces, service/controller tests, and workflow CRUD/reorder/activation validation controller endpoints.
