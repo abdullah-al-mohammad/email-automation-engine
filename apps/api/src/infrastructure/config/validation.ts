@@ -7,4 +7,13 @@ export const validationSchema = Joi.object({
   JWT_SECRET: Joi.string().required(),
   JWT_ENCRYPTION_KEY: Joi.string().hex().length(64).required(),
   BCRYPT_SALT_ROUNDS: Joi.number().integer().min(4).max(31).default(10),
+  QUEUE_TYPE: Joi.string().valid('sqs', 'in-memory').default('in-memory'),
+  CACHE_TYPE: Joi.string().valid('redis', 'in-memory').default('in-memory'),
+  REDIS_URL: Joi.when('CACHE_TYPE', {
+    is: 'redis',
+    then: Joi.string().uri().required(),
+    otherwise: Joi.string().uri().optional(),
+  }),
+  AWS_REGION: Joi.string().optional().default('us-east-1'),
+  AWS_SQS_ENDPOINT_URL: Joi.string().uri().optional(),
 });
