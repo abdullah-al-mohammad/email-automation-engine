@@ -5,3 +5,4 @@ export * from './schemas/health';
 export * from './schemas/auth';
 export * from './schemas/tenant';
 export * from './schemas/role';
+export * from './schemas/workflow';

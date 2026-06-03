@@ -1,7 +1,48 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './interface/health.controller';
+import { WorkflowController } from './interface/workflow.controller';
+import { WorkflowService } from './application/services/workflow.service';
+import { Workflow } from './domain/aggregates/workflow.aggregate';
+import { WorkflowTrigger } from './domain/aggregates/workflow-trigger.aggregate';
+import { WorkflowStep } from './domain/aggregates/workflow-step.aggregate';
+import { WorkflowExitCondition } from './domain/aggregates/workflow-exit-condition.aggregate';
+import {
+  WORKFLOW_REPOSITORY,
+  WORKFLOW_TRIGGER_REPOSITORY,
+  WORKFLOW_STEP_REPOSITORY,
+  WORKFLOW_EXIT_CONDITION_REPOSITORY,
+} from './constants/tokens';
+import { TypeOrmWorkflowRepository } from './infrastructure/repositories/typeorm-workflow.repository';
+import { TypeOrmWorkflowTriggerRepository } from './infrastructure/repositories/typeorm-workflow-trigger.repository';
+import { TypeOrmWorkflowStepRepository } from './infrastructure/repositories/typeorm-workflow-step.repository';
+import { TypeOrmWorkflowExitConditionRepository } from './infrastructure/repositories/typeorm-workflow-exit-condition.repository';
+import { IamModule } from '../iam/iam.module';
 
 @Module({
-  controllers: [HealthController],
+  imports: [
+    TypeOrmModule.forFeature([Workflow, WorkflowTrigger, WorkflowStep, WorkflowExitCondition]),
+    IamModule, // Import IamModule for the AuthGuard and EncryptionService
+  ],
+  controllers: [HealthController, WorkflowController],
+  providers: [
+    WorkflowService,
+    {
+      provide: WORKFLOW_REPOSITORY,
+      useClass: TypeOrmWorkflowRepository,
+    },
+    {
+      provide: WORKFLOW_TRIGGER_REPOSITORY,
+      useClass: TypeOrmWorkflowTriggerRepository,
+    },
+    {
+      provide: WORKFLOW_STEP_REPOSITORY,
+      useClass: TypeOrmWorkflowStepRepository,
+    },
+    {
+      provide: WORKFLOW_EXIT_CONDITION_REPOSITORY,
+      useClass: TypeOrmWorkflowExitConditionRepository,
+    },
+  ],
 })
 export class WorkflowModule {}
