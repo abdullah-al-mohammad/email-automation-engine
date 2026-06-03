@@ -2,7 +2,9 @@
 
 ## Current Phase
 
-Phase 1: Scaffold completed.
+Phase 2: Core Workflow Management completed.
+
+Phase 3: Runtime Core in progress.
 
 ## Completed
 
@@ -61,10 +63,26 @@ Phase 1: Scaffold completed.
   - Bundled all components into a clean IamModule registered in the root AppModule.
   - Added unit tests for AuthService, TenantService, AuthController, TenantController, AuthGuard, TenantMembershipGuard, and PermissionsGuard.
   - Resolved strict compiler checks and ESLint issues for type safety.
+- Implemented the core workflow management slice:
+  - Created Workflow, WorkflowTrigger, WorkflowStep, and WorkflowExitCondition domain aggregates with TypeORM entities.
+  - Created repository interfaces and TypeORM implementations for all workflow domain objects.
+  - Created database migration for workflows, workflow_triggers, workflow_steps, and workflow_exit_conditions tables with foreign keys and cascade rules.
+  - Implemented WorkflowService with full CRUD for workflows, triggers, steps, and exit conditions.
+  - Implemented step reorder with duplicate ID protection and transaction support.
+  - Implemented activation validation: at least one trigger, at least one step, delay requires amount and unit, delay cannot be final step, conditional_split requires true/false routing, email steps require template/subject, tag steps require tagId, webhook steps require URL.
+  - Implemented deactivation with idempotent behavior.
+  - Implemented findStep for individual step retrieval.
+  - Implemented exit condition management with GET, PUT (replace all), POST (add), PATCH (update), and DELETE endpoints.
+  - Created WorkflowController with all endpoints using correct HTTP methods (PATCH for updates, POST for creation, PUT for exit condition replacement).
+  - Added Zod validation schemas in shared package with z.enum() for trigger events and step actions.
+  - Exported SUPPORTED_STEP_ACTIONS and SUPPORTED_TRIGGER_EVENTS constants.
+  - Registered all providers in WorkflowModule with Symbol-based DI tokens.
+  - Added comprehensive unit tests for WorkflowService and WorkflowController.
 
 ## In Progress
 
-- Ready for the next implementation slice.
+- Implementing AWS SQS queue producer/consumer logic for events.
+- Creating the execution engine for traversing workflow steps.
 
 ## Blockers
 
@@ -127,4 +145,4 @@ Phase 1: Scaffold completed.
 
 ## Next Exact Task
 
-Add the core workflow management slice: define Workflow, Trigger, and Step domain aggregates/entities, TypeORM schemas, repository interfaces, service/controller tests, and workflow CRUD/reorder/activation validation controller endpoints.
+Implement the Event Ingestion and core execution loop for traversing active workflow steps using SQS.

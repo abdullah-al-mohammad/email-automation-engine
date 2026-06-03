@@ -6,7 +6,7 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Status
 
-This project is currently in the planning phase. The repository contains architecture, API, worker, infrastructure, testing, and contribution workflow documents.
+This project is currently in the active development phase. The repository contains architecture, API, worker, infrastructure, testing, and contribution workflow documents, and the core domain slices are actively being implemented.
 
 See [Project Status](docs/project-status.md) for the current phase and next task.
 
