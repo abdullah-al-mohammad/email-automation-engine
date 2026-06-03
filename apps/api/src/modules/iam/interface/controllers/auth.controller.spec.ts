@@ -10,7 +10,7 @@ describe('AuthController', () => {
       signup: vi.fn(),
       signin: vi.fn(),
     };
-    controller = new AuthController(authService as unknown as typeof controller['authService']);
+    controller = new AuthController(authService as unknown as (typeof controller)['authService']);
   });
 
   it('should be defined', () => {

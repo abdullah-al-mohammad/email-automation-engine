@@ -47,10 +47,10 @@ describe('AuthService', () => {
     };
 
     service = new AuthService(
-      userRepo as unknown as typeof service['userRepo'],
-      encryptionService as unknown as typeof service['encryptionService'],
-      jwtService as unknown as typeof service['jwt'],
-      configService as unknown as typeof service['config'],
+      userRepo as unknown as (typeof service)['userRepo'],
+      encryptionService as unknown as (typeof service)['encryptionService'],
+      jwtService as unknown as (typeof service)['jwt'],
+      configService as unknown as (typeof service)['config'],
     );
   });
 

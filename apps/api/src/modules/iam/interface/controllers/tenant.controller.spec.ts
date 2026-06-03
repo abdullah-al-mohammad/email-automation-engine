@@ -11,7 +11,9 @@ describe('TenantController', () => {
       findByUser: vi.fn(),
       findById: vi.fn(),
     };
-    controller = new TenantController(tenantService as unknown as typeof controller['tenantService']);
+    controller = new TenantController(
+      tenantService as unknown as (typeof controller)['tenantService'],
+    );
   });
 
   it('should be defined', () => {

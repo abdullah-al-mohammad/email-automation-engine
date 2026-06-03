@@ -13,7 +13,7 @@ describe('PermissionsGuard', () => {
     roleRepo = {
       findPermissionsByRole: vi.fn(),
     };
-    guard = new PermissionsGuard(reflector, roleRepo as unknown as typeof guard['roleRepo']);
+    guard = new PermissionsGuard(reflector, roleRepo as unknown as (typeof guard)['roleRepo']);
   });
 
   const createMockContext = (options: {

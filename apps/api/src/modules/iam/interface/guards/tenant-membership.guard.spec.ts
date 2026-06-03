@@ -20,8 +20,8 @@ describe('TenantMembershipGuard', () => {
       findByUserAndTenant: vi.fn(),
     };
     guard = new TenantMembershipGuard(
-      tenantRepo as unknown as typeof guard['tenantRepo'],
-      membershipRepo as unknown as typeof guard['membershipRepo']
+      tenantRepo as unknown as (typeof guard)['tenantRepo'],
+      membershipRepo as unknown as (typeof guard)['membershipRepo'],
     );
   });
 

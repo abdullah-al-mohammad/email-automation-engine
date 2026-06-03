@@ -15,8 +15,8 @@ describe('AuthGuard', () => {
       decrypt: vi.fn(),
     };
     guard = new AuthGuard(
-      jwtService as unknown as typeof guard['jwtService'],
-      encryptionService as unknown as typeof guard['encryptionService']
+      jwtService as unknown as (typeof guard)['jwtService'],
+      encryptionService as unknown as (typeof guard)['encryptionService'],
     );
   });
 

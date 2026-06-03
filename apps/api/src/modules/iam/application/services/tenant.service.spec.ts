@@ -37,9 +37,9 @@ describe('TenantService', () => {
     };
 
     service = new TenantService(
-      tenantRepo as unknown as typeof service['tenantRepo'],
-      roleRepo as unknown as typeof service['roleRepo'],
-      membershipRepo as unknown as typeof service['membershipRepo'],
+      tenantRepo as unknown as (typeof service)['tenantRepo'],
+      roleRepo as unknown as (typeof service)['roleRepo'],
+      membershipRepo as unknown as (typeof service)['membershipRepo'],
     );
   });
 
