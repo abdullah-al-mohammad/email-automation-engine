@@ -14,7 +14,9 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.1059.0",
     "@email-automation-engine/shared": "workspace:*",
+    "ioredis": "^5.11.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {
