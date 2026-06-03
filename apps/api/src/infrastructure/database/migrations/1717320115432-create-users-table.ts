@@ -1,7 +1,7 @@
 import { Table } from 'typeorm';
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateUsersTable1717320000000 implements MigrationInterface {
+export class CreateUsersTable1717320115432 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Ensure pgcrypto extension is enabled for gen_random_uuid() compatibility in Postgres < 13
     await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');

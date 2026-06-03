@@ -1,11 +1,11 @@
-import { Table, TableForeignKey } from 'typeorm';
+import { Table, TableForeignKey, TableIndex } from 'typeorm';
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTenantsTable1717321000000 implements MigrationInterface {
+export class CreateRolesTable1717320251928 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'tenants',
+        name: 'roles',
         columns: [
           {
             name: 'id',
@@ -15,12 +15,21 @@ export class CreateTenantsTable1717321000000 implements MigrationInterface {
             default: 'gen_random_uuid()',
           },
           {
-            name: 'name',
-            type: 'varchar(100)',
+            name: 'tenant_id',
+            type: 'uuid',
           },
           {
-            name: 'creator_id',
-            type: 'uuid',
+            name: 'name',
+            type: 'varchar(50)',
+          },
+          {
+            name: 'slug',
+            type: 'varchar(50)',
+          },
+          {
+            name: 'description',
+            type: 'varchar(255)',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -37,17 +46,26 @@ export class CreateTenantsTable1717321000000 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'tenants',
+      'roles',
       new TableForeignKey({
-        columnNames: ['creator_id'],
-        referencedTableName: 'users',
+        columnNames: ['tenant_id'],
+        referencedTableName: 'tenants',
         referencedColumnNames: ['id'],
-        onDelete: 'RESTRICT',
+        onDelete: 'CASCADE',
+      }),
+    );
+
+    await queryRunner.createIndex(
+      'roles',
+      new TableIndex({
+        name: 'IDX_roles_tenant_slug',
+        columnNames: ['tenant_id', 'slug'],
+        isUnique: true,
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('tenants');
+    await queryRunner.dropTable('roles');
   }
 }

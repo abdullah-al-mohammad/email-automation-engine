@@ -1,11 +1,11 @@
 import { Table, TableForeignKey, TableIndex } from 'typeorm';
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTenantMembershipsTable1717324000000 implements MigrationInterface {
+export class CreateRolePermissionsTable1717320348103 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'tenant_memberships',
+        name: 'role_permissions',
         columns: [
           {
             name: 'id',
@@ -15,16 +15,12 @@ export class CreateTenantMembershipsTable1717324000000 implements MigrationInter
             default: 'gen_random_uuid()',
           },
           {
-            name: 'tenant_id',
-            type: 'uuid',
-          },
-          {
-            name: 'user_id',
-            type: 'uuid',
-          },
-          {
             name: 'role_id',
             type: 'uuid',
+          },
+          {
+            name: 'permission',
+            type: 'varchar(100)',
           },
           {
             name: 'created_at',
@@ -41,27 +37,7 @@ export class CreateTenantMembershipsTable1717324000000 implements MigrationInter
     );
 
     await queryRunner.createForeignKey(
-      'tenant_memberships',
-      new TableForeignKey({
-        columnNames: ['tenant_id'],
-        referencedTableName: 'tenants',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-      }),
-    );
-
-    await queryRunner.createForeignKey(
-      'tenant_memberships',
-      new TableForeignKey({
-        columnNames: ['user_id'],
-        referencedTableName: 'users',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-      }),
-    );
-
-    await queryRunner.createForeignKey(
-      'tenant_memberships',
+      'role_permissions',
       new TableForeignKey({
         columnNames: ['role_id'],
         referencedTableName: 'roles',
@@ -71,16 +47,16 @@ export class CreateTenantMembershipsTable1717324000000 implements MigrationInter
     );
 
     await queryRunner.createIndex(
-      'tenant_memberships',
+      'role_permissions',
       new TableIndex({
-        name: 'IDX_tenant_memberships_tenant_user',
-        columnNames: ['tenant_id', 'user_id'],
+        name: 'IDX_role_permissions_role_permission',
+        columnNames: ['role_id', 'permission'],
         isUnique: true,
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('tenant_memberships');
+    await queryRunner.dropTable('role_permissions');
   }
 }
