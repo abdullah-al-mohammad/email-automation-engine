@@ -33,6 +33,14 @@ SQS helpers support:
 - Return partial batch failures.
 - Expose queue names/URLs through config.
 
+Runtime environment:
+
+- `QUEUE_TYPE`: `in-memory` for local/test defaults, `sqs` for SQS-backed queues.
+- `CACHE_TYPE`: `in-memory` for local/test defaults, `redis` for Redis-backed cache operations.
+- `REDIS_URL`: required when `CACHE_TYPE=redis`.
+- `AWS_REGION`: AWS region for SQS clients. Defaults to `us-east-1`.
+- `AWS_SQS_ENDPOINT_URL`: optional SQS endpoint override for local emulators.
+
 ## Default Queues
 
 Core queues:
@@ -96,6 +104,7 @@ Fallback:
 
 - If Redis is unavailable, read active triggers from the database.
 - Cache failures must not break event ingestion.
+- Low-level cache adapters should treat Redis read/write failures as cache misses or no-ops. The application service that reads triggers remains responsible for querying the database after a cache miss.
 
 ## Idempotency
 
