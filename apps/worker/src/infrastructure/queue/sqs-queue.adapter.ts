@@ -35,7 +35,12 @@ export class SqsQueueAdapter implements QueueService {
       MessageDeduplicationId: options?.messageDeduplicationId,
     });
 
-    await this.sqsClient.send(command);
+    try {
+      await this.sqsClient.send(command);
+    } catch (error) {
+      console.error(`Failed to send message to SQS queue ${queueUrl}`, error);
+      throw error;
+    }
   }
 
   async sendMessages<T>(
@@ -69,7 +74,8 @@ export class SqsQueueAdapter implements QueueService {
         response.Failed?.forEach((entry) => {
           if (entry.Id) failedIds.push(entry.Id);
         });
-      } catch {
+      } catch (error) {
+        console.error(`Failed to send message batch to SQS queue ${queueUrl}`, error);
         chunk.forEach((entry) => failedIds.push(entry.Id));
       }
     }
