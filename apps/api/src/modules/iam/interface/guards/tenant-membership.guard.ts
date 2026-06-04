@@ -30,9 +30,7 @@ export class TenantMembershipGuard implements CanActivate {
 
     const tenantId = this.extractTenantId(request);
     if (!tenantId) {
-      throw new BadRequestException(
-        'Tenant ID is required in X-Tenant-Id header, route params, query, or body',
-      );
+      throw new BadRequestException('Tenant ID is required in X-Tenant-Id header');
     }
 
     const tenant = await this.tenantRepo.findById(tenantId);
@@ -54,12 +52,6 @@ export class TenantMembershipGuard implements CanActivate {
 
   private extractTenantId(request: AuthenticatedRequest): string | undefined {
     const headerTenantId = request.headers['x-tenant-id'];
-    return (
-      (Array.isArray(headerTenantId) ? headerTenantId[0] : headerTenantId) ||
-      request.params.tenantId ||
-      request.params.id ||
-      request.query.tenantId ||
-      (request.body?.tenantId as string | undefined)
-    );
+    return Array.isArray(headerTenantId) ? headerTenantId[0] : headerTenantId;
   }
 }
