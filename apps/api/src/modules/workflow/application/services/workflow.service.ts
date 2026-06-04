@@ -39,6 +39,7 @@ import { Workflow } from '../../domain/aggregates/workflow.aggregate';
 import { WorkflowTrigger } from '../../domain/aggregates/workflow-trigger.aggregate';
 import { WorkflowStep } from '../../domain/aggregates/workflow-step.aggregate';
 import { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
+import { TriggerCacheService } from '../../../automation-event/application/services/trigger-cache.service';
 
 @Injectable()
 export class WorkflowService {
@@ -416,7 +417,8 @@ export class WorkflowService {
     const events = [...new Set(triggers.map((t) => t.event))];
     for (const event of events) {
       try {
-        await this.cacheService.del(`automation:triggers:tenant:${tenantId}:event:${event}`);
+        const key = TriggerCacheService.getCacheKey(tenantId, event);
+        await this.cacheService.del(key);
       } catch {
         // Ignore cache deletion errors
       }

@@ -17,8 +17,12 @@ export class TriggerCacheService {
     private readonly triggerRepository: WorkflowTriggerRepository,
   ) {}
 
-  private getKey(tenantId: string, event: string): string {
+  public static getCacheKey(tenantId: string, event: string): string {
     return `automation:triggers:tenant:${tenantId}:event:${event}`;
+  }
+
+  private getKey(tenantId: string, event: string): string {
+    return TriggerCacheService.getCacheKey(tenantId, event);
   }
 
   async getMatchingTriggers(tenantId: string, event: string): Promise<WorkflowTrigger[]> {
