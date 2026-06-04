@@ -20,6 +20,7 @@
     "ioredis": "^5.11.0",
     "pg": "^8.21.0",
     "typeorm": "^0.3.30",
+    "uuid": "^14.0.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {
