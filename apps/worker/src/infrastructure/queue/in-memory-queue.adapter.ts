@@ -27,6 +27,7 @@ export class InMemoryQueueAdapter implements QueueService {
   sendMessages<T>(
     queueUrl: string,
     messages: T[],
+    options?: SendMessageOptions,
   ): Promise<{ successfulIds: string[]; failedIds: string[] }> {
     if (!this.queues.has(queueUrl)) {
       this.queues.set(queueUrl, []);
@@ -37,6 +38,7 @@ export class InMemoryQueueAdapter implements QueueService {
     messages.forEach((message) => {
       this.queues.get(queueUrl)!.push({
         message,
+        options,
         timestamp: Date.now(),
       });
       successfulIds.push(randomUUID());

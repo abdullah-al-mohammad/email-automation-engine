@@ -11,5 +11,6 @@ export interface IQueueService {
   sendMessages<T>(
     queueName: string,
     messages: T[],
+    options?: SendMessageOptions,
   ): Promise<{ successfulIds: string[]; failedIds: string[] }>;
 }

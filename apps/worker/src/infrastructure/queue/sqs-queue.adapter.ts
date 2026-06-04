@@ -46,6 +46,7 @@ export class SqsQueueAdapter implements QueueService {
   async sendMessages<T>(
     queueUrl: string,
     messages: T[],
+    options?: SendMessageOptions,
   ): Promise<{ successfulIds: string[]; failedIds: string[] }> {
     if (messages.length === 0) {
       return { successfulIds: [], failedIds: [] };
@@ -54,6 +55,8 @@ export class SqsQueueAdapter implements QueueService {
     const entries = messages.map((message) => ({
       Id: randomUUID(),
       MessageBody: JSON.stringify(message),
+      MessageGroupId: options?.messageGroupId,
+      MessageDeduplicationId: options?.messageDeduplicationId,
     }));
     const successfulIds: string[] = [];
     const failedIds: string[] = [];

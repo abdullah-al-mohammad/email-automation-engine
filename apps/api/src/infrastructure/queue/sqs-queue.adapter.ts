@@ -47,6 +47,7 @@ export class SqsQueueAdapter implements IQueueService {
   async sendMessages<T>(
     queueUrl: string,
     messages: T[],
+    options?: SendMessageOptions,
   ): Promise<{ successfulIds: string[]; failedIds: string[] }> {
     if (messages.length === 0) {
       return { successfulIds: [], failedIds: [] };
@@ -55,6 +56,8 @@ export class SqsQueueAdapter implements IQueueService {
     const entries = messages.map((msg) => ({
       Id: randomUUID(),
       MessageBody: JSON.stringify(msg),
+      MessageGroupId: options?.messageGroupId,
+      MessageDeduplicationId: options?.messageDeduplicationId,
     }));
 
     // SQS batch send allows a maximum of 10 messages per request.

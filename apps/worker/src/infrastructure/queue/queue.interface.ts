@@ -10,5 +10,6 @@ export interface QueueService {
   sendMessages<T>(
     queueUrl: string,
     messages: T[],
+    options?: SendMessageOptions,
   ): Promise<{ successfulIds: string[]; failedIds: string[] }>;
 }
