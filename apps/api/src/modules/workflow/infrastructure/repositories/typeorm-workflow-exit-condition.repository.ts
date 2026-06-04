@@ -15,8 +15,15 @@ export class TypeOrmWorkflowExitConditionRepository implements WorkflowExitCondi
     return this.repo.find({ where: { workflowId } });
   }
 
-  async save(condition: WorkflowExitCondition): Promise<WorkflowExitCondition> {
-    return this.repo.save(condition);
+  save(condition: WorkflowExitCondition): Promise<WorkflowExitCondition>;
+  save(conditions: WorkflowExitCondition[]): Promise<WorkflowExitCondition[]>;
+  async save(
+    conditionOrConditions: WorkflowExitCondition | WorkflowExitCondition[],
+  ): Promise<WorkflowExitCondition | WorkflowExitCondition[]> {
+    if (Array.isArray(conditionOrConditions)) {
+      return this.repo.save(conditionOrConditions);
+    }
+    return this.repo.save(conditionOrConditions);
   }
 
   async delete(id: string): Promise<void> {

@@ -389,8 +389,7 @@ export class WorkflowService {
     await this.verifyWorkflowInactive(tenantId, workflowId);
     await this.exitConditionRepo.deleteByWorkflowId(workflowId);
 
-    const saved: WorkflowExitCondition[] = [];
-    for (const dto of dtos) {
+    const conditionsToSave = dtos.map((dto) => {
       const condition = new WorkflowExitCondition();
       condition.tenantId = tenantId;
       condition.workflowId = workflowId;
@@ -398,7 +397,12 @@ export class WorkflowService {
       condition.resource = dto.resource;
       condition.operator = dto.operator;
       condition.value = dto.value ?? null;
-      saved.push(await this.exitConditionRepo.save(condition));
+      return condition;
+    });
+
+    let saved: WorkflowExitCondition[] = [];
+    if (conditionsToSave.length > 0) {
+      saved = await this.exitConditionRepo.save(conditionsToSave);
     }
 
     return saved.map((c) => this.mapExitConditionToResponse(c));
