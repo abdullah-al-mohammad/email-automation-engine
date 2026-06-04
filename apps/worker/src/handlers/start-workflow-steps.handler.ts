@@ -6,7 +6,7 @@ import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { CacheService } from '../infrastructure/cache/cache.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-
+import { v7 as uuidv7 } from 'uuid';
 export interface WorkerDeps {
   queueService: QueueService;
   cacheService: CacheService;
@@ -39,12 +39,13 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         continue;
       }
 
+      const newStepId = uuidv7();
       const stepInsert = await dataSource.query<Array<{ id: string }>>(
-        `INSERT INTO contact_workflow_steps (tenant_id, contact_workflow_id, workflow_step_id, status, created_at, updated_at)
-         VALUES ($1, $2, $3, 'pending', now(), now())
+        `INSERT INTO contact_workflow_steps (id, tenant_id, contact_workflow_id, workflow_step_id, status, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, 'pending', now(), now())
          ON CONFLICT (contact_workflow_id, workflow_step_id) WHERE status != 'finished' DO NOTHING
          RETURNING id`,
-        [message.tenantId, message.contactWorkflowId, message.workflowStepId],
+        [newStepId, message.tenantId, message.contactWorkflowId, message.workflowStepId],
       );
 
       let stepId: string;
