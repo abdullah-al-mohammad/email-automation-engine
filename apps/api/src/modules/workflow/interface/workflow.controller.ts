@@ -40,7 +40,7 @@ export class WorkflowController {
   @Post()
   @RequirePermissions('workflows.manage')
   async create(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Body(new ZodValidationPipe(CreateWorkflowSchema)) dto: CreateWorkflowDto,
   ): Promise<WorkflowResponse> {
     return this.workflowService.create(tenantId, dto);
@@ -48,14 +48,14 @@ export class WorkflowController {
 
   @Get()
   @RequirePermissions('workflows.read')
-  async findAll(@CurrentTenant() tenantId: string): Promise<WorkflowResponse[]> {
+  async findAll(@CurrentTenant('id') tenantId: string): Promise<WorkflowResponse[]> {
     return this.workflowService.findByTenantId(tenantId);
   }
 
   @Get(':id')
   @RequirePermissions('workflows.read')
   async findOne(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
   ): Promise<WorkflowResponse> {
     return this.workflowService.findById(tenantId, id);
@@ -64,7 +64,7 @@ export class WorkflowController {
   @Patch(':id')
   @RequirePermissions('workflows.manage')
   async update(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateWorkflowSchema)) dto: UpdateWorkflowDto,
   ): Promise<WorkflowResponse> {
@@ -73,14 +73,14 @@ export class WorkflowController {
 
   @Delete(':id')
   @RequirePermissions('workflows.manage')
-  async remove(@CurrentTenant() tenantId: string, @Param('id') id: string): Promise<void> {
+  async remove(@CurrentTenant('id') tenantId: string, @Param('id') id: string): Promise<void> {
     return this.workflowService.delete(tenantId, id);
   }
 
   @Patch(':id/activate')
   @RequirePermissions('workflows.activate')
   async activate(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
   ): Promise<WorkflowResponse> {
     return this.workflowService.activate(tenantId, id);
@@ -89,7 +89,7 @@ export class WorkflowController {
   @Patch(':id/deactivate')
   @RequirePermissions('workflows.activate')
   async deactivate(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
   ): Promise<WorkflowResponse> {
     return this.workflowService.deactivate(tenantId, id);
@@ -98,7 +98,7 @@ export class WorkflowController {
   @Post(':id/triggers')
   @RequirePermissions('workflows.manage')
   async addTrigger(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CreateWorkflowTriggerSchema)) dto: CreateWorkflowTriggerDto,
   ): Promise<WorkflowTriggerResponse> {
@@ -108,7 +108,7 @@ export class WorkflowController {
   @Patch(':id/triggers/:triggerId')
   @RequirePermissions('workflows.manage')
   async updateTrigger(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('triggerId') triggerId: string,
     @Body(new ZodValidationPipe(UpdateWorkflowTriggerSchema)) dto: UpdateWorkflowTriggerDto,
@@ -119,7 +119,7 @@ export class WorkflowController {
   @Delete(':id/triggers/:triggerId')
   @RequirePermissions('workflows.manage')
   async deleteTrigger(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('triggerId') triggerId: string,
   ): Promise<void> {
@@ -129,7 +129,7 @@ export class WorkflowController {
   @Patch(':id/steps/reorder')
   @RequirePermissions('workflows.manage')
   async reorderSteps(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(ReorderStepsSchema)) dto: ReorderStepsDto,
   ): Promise<void> {
@@ -139,7 +139,7 @@ export class WorkflowController {
   @Post(':id/steps')
   @RequirePermissions('workflows.manage')
   async addStep(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CreateWorkflowStepSchema)) dto: CreateWorkflowStepDto,
   ): Promise<WorkflowStepResponse> {
@@ -149,7 +149,7 @@ export class WorkflowController {
   @Get(':id/steps/:stepId')
   @RequirePermissions('workflows.read')
   async findStep(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('stepId') stepId: string,
   ): Promise<WorkflowStepResponse> {
@@ -159,7 +159,7 @@ export class WorkflowController {
   @Patch(':id/steps/:stepId')
   @RequirePermissions('workflows.manage')
   async updateStep(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('stepId') stepId: string,
     @Body(new ZodValidationPipe(UpdateWorkflowStepSchema)) dto: UpdateWorkflowStepDto,
@@ -170,7 +170,7 @@ export class WorkflowController {
   @Delete(':id/steps/:stepId')
   @RequirePermissions('workflows.manage')
   async deleteStep(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('stepId') stepId: string,
   ): Promise<void> {
@@ -180,7 +180,7 @@ export class WorkflowController {
   @Get(':id/exit-conditions')
   @RequirePermissions('workflows.read')
   async getExitConditions(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
   ): Promise<WorkflowExitConditionResponse[]> {
     return this.workflowService.getExitConditions(tenantId, id);
@@ -189,7 +189,7 @@ export class WorkflowController {
   @Put(':id/exit-conditions')
   @RequirePermissions('workflows.manage')
   async replaceExitConditions(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(z.array(CreateWorkflowExitConditionSchema)))
     dtos: CreateWorkflowExitConditionDto[],
@@ -200,7 +200,7 @@ export class WorkflowController {
   @Post(':id/exit-conditions')
   @RequirePermissions('workflows.manage')
   async addExitCondition(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CreateWorkflowExitConditionSchema))
     dto: CreateWorkflowExitConditionDto,
@@ -211,7 +211,7 @@ export class WorkflowController {
   @Patch(':id/exit-conditions/:conditionId')
   @RequirePermissions('workflows.manage')
   async updateExitCondition(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('conditionId') conditionId: string,
     @Body(new ZodValidationPipe(UpdateWorkflowExitConditionSchema))
@@ -223,7 +223,7 @@ export class WorkflowController {
   @Delete(':id/exit-conditions/:conditionId')
   @RequirePermissions('workflows.manage')
   async deleteExitCondition(
-    @CurrentTenant() tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Param('conditionId') conditionId: string,
   ): Promise<void> {
