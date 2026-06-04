@@ -1,19 +1,27 @@
+import { v7 as uuidv7 } from 'uuid';
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
+  PrimaryColumn,
 } from 'typeorm';
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
 
 @Entity('contacts')
 export class Contact {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id!: string;
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv7();
+    }
+  }
 
   @Column({ name: 'tenant_id', type: 'uuid' })
   tenantId!: string;

@@ -1,15 +1,23 @@
+import { v7 as uuidv7 } from 'uuid';
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  PrimaryColumn,
 } from 'typeorm';
 
 @Entity('workflow_exit_conditions')
 export class WorkflowExitCondition {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id!: string;
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv7();
+    }
+  }
 
   @Column({ name: 'tenant_id', type: 'uuid' })
   tenantId!: string;

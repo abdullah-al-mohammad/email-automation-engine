@@ -1,11 +1,13 @@
+import { v7 as uuidv7 } from 'uuid';
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
+  PrimaryColumn,
 } from 'typeorm';
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
 import { ContactWorkflow } from './contact-workflow.aggregate';
@@ -13,8 +15,14 @@ import { WorkflowStep } from '../../../workflow/domain/aggregates/workflow-step.
 
 @Entity('contact_workflow_steps')
 export class ContactWorkflowStep {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id!: string;
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv7();
+    }
+  }
 
   @Column({ name: 'tenant_id', type: 'uuid' })
   tenantId!: string;

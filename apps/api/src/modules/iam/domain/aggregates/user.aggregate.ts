@@ -1,16 +1,24 @@
+import { v7 as uuidv7 } from 'uuid';
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  PrimaryColumn,
 } from 'typeorm';
 import { type UserStatus, USER_NEW } from '@email-automation-engine/shared';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id!: string;
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv7();
+    }
+  }
 
   @Column({ type: 'varchar', length: 254, unique: true })
   email!: string;
