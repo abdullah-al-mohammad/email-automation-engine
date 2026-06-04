@@ -7,6 +7,10 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import {
+  CACHE_SERVICE,
+  type ICacheService,
+} from '../../../../infrastructure/cache/cache.interface';
+import {
   type CreateWorkflowDto,
   type UpdateWorkflowDto,
   type WorkflowResponse,
@@ -49,6 +53,9 @@ export class WorkflowService {
     private readonly exitConditionRepo: WorkflowExitConditionRepository,
     @Optional()
     private readonly dataSource?: DataSource,
+    @Optional()
+    @Inject(CACHE_SERVICE)
+    private readonly cacheService?: ICacheService,
   ) {}
 
   async create(tenantId: string, dto: CreateWorkflowDto): Promise<WorkflowResponse> {
@@ -97,6 +104,7 @@ export class WorkflowService {
     workflow.isActive = true;
 
     const saved = await this.workflowRepo.save(workflow);
+    await this.invalidateTriggerCache(tenantId, workflowId);
     return this.mapWorkflowToResponse(saved);
   }
 
@@ -110,6 +118,7 @@ export class WorkflowService {
     workflow.isActive = false;
 
     const saved = await this.workflowRepo.save(workflow);
+    await this.invalidateTriggerCache(tenantId, workflowId);
     return this.mapWorkflowToResponse(saved);
   }
 
@@ -398,6 +407,19 @@ export class WorkflowService {
     const workflow = await this.getWorkflowOrThrow(tenantId, workflowId);
     if (workflow.isActive) {
       throw new BadRequestException('Cannot modify structural fields of an active workflow');
+    }
+  }
+
+  private async invalidateTriggerCache(tenantId: string, workflowId: string): Promise<void> {
+    if (!this.cacheService) return;
+    const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
+    const events = [...new Set(triggers.map((t) => t.event))];
+    for (const event of events) {
+      try {
+        await this.cacheService.del(`automation:triggers:tenant:${tenantId}:event:${event}`);
+      } catch {
+        // Ignore cache deletion errors
+      }
     }
   }
 

@@ -16,4 +16,7 @@ export const validationSchema = Joi.object({
   }),
   AWS_REGION: Joi.string().optional().default('us-east-1'),
   AWS_SQS_ENDPOINT_URL: Joi.string().uri().optional(),
+  AUTOMATION_EVENTS_QUEUE_URL: Joi.string().default('automation-events'),
+  WAITING_STEPS_QUEUE_URL: Joi.string().default('waiting-contact-workflow-steps'),
+  FINISHED_STEPS_QUEUE_URL: Joi.string().default('finished-contact-workflow-steps'),
 });

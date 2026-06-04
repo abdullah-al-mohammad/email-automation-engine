@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Workflow } from './workflow.aggregate';
 
 @Entity('workflow_triggers')
 export class WorkflowTrigger {
@@ -16,6 +19,10 @@ export class WorkflowTrigger {
 
   @Column({ name: 'workflow_id', type: 'uuid' })
   workflowId!: string;
+
+  @ManyToOne(() => Workflow)
+  @JoinColumn({ name: 'workflow_id' })
+  workflow?: Workflow;
 
   @Column({ type: 'varchar', length: 100 })
   event!: string;

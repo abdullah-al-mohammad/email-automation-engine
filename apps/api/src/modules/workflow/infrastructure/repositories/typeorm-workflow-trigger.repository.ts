@@ -15,6 +15,16 @@ export class TypeOrmWorkflowTriggerRepository implements WorkflowTriggerReposito
     return this.repo.find({ where: { workflowId } });
   }
 
+  async findActiveByEvent(tenantId: string, event: string): Promise<WorkflowTrigger[]> {
+    return this.repo
+      .createQueryBuilder('trigger')
+      .innerJoinAndSelect('trigger.workflow', 'workflow')
+      .where('trigger.tenant_id = :tenantId', { tenantId })
+      .andWhere('trigger.event = :event', { event })
+      .andWhere('workflow.is_active = true')
+      .getMany();
+  }
+
   async save(trigger: WorkflowTrigger): Promise<WorkflowTrigger> {
     return this.repo.save(trigger);
   }

@@ -1,0 +1,1 @@
+export const TRIGGER_CACHE_SERVICE = Symbol('TRIGGER_CACHE_SERVICE');

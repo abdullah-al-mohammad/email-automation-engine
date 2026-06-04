@@ -6,3 +6,8 @@ export * from './schemas/auth';
 export * from './schemas/tenant';
 export * from './schemas/role';
 export * from './schemas/workflow';
+export * from './schemas/automation-event';
+export * from './queue/message-version';
+export * from './queue/automation-event.message';
+export * from './queue/waiting-step.message';
+export * from './queue/finished-step.message';

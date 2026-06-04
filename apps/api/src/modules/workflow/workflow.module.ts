@@ -44,5 +44,12 @@ import { IamModule } from '../iam/iam.module';
       useClass: TypeOrmWorkflowExitConditionRepository,
     },
   ],
+  exports: [
+    WORKFLOW_REPOSITORY,
+    WORKFLOW_TRIGGER_REPOSITORY,
+    WORKFLOW_STEP_REPOSITORY,
+    WORKFLOW_EXIT_CONDITION_REPOSITORY,
+    WorkflowService,
+  ],
 })
 export class WorkflowModule {}

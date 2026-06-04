@@ -10,6 +10,9 @@ import {
   REDIS_URL,
   AWS_REGION,
   AWS_SQS_ENDPOINT_URL,
+  AUTOMATION_EVENTS_QUEUE_URL,
+  WAITING_STEPS_QUEUE_URL,
+  FINISHED_STEPS_QUEUE_URL,
 } from './config-keys';
 
 export default () => ({
@@ -24,4 +27,9 @@ export default () => ({
   [REDIS_URL]: process.env.REDIS_URL,
   [AWS_REGION]: process.env.AWS_REGION ?? 'us-east-1',
   [AWS_SQS_ENDPOINT_URL]: process.env.AWS_SQS_ENDPOINT_URL,
+  [AUTOMATION_EVENTS_QUEUE_URL]: process.env.AUTOMATION_EVENTS_QUEUE_URL ?? 'automation-events',
+  [WAITING_STEPS_QUEUE_URL]:
+    process.env.WAITING_STEPS_QUEUE_URL ?? 'waiting-contact-workflow-steps',
+  [FINISHED_STEPS_QUEUE_URL]:
+    process.env.FINISHED_STEPS_QUEUE_URL ?? 'finished-contact-workflow-steps',
 });
