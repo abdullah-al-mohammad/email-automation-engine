@@ -79,10 +79,20 @@ Phase 3: Runtime Core in progress.
   - Registered all providers in WorkflowModule with Symbol-based DI tokens.
   - Added comprehensive unit tests for WorkflowService and WorkflowController.
 
+- Implemented the Event Ingestion and core execution loop for traversing active workflow steps using SQS:
+  - Created POST `/automation/events` API endpoint for generic event ingestion.
+  - Implemented trigger matching to find active workflows matching incoming events.
+  - Defined Zod schemas and queue message contracts in `packages/shared`.
+  - Implemented `start-workflows` worker handler.
+  - Implemented `start-workflow-steps` worker handler with delay processing.
+  - Implemented `finish-workflow-steps` worker handler with exit conditions check.
+  - Implemented `watch-workflow-steps` worker handler to manage delayed steps.
+  - Fixed workflow trigger entity relations and added integration tests for trigger matching.
+  - Added worker idempotency and partial batch failure mechanisms.
+
 ## In Progress
 
-- Implementing AWS SQS queue producer/consumer logic for events.
-- Creating the execution engine for traversing workflow steps.
+- Implementing Phase 4: Core Actions (AWS SES email step, etc.).
 
 ## Blockers
 
@@ -145,4 +155,4 @@ Phase 3: Runtime Core in progress.
 
 ## Next Exact Task
 
-Implement the Event Ingestion and core execution loop for traversing active workflow steps using SQS.
+Begin Phase 4: Core Actions, starting with the AWS SES email step integration and webhook dispatch.
