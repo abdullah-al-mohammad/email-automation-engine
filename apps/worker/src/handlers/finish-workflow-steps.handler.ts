@@ -63,8 +63,8 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
             : currentStep.false_step_id;
       } else {
         const nextSteps = await dataSource.query<Array<{ id: string }>>(
-          `SELECT id FROM workflow_steps WHERE workflow_id = $1 AND position > $2 ORDER BY position ASC LIMIT 1`,
-          [message.workflowId, currentStep.position],
+          `SELECT id FROM workflow_steps WHERE workflow_id = $1 AND parent_workflow_step_id = $2 LIMIT 1`,
+          [message.workflowId, currentStep.id],
         );
         if (nextSteps.length > 0 && nextSteps[0]) {
           nextStepId = nextSteps[0].id;
