@@ -163,9 +163,18 @@ importers:
       '@email-automation-engine/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
       ioredis:
         specifier: ^5.11.0
         version: 5.11.0
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
+      typeorm:
+        specifier: ^0.3.30
+        version: 0.3.30(ioredis@5.11.0)(pg@8.21.0)(ts-node@10.9.2(@types/node@24.12.4)(typescript@5.9.3))
       zod:
         specifier: ^4.1.13
         version: 4.4.3

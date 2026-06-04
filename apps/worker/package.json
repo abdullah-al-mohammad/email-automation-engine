@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "tsx watch src/index.ts",
-    "lint": "eslint src --ignore-pattern \"**/*.spec.ts\"",
+    "lint": "eslint src",
     "format:check": "prettier --check package.json tsconfig.json vitest.config.ts src",
     "test": "vitest run",
     "test:integration": "vitest run --passWithNoTests",
@@ -16,7 +16,10 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.1059.0",
     "@email-automation-engine/shared": "workspace:*",
+    "dotenv": "^16.6.1",
     "ioredis": "^5.11.0",
+    "pg": "^8.21.0",
+    "typeorm": "^0.3.30",
     "zod": "^4.1.13"
   },
   "devDependencies": {
