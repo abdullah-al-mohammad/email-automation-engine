@@ -475,7 +475,7 @@ export class WorkflowService {
       }
     }
 
-    const lastStep = steps.sort((a, b) => a.position - b.position)[steps.length - 1];
+    const lastStep = [...steps].sort((a, b) => a.position - b.position)[steps.length - 1];
     if (lastStep?.action === 'delay') {
       throw new BadRequestException('A delay cannot be the final step in a workflow');
     }
