@@ -37,7 +37,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       const cwStepId = cwSteps[0].id;
 
       await dataSource.query(
-        `UPDATE contact_workflow_steps SET status = 'finished', finished_at = now(), error = $1, updated_at = now() WHERE id = $2`,
+        `UPDATE contact_workflow_steps SET status = 'finished', finished_at = now(), error = COALESCE($1, error), updated_at = now() WHERE id = $2`,
         [message.error || null, cwStepId],
       );
 
