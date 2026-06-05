@@ -48,10 +48,9 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           true_step_id: string;
           false_step_id: string;
         }>
-      >(
-        `SELECT id, action, true_step_id, false_step_id FROM workflow_steps WHERE id = $1`,
-        [message.workflowStepId],
-      );
+      >(`SELECT id, action, true_step_id, false_step_id FROM workflow_steps WHERE id = $1`, [
+        message.workflowStepId,
+      ]);
       if (currentSteps.length === 0 || !currentSteps[0]) continue;
       const currentStep = currentSteps[0];
 
