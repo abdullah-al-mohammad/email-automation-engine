@@ -8,6 +8,7 @@ import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { v7 as uuidv7 } from 'uuid';
 import { Logger } from '../infrastructure/logger/logger';
+import { workerConfig } from '../infrastructure';
 
 export interface WorkerDeps {
   queueService: QueueService;
@@ -89,8 +90,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           const contactWorkflowId = insertRes[0].id;
 
           // Enqueue to waiting-contact-workflow-steps
-          const waitingUrl =
-            process.env.WAITING_STEPS_QUEUE_URL || 'waiting-contact-workflow-steps';
+          const waitingUrl = workerConfig.WAITING_STEPS_QUEUE_URL;
           await queueService.sendMessage(waitingUrl, {
             version: 1,
             messageId: randomUUID(),

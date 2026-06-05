@@ -7,3 +7,4 @@ export * from './queue/queue.factory';
 export * from './queue/queue.interface';
 export * from './queue/sqs-queue.adapter';
 export * from './queue/sqs-record.parser';
+export * from './config/config';

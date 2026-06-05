@@ -7,6 +7,7 @@ import type { CacheService } from '../infrastructure/cache/cache.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { Logger } from '../infrastructure/logger/logger';
+import { workerConfig } from '../infrastructure';
 import { v7 as uuidv7 } from 'uuid';
 export interface WorkerDeps {
   queueService: QueueService;
@@ -151,7 +152,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           break;
         }
         case 'send_email': {
-          const queueUrl = process.env.WORKFLOW_EMAILS_QUEUE_URL || 'workflow-emails.fifo';
+          const queueUrl = workerConfig.WORKFLOW_EMAILS_QUEUE_URL;
           await queueService.sendMessage(queueUrl, message, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
@@ -159,7 +160,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           break;
         }
         case 'conditional_split': {
-          const queueUrl = process.env.CONDITIONAL_SPLIT_QUEUE_URL || 'conditional-split.fifo';
+          const queueUrl = workerConfig.CONDITIONAL_SPLIT_QUEUE_URL;
           await queueService.sendMessage(queueUrl, message, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
@@ -167,7 +168,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           break;
         }
         case 'webhook': {
-          const queueUrl = process.env.WEBHOOK_STEPS_QUEUE_URL || 'webhook-steps.fifo';
+          const queueUrl = workerConfig.WEBHOOK_STEPS_QUEUE_URL;
           await queueService.sendMessage(queueUrl, message, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
@@ -177,7 +178,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       }
 
       if (enqueueFinish) {
-        const finishUrl = process.env.FINISHED_STEPS_QUEUE_URL || 'finished-contact-workflow-steps';
+        const finishUrl = workerConfig.FINISHED_STEPS_QUEUE_URL;
         await queueService.sendMessage(finishUrl, {
           version: 1,
           messageId: randomUUID(),
