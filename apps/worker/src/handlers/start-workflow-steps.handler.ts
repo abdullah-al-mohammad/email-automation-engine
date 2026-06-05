@@ -71,7 +71,19 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       }
 
       const steps = await dataSource.query<
-        Array<{ config: { amount?: number; unit?: string; tagId?: string } }>
+        Array<{
+          config: {
+            amount?: number;
+            unit?: string;
+            tagId?: string;
+            templateId?: string;
+            subject?: string;
+            url?: string;
+            method?: string;
+            headers?: Record<string, string>;
+            body?: string;
+          };
+        }>
       >(`SELECT config FROM workflow_steps WHERE id = $1`, [message.workflowStepId]);
       if (steps.length === 0 || !steps[0]) continue;
       const config = steps[0].config || {};
