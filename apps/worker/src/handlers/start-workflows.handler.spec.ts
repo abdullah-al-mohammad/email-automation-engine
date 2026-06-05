@@ -17,6 +17,9 @@ describe('start-workflows.handler', () => {
     };
     dataSource = {
       query: vi.fn(),
+      transaction: vi.fn().mockImplementation(async (cb) => {
+        return cb(dataSource);
+      }),
     } as unknown as Mocked<DataSource>;
   });
 
