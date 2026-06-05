@@ -422,11 +422,15 @@ describe('WorkflowService', () => {
         isActive: false,
       });
       exitConditionRepo.deleteByWorkflowId.mockResolvedValue(undefined);
-      exitConditionRepo.save.mockImplementation((c: WorkflowExitCondition) => {
-        c.id = 'ec-new';
-        c.createdAt = new Date();
-        c.updatedAt = new Date();
-        return Promise.resolve(c);
+      exitConditionRepo.save.mockImplementation((conditions: WorkflowExitCondition[]) => {
+        return Promise.resolve(
+          conditions.map((c) => {
+            c.id = 'ec-new';
+            c.createdAt = new Date();
+            c.updatedAt = new Date();
+            return c;
+          }),
+        );
       });
 
       const result = await service.replaceExitConditions('tenant-1', 'workflow-1', [

@@ -58,9 +58,7 @@ describe('TenantMembershipGuard', () => {
   it('should throw BadRequestException if tenantId is missing', async () => {
     const context = createMockContext({ user: { id: 'user-1' } });
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new BadRequestException(
-        'Tenant ID is required in X-Tenant-Id header, route params, query, or body',
-      ),
+      new BadRequestException('Tenant ID is required in X-Tenant-Id header'),
     );
   });
 
@@ -98,7 +96,7 @@ describe('TenantMembershipGuard', () => {
   it('should allow access if user is tenant creator even without membership record', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
-      params: { tenantId: 'tenant-1' },
+      headers: { 'x-tenant-id': 'tenant-1' },
     });
     const mockTenant = { id: 'tenant-1', creatorId: 'user-1' };
 
@@ -115,7 +113,7 @@ describe('TenantMembershipGuard', () => {
   it('should throw ForbiddenException if user is not a member and not the creator', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
-      query: { tenantId: 'tenant-1' },
+      headers: { 'x-tenant-id': 'tenant-1' },
     });
     const mockTenant = { id: 'tenant-1', creatorId: 'user-2' };
 

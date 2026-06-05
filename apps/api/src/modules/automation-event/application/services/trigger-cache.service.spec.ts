@@ -19,9 +19,21 @@ describe('TriggerCacheService', () => {
   });
 
   it('should return from cache if hit', async () => {
-    cacheService.get.mockResolvedValue([{ id: '1' }]);
+    const cachedAt = new Date().toISOString();
+    cacheService.get.mockResolvedValue([
+      {
+        id: '1',
+        tenantId: 't1',
+        workflowId: 'w1',
+        event: 'e1',
+        createdAt: cachedAt,
+        updatedAt: cachedAt,
+      },
+    ]);
     const result = await service.getMatchingTriggers('t1', 'e1');
-    expect(result).toEqual([{ id: '1' }]);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('1');
+    expect(result[0].createdAt.toISOString()).toBe(cachedAt);
     expect(triggerRepository.findActiveByEvent).not.toHaveBeenCalled();
   });
 
