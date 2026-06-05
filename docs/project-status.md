@@ -82,17 +82,17 @@ Phase 3: Runtime Core in progress.
 - Implemented the Event Ingestion and core execution loop for traversing active workflow steps using SQS:
   - Created POST `/automation/events` API endpoint for generic event ingestion.
   - Implemented trigger matching to find active workflows matching incoming events.
-  - Defined Zod schemas and queue message contracts in `packages/shared`.
+  - Defined Zod schemas and queue message contracts in `packages/shared` for core workflow execution (automation events, waiting steps, finished steps).
   - Implemented `start-workflows` worker handler.
   - Implemented `start-workflow-steps` worker handler with delay processing.
   - Implemented `finish-workflow-steps` worker handler with exit conditions check.
   - Implemented `watch-workflow-steps` worker handler to manage delayed steps.
   - Fixed workflow trigger entity relations and added integration tests for trigger matching.
-  - Added worker idempotency and partial batch failure mechanisms.
+  - Added worker idempotency and partial batch failure mechanisms for the `start-workflows` handler (needs to be expanded to other handlers).
 
 ## In Progress
 
-- Implementing Phase 4: Core Actions (AWS SES email step, etc.).
+- Implementing Phase 4: Core Actions (AWS SES email step, etc.). Currently, step handlers route to queues but dedicated action handlers (`send-workflow-email`, `conditional-split`, `call-webhook`) still need to be implemented.
 
 ## Blockers
 

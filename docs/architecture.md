@@ -38,27 +38,25 @@ apps/api/src/
   infrastructure/
     config/
     database/
-    decorators/
     pipes/
   modules/
+    iam/
+      application/
+      domain/
+      infrastructure/
+      interface/
+        controllers/
+        decorators/
+        guards/
     workflow/
       application/
+      constants/
       domain/
       infrastructure/
       interface/
-      constants/
-    workflow-trigger/
+    automation-event/
       application/
-      domain/
-      infrastructure/
       interface/
-      constants/
-    workflow-step/
-      application/
-      domain/
-      infrastructure/
-      interface/
-      constants/
 ```
 
 Each domain module keeps HTTP controllers in `interface`, use cases and services in `application`, aggregates/entities and repository contracts in `domain`, and TypeORM repository implementations in `infrastructure`.
