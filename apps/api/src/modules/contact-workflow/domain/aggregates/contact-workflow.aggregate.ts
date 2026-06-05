@@ -25,49 +25,49 @@ export class ContactWorkflow {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
-  @Column({ name: 'workflow_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   workflowId!: string;
 
-  @Column({ name: 'workflow_trigger_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   workflowTriggerId?: string;
 
-  @Column({ name: 'contact_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   contactId!: string;
 
   @Column({ type: 'varchar', length: 50, default: 'pending' })
   status!: string;
 
-  @Column({ name: 'trigger_event', type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   triggerEvent!: string;
 
-  @Column({ name: 'started_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   startedAt?: Date;
 
-  @Column({ name: 'finished_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   finishedAt?: Date;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
   @ManyToOne(() => Tenant)
-  @JoinColumn({ name: 'tenant_id' })
+  @JoinColumn()
   tenant?: Tenant;
 
   @ManyToOne(() => Workflow)
-  @JoinColumn({ name: 'workflow_id' })
+  @JoinColumn()
   workflow?: Workflow;
 
   @ManyToOne(() => WorkflowTrigger)
-  @JoinColumn({ name: 'workflow_trigger_id' })
+  @JoinColumn()
   workflowTrigger?: WorkflowTrigger;
 
   @ManyToOne(() => Contact)
-  @JoinColumn({ name: 'contact_id' })
+  @JoinColumn()
   contact?: Contact;
 }

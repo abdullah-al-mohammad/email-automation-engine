@@ -19,13 +19,13 @@ export class WorkflowStep {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
-  @Column({ name: 'workflow_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   workflowId!: string;
 
-  @Column({ name: 'parent_workflow_step_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   parentWorkflowStepId?: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -37,15 +37,15 @@ export class WorkflowStep {
   @Column({ type: 'int', default: 0 })
   position!: number;
 
-  @Column({ name: 'true_step_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   trueStepId?: string;
 
-  @Column({ name: 'false_step_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   falseStepId?: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 }

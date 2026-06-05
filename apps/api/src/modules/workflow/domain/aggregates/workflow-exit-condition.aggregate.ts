@@ -19,10 +19,10 @@ export class WorkflowExitCondition {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
-  @Column({ name: 'workflow_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   workflowId!: string;
 
   @Column({ type: 'varchar', length: 50 })
@@ -37,9 +37,9 @@ export class WorkflowExitCondition {
   @Column({ type: 'text', nullable: true })
   value?: string | null;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 }

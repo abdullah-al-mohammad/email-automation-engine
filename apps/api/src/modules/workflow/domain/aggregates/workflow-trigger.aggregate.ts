@@ -22,14 +22,14 @@ export class WorkflowTrigger {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
-  @Column({ name: 'workflow_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   workflowId!: string;
 
   @ManyToOne(() => Workflow)
-  @JoinColumn({ name: 'workflow_id' })
+  @JoinColumn()
   workflow?: Workflow;
 
   @Column({ type: 'varchar', length: 100 })
@@ -38,9 +38,9 @@ export class WorkflowTrigger {
   @Column({ type: 'jsonb', nullable: true })
   filters?: Record<string, unknown>;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 }

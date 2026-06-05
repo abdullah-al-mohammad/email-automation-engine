@@ -4,20 +4,20 @@ import { Tag } from './tag.aggregate';
 
 @Entity('contact_tags')
 export class ContactTag {
-  @PrimaryColumn({ name: 'contact_id', type: 'uuid' })
+  @PrimaryColumn({ type: 'uuid' })
   contactId!: string;
 
-  @PrimaryColumn({ name: 'tag_id', type: 'uuid' })
+  @PrimaryColumn({ type: 'uuid' })
   tagId!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
   @ManyToOne(() => Contact)
-  @JoinColumn({ name: 'contact_id' })
+  @JoinColumn()
   contact?: Contact;
 
   @ManyToOne(() => Tag)
-  @JoinColumn({ name: 'tag_id' })
+  @JoinColumn()
   tag?: Tag;
 }

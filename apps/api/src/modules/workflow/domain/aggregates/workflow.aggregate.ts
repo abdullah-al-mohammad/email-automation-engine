@@ -19,7 +19,7 @@ export class Workflow {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
   @Column({ type: 'varchar', length: 255 })
@@ -28,18 +28,18 @@ export class Workflow {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ name: 'is_active', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false })
   isActive!: boolean;
 
   @Column({ type: 'varchar', length: 50, default: 'draft' })
   status!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
-  @Column({ name: 'activated_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   activatedAt?: Date;
 }

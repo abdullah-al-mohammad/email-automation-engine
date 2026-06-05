@@ -24,45 +24,45 @@ export class ContactWorkflowStep {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
-  @Column({ name: 'contact_workflow_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   contactWorkflowId!: string;
 
-  @Column({ name: 'workflow_step_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   workflowStepId!: string;
 
   @Column({ type: 'varchar', length: 50, default: 'pending' })
   status!: string;
 
-  @Column({ name: 'started_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   startedAt?: Date;
 
-  @Column({ name: 'scheduled_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   scheduledAt?: Date;
 
-  @Column({ name: 'finished_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   finishedAt?: Date;
 
   @Column({ type: 'text', nullable: true })
   error?: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
   @ManyToOne(() => Tenant)
-  @JoinColumn({ name: 'tenant_id' })
+  @JoinColumn()
   tenant?: Tenant;
 
   @ManyToOne(() => ContactWorkflow)
-  @JoinColumn({ name: 'contact_workflow_id' })
+  @JoinColumn()
   contactWorkflow?: ContactWorkflow;
 
   @ManyToOne(() => WorkflowStep)
-  @JoinColumn({ name: 'workflow_step_id' })
+  @JoinColumn()
   workflowStep?: WorkflowStep;
 }

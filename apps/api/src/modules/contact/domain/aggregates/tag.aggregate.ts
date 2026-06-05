@@ -22,19 +22,19 @@ export class Tag {
     }
   }
 
-  @Column({ name: 'tenant_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   tenantId!: string;
 
   @Column({ type: 'varchar', length: 255 })
   name!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
   @ManyToOne(() => Tenant)
-  @JoinColumn({ name: 'tenant_id' })
+  @JoinColumn()
   tenant?: Tenant;
 }
