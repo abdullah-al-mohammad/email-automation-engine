@@ -5,6 +5,7 @@ import {
   SendMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { randomUUID } from 'crypto';
+import { Logger } from '../logger/logger';
 import { type QueueService, type SendMessageOptions } from './queue.interface';
 
 export interface SqsQueueConfig {
@@ -78,7 +79,7 @@ export class SqsQueueAdapter implements QueueService {
           if (entry.Id) failedIds.push(entry.Id);
         });
       } catch (error) {
-        console.error(`Failed to send message batch to SQS queue ${queueUrl}`, error);
+        Logger.error(`Failed to send message batch to SQS queue ${queueUrl}`, error);
         chunk.forEach((entry) => failedIds.push(entry.Id));
       }
     }

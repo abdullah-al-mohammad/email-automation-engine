@@ -7,6 +7,7 @@ import type { CacheService } from '../infrastructure/cache/cache.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { v7 as uuidv7 } from 'uuid';
+import { Logger } from '../infrastructure/logger/logger';
 
 export interface WorkerDeps {
   queueService: QueueService;
@@ -48,9 +49,9 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
             return; // Skip deleted/missing contact
           }
 
-          // Get first step
+          // Get first step (root step has no parent)
           const steps = await manager.query<Array<{ id: string; action: string }>>(
-            `SELECT id, action FROM workflow_steps WHERE workflow_id = $1 ORDER BY position ASC LIMIT 1`,
+            `SELECT id, action FROM workflow_steps WHERE workflow_id = $1 AND parent_workflow_step_id IS NULL LIMIT 1`,
             [workflowId],
           );
           if (steps.length === 0 || !steps[0]) {
@@ -104,7 +105,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         });
       }
     } catch (err) {
-      console.error(`Failed to process start-workflow for record ${record.messageId}`, err);
+      Logger.error(`Failed to process start-workflow for record ${record.messageId}`, err);
       batchItemFailures.push({ itemIdentifier: record.messageId });
     }
   }

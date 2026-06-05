@@ -6,6 +6,7 @@ import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { CacheService } from '../infrastructure/cache/cache.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { Logger } from '../infrastructure/logger/logger';
 import { v7 as uuidv7 } from 'uuid';
 export interface WorkerDeps {
   queueService: QueueService;
@@ -178,7 +179,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         });
       }
     } catch (err) {
-      console.error(`Failed to process start-workflow-steps for record ${record.messageId}`, err);
+      Logger.error(`Failed to process start-workflow-steps for record ${record.messageId}`, err);
       batchItemFailures.push({ itemIdentifier: record.messageId });
     }
   }

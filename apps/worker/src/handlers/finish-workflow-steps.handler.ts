@@ -6,6 +6,7 @@ import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { CacheService } from '../infrastructure/cache/cache.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { Logger } from '../infrastructure/logger/logger';
 
 export interface WorkerDeps {
   queueService: QueueService;
@@ -43,13 +44,12 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       const currentSteps = await dataSource.query<
         Array<{
           id: string;
-          position: number;
           action: string;
           true_step_id: string;
           false_step_id: string;
         }>
       >(
-        `SELECT id, position, action, true_step_id, false_step_id FROM workflow_steps WHERE id = $1`,
+        `SELECT id, action, true_step_id, false_step_id FROM workflow_steps WHERE id = $1`,
         [message.workflowStepId],
       );
       if (currentSteps.length === 0 || !currentSteps[0]) continue;
@@ -137,7 +137,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         }
       }
     } catch (err) {
-      console.error(`Failed to process finish-workflow-steps for record ${record.messageId}`, err);
+      Logger.error(`Failed to process finish-workflow-steps for record ${record.messageId}`, err);
       batchItemFailures.push({ itemIdentifier: record.messageId });
     }
   }

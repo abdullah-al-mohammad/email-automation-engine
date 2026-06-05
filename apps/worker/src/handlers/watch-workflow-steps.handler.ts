@@ -1,6 +1,7 @@
 import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { Logger } from '../infrastructure/logger/logger';
 
 export interface SchedulerDeps {
   queueService: QueueService;
@@ -60,7 +61,7 @@ export async function handler(event: unknown, deps: SchedulerDeps): Promise<void
         action: step.action,
       });
     } catch (err) {
-      console.error(`Failed to process scheduled step ${step.contact_workflow_step_id}`, err);
+      Logger.error(`Failed to process scheduled step ${step.contact_workflow_step_id}`, err);
     }
   }
 }
