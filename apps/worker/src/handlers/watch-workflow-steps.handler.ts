@@ -57,6 +57,7 @@ export async function handler(event: unknown, deps: SchedulerDeps): Promise<void
         createdAt: new Date().toISOString(),
         contactId: step.contact_id,
         contactWorkflowId: step.contact_workflow_id,
+        contactWorkflowStepId: step.contact_workflow_step_id,
         workflowId: step.workflow_id,
         workflowStepId: step.workflow_step_id,
         action: step.action,

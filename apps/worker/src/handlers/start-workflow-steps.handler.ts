@@ -153,7 +153,8 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         }
         case 'send_email': {
           const queueUrl = workerConfig.WORKFLOW_EMAILS_QUEUE_URL;
-          await queueService.sendMessage(queueUrl, message, {
+          const outMsg = { ...message, contactWorkflowStepId: stepId };
+          await queueService.sendMessage(queueUrl, outMsg, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
           });
@@ -161,7 +162,8 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         }
         case 'conditional_split': {
           const queueUrl = workerConfig.CONDITIONAL_SPLIT_QUEUE_URL;
-          await queueService.sendMessage(queueUrl, message, {
+          const outMsg = { ...message, contactWorkflowStepId: stepId };
+          await queueService.sendMessage(queueUrl, outMsg, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
           });
@@ -169,7 +171,8 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         }
         case 'webhook': {
           const queueUrl = workerConfig.WEBHOOK_STEPS_QUEUE_URL;
-          await queueService.sendMessage(queueUrl, message, {
+          const outMsg = { ...message, contactWorkflowStepId: stepId };
+          await queueService.sendMessage(queueUrl, outMsg, {
             messageGroupId: message.contactWorkflowId,
             messageDeduplicationId: message.messageId,
           });
@@ -188,6 +191,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           contactWorkflowId: message.contactWorkflowId,
           workflowId: message.workflowId,
           workflowStepId: message.workflowStepId,
+          contactWorkflowStepId: stepId,
           action: message.action,
         });
       }

@@ -56,11 +56,13 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       const currentStep = currentSteps[0];
 
       let nextStepId: string | null = null;
-      if (currentStep.action === 'conditional_split' && message.conditionalSplitResult) {
-        nextStepId =
-          message.conditionalSplitResult === 'true'
-            ? currentStep.true_step_id
-            : currentStep.false_step_id;
+      if (
+        currentStep.action === 'conditional_split' &&
+        message.conditionalSplitResult !== undefined
+      ) {
+        nextStepId = message.conditionalSplitResult
+          ? currentStep.true_step_id
+          : currentStep.false_step_id;
       } else {
         const nextSteps = await dataSource.query<Array<{ id: string }>>(
           `SELECT id FROM workflow_steps WHERE workflow_id = $1 AND parent_workflow_step_id = $2 LIMIT 1`,

@@ -50,6 +50,7 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'delay',
     };
 
@@ -88,6 +89,7 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'delay',
     };
 
@@ -134,8 +136,9 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'conditional_split',
-      conditionalSplitResult: 'true', // It routed to true
+      conditionalSplitResult: true,
     };
 
     const result = await handler(createEvent([msg]), {
@@ -174,6 +177,7 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'delay',
     };
 
@@ -208,6 +212,7 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'delay',
     };
 
@@ -244,6 +249,7 @@ describe('finish-workflow-steps.handler', () => {
       contactWorkflowId: '66666666-6666-4666-a666-666666666666',
       workflowId: '33333333-3333-4333-a333-333333333333',
       workflowStepId: '44444444-4444-4444-a444-444444444444',
+      contactWorkflowStepId: '55555555-5555-4555-a555-555555555555',
       action: 'delay',
     };
 
