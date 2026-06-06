@@ -153,3 +153,35 @@ export const WorkflowExitConditionResponseSchema = z.object({
 });
 
 export type WorkflowExitConditionResponse = z.infer<typeof WorkflowExitConditionResponseSchema>;
+
+export const EmailTemplateSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  subject: z.string().min(1).max(998),
+  html: z.string().min(1),
+  text: z.string().optional().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  deletedAt: z.string().optional().nullable(),
+});
+
+export type EmailTemplateResponse = z.infer<typeof EmailTemplateSchema>;
+
+export const CreateEmailTemplateSchema = z.object({
+  name: z.string().min(1).max(255),
+  subject: z.string().min(1).max(998),
+  html: z.string().min(1),
+  text: z.string().optional().nullable(),
+});
+
+export type CreateEmailTemplateDto = z.infer<typeof CreateEmailTemplateSchema>;
+
+export const UpdateEmailTemplateSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  subject: z.string().min(1).max(998).optional(),
+  html: z.string().min(1).optional(),
+  text: z.string().optional().nullable(),
+});
+
+export type UpdateEmailTemplateDto = z.infer<typeof UpdateEmailTemplateSchema>;

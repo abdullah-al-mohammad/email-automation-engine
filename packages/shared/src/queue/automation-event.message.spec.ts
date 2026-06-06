@@ -20,9 +20,8 @@ describe('automationEventMessageSchema', () => {
   });
 
   it('rejects missing required fields', () => {
-    const invalid = { ...validMessage };
-    // @ts-ignore
-    delete invalid.event;
+    const { event, ...invalid } = validMessage;
+    expect(event).toBeDefined();
     expect(automationEventMessageSchema.safeParse(invalid).success).toBe(false);
   });
 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { finishedStepMessageSchema, isFinishedStepMessage } from './finished-step.message';
+import { emailStepMessageSchema, isEmailStepMessage } from './email-step.message';
 
-describe('finishedStepMessageSchema', () => {
+describe('emailStepMessageSchema', () => {
   const validMessage = {
     version: 1,
     messageId: '123e4567-e89b-12d3-a456-426614174000',
@@ -12,31 +12,30 @@ describe('finishedStepMessageSchema', () => {
     workflowId: '123e4567-e89b-12d3-a456-426614174004',
     workflowStepId: '123e4567-e89b-12d3-a456-426614174005',
     contactWorkflowStepId: '123e4567-e89b-12d3-a456-426614174006',
-    action: 'conditional_split',
-    conditionalSplitResult: true,
+    action: 'send_email',
   };
 
   it('accepts valid messages', () => {
-    expect(finishedStepMessageSchema.safeParse(validMessage).success).toBe(true);
+    expect(emailStepMessageSchema.safeParse(validMessage).success).toBe(true);
   });
 
   it('rejects missing required fields', () => {
     const { action, ...invalid } = validMessage;
     expect(action).toBeDefined();
-    expect(finishedStepMessageSchema.safeParse(invalid).success).toBe(false);
+    expect(emailStepMessageSchema.safeParse(invalid).success).toBe(false);
   });
 
   it('rejects wrong version', () => {
     const invalid = { ...validMessage, version: 2 };
-    expect(finishedStepMessageSchema.safeParse(invalid).success).toBe(false);
+    expect(emailStepMessageSchema.safeParse(invalid).success).toBe(false);
   });
 
   it('type guard returns true for valid', () => {
-    expect(isFinishedStepMessage(validMessage)).toBe(true);
+    expect(isEmailStepMessage(validMessage)).toBe(true);
   });
 
   it('type guard returns false for invalid', () => {
     const invalid = { ...validMessage, version: 2 };
-    expect(isFinishedStepMessage(invalid)).toBe(false);
+    expect(isEmailStepMessage(invalid)).toBe(false);
   });
 });

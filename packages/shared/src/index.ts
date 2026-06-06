@@ -11,3 +11,8 @@ export * from './queue/message-version';
 export * from './queue/automation-event.message';
 export * from './queue/waiting-step.message';
 export * from './queue/finished-step.message';
+export * from './queue/email-step.message';
+export * from './queue/conditional-split.message';
+export * from './queue/email-tracking-event.message';
+export * from './queue/webhook-step.message';
+export * from './queue/webhook-delivery.message';

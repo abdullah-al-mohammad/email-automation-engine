@@ -5,6 +5,7 @@ import { SUPPORTED_STEP_ACTIONS } from '../schemas/workflow';
 export const waitingStepMessageSchema = queueMessageEnvelopeSchema.extend({
   contactId: z.string().uuid(),
   contactWorkflowId: z.string().uuid(),
+  contactWorkflowStepId: z.string().uuid().optional(),
   workflowId: z.string().uuid(),
   workflowStepId: z.string().uuid(),
   action: z.enum(SUPPORTED_STEP_ACTIONS),

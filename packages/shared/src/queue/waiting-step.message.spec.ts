@@ -19,9 +19,8 @@ describe('waitingStepMessageSchema', () => {
   });
 
   it('rejects missing required fields', () => {
-    const invalid = { ...validMessage };
-    // @ts-ignore
-    delete invalid.action;
+    const { action, ...invalid } = validMessage;
+    expect(action).toBeDefined();
     expect(waitingStepMessageSchema.safeParse(invalid).success).toBe(false);
   });
 
