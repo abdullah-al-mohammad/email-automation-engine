@@ -5,6 +5,7 @@ import { IamModule } from './modules/iam/iam.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { ContactWorkflowModule } from './modules/contact-workflow/contact-workflow.module';
 import { AutomationEventModule } from './modules/automation-event/automation-event.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AutomationEventModule } from './modules/automation-event/automation-eve
     ContactModule,
     ContactWorkflowModule,
     AutomationEventModule,
+    EmailModule,
   ],
 })
 export class AppModule {}
