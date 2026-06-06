@@ -76,6 +76,18 @@ GET    /workflows/:workflowId/exit-conditions
 PUT    /workflows/:workflowId/exit-conditions
 ```
 
+## Email Template Endpoints
+
+```text
+POST   /tenants/:tenantId/email-templates
+GET    /tenants/:tenantId/email-templates
+GET    /tenants/:tenantId/email-templates/:id
+PATCH  /tenants/:tenantId/email-templates/:id
+DELETE /tenants/:tenantId/email-templates/:id
+```
+
+Requires `workflows.read` permission for read endpoints, `workflows.manage` for create/update/delete. Email templates are soft-deleted and tenant-scoped.
+
 ## Event Ingestion Endpoint
 
 ```text
@@ -120,6 +132,7 @@ SES webhook behavior:
 - Update message status and first/last activity timestamps.
 - Emit generic automation events such as `email.opened` and `email.link_clicked` when workflows can be triggered by those events.
 - Keep webhook processing idempotent because SES notifications can be retried.
+- Map SES PascalCase event types (`Delivery`, `Bounce`, `Open`) to lowercase schema values (`delivered`, `bounced`, `opened`).
 
 ## Supported Trigger Events
 
@@ -160,8 +173,9 @@ Before activation:
 - Trigger filters must be valid for their event.
 - Delay steps must have amount and unit.
 - Delay cannot be the final step.
-- Email steps must have required email/template config.
+- Email steps must have either a templateId or a subject/html pair.
+- Email steps with a templateId validate the template exists and is not soft-deleted.
 - Tag steps must have a tag reference.
-- Webhook steps must have a valid URL.
-- Conditional split steps must have valid true/false routing.
+- Webhook steps must have a valid non-private URL (SSRF protection: blocks localhost, private IP ranges, and malformed URLs).
+- Conditional split steps must have valid true/false routing or conditions in the database.
 - All referenced resources must belong to the same tenant.

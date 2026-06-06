@@ -342,11 +342,45 @@ Initial events:
 
 Store the raw SES event payload in `metadata` only after removing or avoiding sensitive fields that should not be retained.
 
-## Optional Tables
+### workflowStepConditions
 
-- `webhookDeliveries`
-- `automationEvents`
-- `contactFields`
+Conditions evaluated by the conditional split step handler to determine which branch to follow.
+
+Suggested fields:
+
+- `id`
+- `tenantId`
+- `workflowId`
+- `workflowStepId`
+- `type` — `tag_has`, `tag_missing`, `contact_field`
+- `resource` — tag ID or field name
+- `operator` — `equals`, `not_equals`, `contains`
+- `value`
+- `logicalOperator` — `AND`, `OR`
+- `createdAt`
+- `updatedAt`
+
+### webhookDeliveries
+
+One outbound webhook delivery attempt and its response.
+
+Suggested fields:
+
+- `id`
+- `tenantId`
+- `contactWorkflowStepId`
+- `url`
+- `method`
+- `requestHeaders`
+- `requestBody`
+- `responseStatus`
+- `responseBody`
+- `status` — `pending`, `completed`, `failed`
+- `completedAt`
+- `createdAt`
+- `updatedAt`
+
+## Optional Tables
 
 ## ORM Recommendation
 

@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-Phase 2: Core Workflow Management completed.
+Phase 3: Runtime Core completed.
 
-Phase 3: Runtime Core in progress.
+Phase 4: Core Actions completed.
 
 ## Completed
 
@@ -90,9 +90,21 @@ Phase 3: Runtime Core in progress.
   - Fixed workflow trigger entity relations and added integration tests for trigger matching.
   - Added worker idempotency and partial batch failure mechanisms for the `start-workflows` handler (needs to be expanded to other handlers).
 
-## In Progress
-
-- Implementing Phase 4: Core Actions (AWS SES email step, etc.). Currently, step handlers route to queues but dedicated action handlers (`send-workflow-email`, `conditional-split`, `call-webhook`) still need to be implemented.
+- Implemented Phase 4 Core Actions (AWS SES email step, webhook, conditional split, email tracking):
+  - Created email module with full CRUD for email templates (TypeORM entities, repository, service, controller).
+  - Added 5 database migrations for `email_templates`, `email_messages`, `email_events`, `workflow_step_conditions`, and `webhook_deliveries` tables.
+  - Developed 5 queue message contracts and Zod schemas (`email-step`, `conditional-split`, `email-tracking-event`, `webhook-step`, `webhook-delivery`).
+  - Implemented `send-workflow-email` handler with SES integration, idempotent message tracking, and template resolution.
+  - Implemented `conditional-split` handler evaluating tag, tag_missing, and contact_field conditions.
+  - Implemented `process-email-tracking-event` handler storing email events and updating message aggregate timestamps.
+  - Implemented `webhook-step` handler creating delivery records and enqueuing webhook delivery work.
+  - Implemented `call-webhook` handler performing HTTP requests with timeout, recording response status and body.
+  - Built SES webhook controller at `POST /webhooks/ses` with event type mapping (PascalCase → lowercase).
+  - Added activation validation for email, webhook, and conditional split steps (SSRF protection, template existence checks, condition validation).
+  - Updated worker config with all queue URLs and `FROM_EMAIL_ADDRESS`.
+  - Switched all UUID generation to time-ordered v7 for better index performance.
+  - Added spec files and contract tests for all 5 new handlers and 5 new message schemas.
+  - All 5 gates pass: format, lint, typecheck, test, build.
 
 ## Blockers
 
@@ -155,4 +167,4 @@ Phase 3: Runtime Core in progress.
 
 ## Next Exact Task
 
-Begin Phase 4: Core Actions, starting with the AWS SES email step integration and webhook dispatch.
+Begin Phase 5: Frontend Builder, starting with the workflow list and builder UI.
