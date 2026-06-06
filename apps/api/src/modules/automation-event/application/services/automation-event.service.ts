@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
+import { v7 as uuidv7 } from 'uuid';
 import { AutomationEventDto, AutomationEventMessage } from '@email-automation-engine/shared';
 import { QUEUE_SERVICE, IQueueService } from '../../../../infrastructure/queue/queue.interface';
 import { TriggerCacheService } from './trigger-cache.service';
@@ -32,7 +32,7 @@ export class AutomationEventService {
 
     const message: AutomationEventMessage = {
       version: 1,
-      messageId: randomUUID(),
+      messageId: uuidv7(),
       tenantId: dto.tenantId,
       createdAt: new Date().toISOString(),
       contactId: dto.contactId,

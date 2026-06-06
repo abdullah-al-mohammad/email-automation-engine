@@ -16,6 +16,7 @@ describe('WorkflowService', () => {
     delete: Mock;
     deleteByWorkflowId: Mock;
   };
+  let dataSource: { query: Mock; transaction: Mock };
 
   beforeEach(() => {
     workflowRepo = {
@@ -40,12 +41,19 @@ describe('WorkflowService', () => {
       delete: vi.fn(),
       deleteByWorkflowId: vi.fn(),
     };
+    dataSource = {
+      query: vi.fn().mockResolvedValue([{ count: '0' }]),
+      transaction: vi.fn().mockImplementation(async (cb) => {
+        return cb({ save: vi.fn() });
+      }),
+    };
 
     service = new WorkflowService(
       workflowRepo as unknown as (typeof service)['workflowRepo'],
       triggerRepo as unknown as (typeof service)['triggerRepo'],
       stepRepo as unknown as (typeof service)['stepRepo'],
       exitConditionRepo as unknown as (typeof service)['exitConditionRepo'],
+      dataSource as unknown as (typeof service)['dataSource'],
     );
   });
 
@@ -248,7 +256,7 @@ describe('WorkflowService', () => {
       ]);
 
       await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'requires email template or subject configuration',
+        'requires either templateId OR (subject and html)',
       );
     });
 

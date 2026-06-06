@@ -6,6 +6,7 @@ import {
   Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { lookup } from 'node:dns/promises';
 import {
   CACHE_SERVICE,
   type ICacheService,
@@ -52,8 +53,7 @@ export class WorkflowService {
     private readonly stepRepo: WorkflowStepRepository,
     @Inject(WORKFLOW_EXIT_CONDITION_REPOSITORY)
     private readonly exitConditionRepo: WorkflowExitConditionRepository,
-    @Optional()
-    private readonly dataSource?: DataSource,
+    private readonly dataSource: DataSource,
     @Optional()
     @Inject(CACHE_SERVICE)
     private readonly cacheService?: ICacheService,
@@ -460,24 +460,96 @@ export class WorkflowService {
 
       if (step.action === 'conditional_split') {
         if (!step.trueStepId || !step.falseStepId) {
-          throw new BadRequestException(
-            `Conditional split step ${step.id} must have both true and false step routing`,
+          // Check if conditions exist in workflow_step_conditions
+          const conditionsCount = await this.dataSource.query<{ count: string }[]>(
+            `SELECT COUNT(*) FROM workflow_step_conditions WHERE workflow_step_id = $1`,
+            [step.id],
           );
+          if (!conditionsCount || parseInt(conditionsCount[0]?.count ?? '0') === 0) {
+            throw new BadRequestException(
+              `Conditional split step ${step.id} must have both true and false step routing or valid conditions in the database`,
+            );
+          }
         }
       }
 
-      if (step.action === 'send_email' && !step.config?.templateId && !step.config?.subject) {
-        throw new BadRequestException(
-          `Email step ${step.id} requires email template or subject configuration`,
-        );
+      if (step.action === 'send_email') {
+        if (!step.config?.templateId && (!step.config?.subject || !step.config?.html)) {
+          throw new BadRequestException(
+            `Email step ${step.id} requires either templateId OR (subject and html)`,
+          );
+        }
+        if (step.config?.templateId) {
+          const templateExists = await this.dataSource.query<{ id: string }[]>(
+            `SELECT id FROM email_templates WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL LIMIT 1`,
+            [step.config.templateId, step.tenantId],
+          );
+          if (!templateExists || templateExists.length === 0) {
+            throw new BadRequestException(
+              `Email step ${step.id} references a deleted or non-existent template`,
+            );
+          }
+        }
       }
 
       if ((step.action === 'attach_tag' || step.action === 'detach_tag') && !step.config?.tagId) {
         throw new BadRequestException(`Tag step ${step.id} requires a tag reference`);
       }
 
-      if (step.action === 'webhook' && !step.config?.url) {
-        throw new BadRequestException(`Webhook step ${step.id} requires a valid URL`);
+      if (step.action === 'webhook') {
+        const urlStr = typeof step.config?.url === 'string' ? step.config.url : '';
+        if (!urlStr) {
+          throw new BadRequestException(`Webhook step ${step.id} requires a valid URL`);
+        }
+        try {
+          const parsedUrl = new URL(urlStr);
+          const hostname = parsedUrl.hostname;
+          if (
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1' ||
+            hostname === '0.0.0.0' ||
+            hostname === '[::1]' ||
+            hostname === '[::]' ||
+            hostname.startsWith('10.') ||
+            hostname.startsWith('192.168.') ||
+            hostname.startsWith('169.254.') ||
+            /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+            /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(hostname) || // CGN 100.64.0.0/10
+            /^\[[fF][cC0-9a-fA-F]{3}:/.test(hostname) || // fc00::/7
+            /^\[[fF][eE][89aAbB][0-9a-fA-F]:/.test(hostname) // fe80::/10
+          ) {
+            throw new BadRequestException(`Webhook step ${step.id} has an invalid or private URL`);
+          }
+
+          // DNS resolution check
+          try {
+            const dnsResult = await lookup(hostname);
+            const address = dnsResult.address;
+            if (
+              address === '127.0.0.1' ||
+              address === '0.0.0.0' ||
+              address === '::1' ||
+              address === '::' ||
+              address.startsWith('10.') ||
+              address.startsWith('192.168.') ||
+              address.startsWith('169.254.') ||
+              /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(address) ||
+              /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(address) ||
+              /^[fF][cC0-9a-fA-F]{3}:/.test(address) ||
+              /^[fF][eE][89aAbB][0-9a-fA-F]:/.test(address)
+            ) {
+              throw new BadRequestException(`Webhook step ${step.id} resolves to a private IP`);
+            }
+          } catch (dnsError) {
+            // If DNS resolution fails, block it or let it pass?
+            // Usually, if it doesn't resolve, we block it to prevent targeting internal unresolved names.
+            if (dnsError instanceof BadRequestException) throw dnsError;
+            throw new BadRequestException(`Webhook step ${step.id} domain could not be resolved`);
+          }
+        } catch (e) {
+          if (e instanceof BadRequestException) throw e;
+          throw new BadRequestException(`Webhook step ${step.id} has a malformed URL`);
+        }
       }
     }
 
