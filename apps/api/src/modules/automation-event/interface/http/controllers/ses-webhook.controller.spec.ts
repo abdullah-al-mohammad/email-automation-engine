@@ -15,9 +15,15 @@ describe('SesWebhookController', () => {
   let configService: Mocked<ConfigService>;
 
   beforeEach(() => {
-    queueService = { sendMessage: vi.fn(), receiveMessages: vi.fn(), deleteMessage: vi.fn() } as unknown as Mocked<IQueueService>;
+    queueService = {
+      sendMessage: vi.fn(),
+      receiveMessages: vi.fn(),
+      deleteMessage: vi.fn(),
+    } as unknown as Mocked<IQueueService>;
     emailMessageService = { findBySesMessageId: vi.fn() } as unknown as Mocked<EmailMessageService>;
-    configService = { get: vi.fn().mockReturnValue('email-tracking-events') } as unknown as Mocked<ConfigService>;
+    configService = {
+      get: vi.fn().mockReturnValue('email-tracking-events'),
+    } as unknown as Mocked<ConfigService>;
 
     controller = new SesWebhookController(queueService, emailMessageService, configService);
     vi.spyOn(Logger, 'warn').mockImplementation(() => {});

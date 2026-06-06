@@ -26,14 +26,17 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
       );
       const stepConfig = stepQuery[0]?.config || {};
 
-      const targetUrl = typeof stepConfig.url === 'string' ? stepConfig.url : 'https://example.com/webhook';
+      const targetUrl =
+        typeof stepConfig.url === 'string' ? stepConfig.url : 'https://example.com/webhook';
       const method = typeof stepConfig.method === 'string' ? stepConfig.method : 'POST';
-      const headers = typeof stepConfig.headers === 'object' && stepConfig.headers !== null 
-        ? (stepConfig.headers as Record<string, string>) 
-        : {};
-      const body = typeof stepConfig.body === 'string' || typeof stepConfig.body === 'object'
-        ? stepConfig.body
-        : JSON.stringify({ event: 'workflow_trigger', contactId: message.contactId });
+      const headers =
+        typeof stepConfig.headers === 'object' && stepConfig.headers !== null
+          ? (stepConfig.headers as Record<string, string>)
+          : {};
+      const body =
+        typeof stepConfig.body === 'string' || typeof stepConfig.body === 'object'
+          ? stepConfig.body
+          : JSON.stringify({ event: 'workflow_trigger', contactId: message.contactId });
 
       // 2. Insert WebhookDelivery record
       const deliveryId = uuidv7();
@@ -48,7 +51,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
           method,
           headers,
           typeof body === 'string' ? body : JSON.stringify(body),
-          'pending'
+          'pending',
         ],
       );
 

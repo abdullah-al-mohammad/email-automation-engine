@@ -26,13 +26,13 @@ describe('EmailTemplateService', () => {
       const dto = { name: 'Test', subject: 'Subj', html: '<p>Hi</p>' };
       const expectedTemplate = new EmailTemplate();
       Object.assign(expectedTemplate, { id: 'uuid', tenantId: 'tenant1', ...dto });
-      
+
       mockRepository.create.mockResolvedValue(expectedTemplate);
 
       const result = await service.create('tenant1', dto);
 
       expect(mockRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ tenantId: 'tenant1', name: 'Test', text: null })
+        expect.objectContaining({ tenantId: 'tenant1', name: 'Test', text: null }),
       );
       expect(result).toEqual(expectedTemplate);
     });
