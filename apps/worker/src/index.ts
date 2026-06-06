@@ -4,3 +4,8 @@ export * as startWorkflowsHandler from './handlers/start-workflows.handler';
 export * as startWorkflowStepsHandler from './handlers/start-workflow-steps.handler';
 export * as finishWorkflowStepsHandler from './handlers/finish-workflow-steps.handler';
 export * as watchWorkflowStepsHandler from './handlers/watch-workflow-steps.handler';
+export * as conditionalSplitHandler from './handlers/conditional-split.handler';
+export * as sendWorkflowEmailHandler from './handlers/send-workflow-email.handler';
+export * as processEmailTrackingEventHandler from './handlers/process-email-tracking-event.handler';
+export * as webhookStepHandler from './handlers/webhook-step.handler';
+export * as callWebhookHandler from './handlers/call-webhook.handler';

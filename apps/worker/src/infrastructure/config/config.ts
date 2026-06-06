@@ -14,6 +14,10 @@ export const WorkerConfigSchema = z.object({
   CONDITIONAL_SPLIT_QUEUE_URL: z.string().min(1).default('conditional-split.fifo'),
   WEBHOOK_STEPS_QUEUE_URL: z.string().min(1).default('webhook-steps.fifo'),
   FINISHED_STEPS_QUEUE_URL: z.string().min(1).default('finished-contact-workflow-steps'),
+  AUTOMATION_EVENTS_QUEUE_URL: z.string().min(1).default('automation-events'),
+  EMAIL_TRACKING_EVENTS_QUEUE_URL: z.string().min(1).default('email-tracking-events'),
+  WEBHOOK_DELIVERIES_QUEUE_URL: z.string().min(1).default('webhook-deliveries'),
+  FROM_EMAIL_ADDRESS: z.string().min(1).default('noreply@example.com'),
 });
 
 export type WorkerConfig = z.infer<typeof WorkerConfigSchema>;
