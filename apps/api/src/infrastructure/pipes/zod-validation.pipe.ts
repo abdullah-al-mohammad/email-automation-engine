@@ -9,7 +9,7 @@ export class ZodValidationPipe<TInput, TOutput> implements PipeTransform<TInput,
     // Only validate the body. If we need to validate params/queries, 
     // we should create specific pipes or check metadata properly.
     if (metadata.type !== 'body') {
-      return value as any;
+      return value as unknown as TOutput;
     }
 
     const result = this.schema.safeParse(value);
