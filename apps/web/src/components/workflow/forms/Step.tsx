@@ -1,9 +1,36 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type WorkflowStepResponse, SUPPORTED_STEP_ACTIONS, type TagResponse, type EmailTemplateResponse, type ContactResponse } from '@email-automation-engine/shared';
-import { useTenant } from '../../../../contexts/TenantContext';
+import { type WorkflowStepResponse, SUPPORTED_STEP_ACTIONS, STEP_ACTIONS, type TagResponse, type EmailTemplateResponse } from '@email-automation-engine/shared';
+import { useTenant } from '../../../contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../../../lib/api';
+import api from '../../../lib/api';
+
+const STEP_ACTION_LABELS: Record<string, string> = {
+  [STEP_ACTIONS.DELAY]: 'Delay',
+  [STEP_ACTIONS.SEND_EMAIL]: 'Send email',
+  [STEP_ACTIONS.ATTACH_TAG]: 'Attach tag',
+  [STEP_ACTIONS.DETACH_TAG]: 'Detach tag',
+  [STEP_ACTIONS.UNSUBSCRIBE_CONTACT]: 'Unsubscribe contact',
+  [STEP_ACTIONS.DELETE_CONTACT]: 'Delete contact',
+  [STEP_ACTIONS.CONDITIONAL_SPLIT]: 'Conditional split',
+  [STEP_ACTIONS.WEBHOOK]: 'Webhook',
+};
+
+interface StepConfigPayload {
+  durationValue?: number;
+  durationUnit?: string;
+  templateId?: string;
+  tagId?: string;
+}
+
+interface StepFormData {
+  action: string;
+  config: string;
+  durationValue: number | string;
+  durationUnit: string;
+  templateId: string;
+  tagId: string;
+}
 
 interface StepFormProps {
   step: WorkflowStepResponse;
@@ -12,19 +39,19 @@ interface StepFormProps {
   onSuccess: () => void;
 }
 
-export default function StepForm({ step, workflowId, isActive, onSuccess }: StepFormProps) {
+export default function Step({ step, workflowId, isActive, onSuccess }: StepFormProps) {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, formState: { isSubmitting } } = useForm<StepFormData>({
     defaultValues: {
       action: step.action,
       config: JSON.stringify(step.config, null, 2),
       // Individual fields for specific actions
-      durationValue: (step.config as any)?.durationValue || 1,
-      durationUnit: (step.config as any)?.durationUnit || 'days',
-      templateId: (step.config as any)?.templateId || '',
-      tagId: (step.config as any)?.tagId || '',
+      durationValue: (step.config as StepConfigPayload)?.durationValue || 1,
+      durationUnit: (step.config as StepConfigPayload)?.durationUnit || 'days',
+      templateId: (step.config as StepConfigPayload)?.templateId || '',
+      tagId: (step.config as StepConfigPayload)?.tagId || '',
     }
   });
 
@@ -37,7 +64,7 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
       const res = await api.get<EmailTemplateResponse[]>(`/tenants/${currentTenant?.id}/email-templates`);
       return res.data;
     },
-    enabled: !!currentTenant && selectedAction === 'send_email',
+    enabled: !!currentTenant && selectedAction === STEP_ACTIONS.SEND_EMAIL,
   });
 
   const { data: tags = [] } = useQuery({
@@ -46,35 +73,35 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
       const res = await api.get<TagResponse[]>(`/tenants/${currentTenant?.id}/tags`);
       return res.data;
     },
-    enabled: !!currentTenant && (selectedAction === 'attach_tag' || selectedAction === 'detach_tag' || selectedAction === 'conditional_split'),
+    enabled: !!currentTenant && (selectedAction === STEP_ACTIONS.ATTACH_TAG || selectedAction === STEP_ACTIONS.DETACH_TAG || selectedAction === STEP_ACTIONS.CONDITIONAL_SPLIT),
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      let finalConfig = {};
+    mutationFn: async (data: StepFormData) => {
+      let finalConfig: Record<string, unknown> = {};
       
       // Build config based on selected action
-      if (data.action === 'delay') {
+      if (data.action === STEP_ACTIONS.DELAY) {
         finalConfig = { durationValue: Number(data.durationValue), durationUnit: data.durationUnit };
-      } else if (data.action === 'send_email') {
+      } else if (data.action === STEP_ACTIONS.SEND_EMAIL) {
         finalConfig = { templateId: data.templateId };
-      } else if (data.action === 'attach_tag' || data.action === 'detach_tag') {
+      } else if (data.action === STEP_ACTIONS.ATTACH_TAG || data.action === STEP_ACTIONS.DETACH_TAG) {
         finalConfig = { tagId: data.tagId };
       } else {
         try {
-          finalConfig = JSON.parse(data.config || '{}');
-        } catch(e) {}
+          finalConfig = JSON.parse(data.config || '{}') as Record<string, unknown>;
+        } catch { /* ignore parsing error */ }
       }
 
       const payload = {
         action: data.action,
         config: finalConfig,
       };
-      const res = await api.patch(`/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${step.id}`, payload);
+      const res = await api.patch<WorkflowStepResponse>(`/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${step.id}`, payload);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-steps', currentTenant?.id, workflowId] });
+      void queryClient.invalidateQueries({ queryKey: ['workflow-steps', currentTenant?.id, workflowId] });
       onSuccess();
     }
   });
@@ -84,20 +111,20 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
       await api.delete(`/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${step.id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-steps', currentTenant?.id, workflowId] });
+      void queryClient.invalidateQueries({ queryKey: ['workflow-steps', currentTenant?.id, workflowId] });
       onSuccess();
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: StepFormData) => {
     updateMutation.mutate(data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex flex-col h-full">
+    <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-4 flex flex-col h-full">
       <div className="flex-1 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Action Type</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Action type</label>
           <select 
             {...register('action')} 
             disabled={isActive}
@@ -105,13 +132,13 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
           >
             {SUPPORTED_STEP_ACTIONS.map(action => (
               <option key={action} value={action}>
-                {action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                {STEP_ACTION_LABELS[action] || action}
               </option>
             ))}
           </select>
         </div>
 
-        {selectedAction === 'delay' && (
+        {selectedAction === STEP_ACTIONS.DELAY && (
           <div className="flex gap-2">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Wait for</label>
@@ -123,7 +150,7 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Time Unit</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Time unit</label>
               <select 
                 {...register('durationUnit')}
                 disabled={isActive}
@@ -138,9 +165,9 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
           </div>
         )}
 
-        {selectedAction === 'send_email' && (
+        {selectedAction === STEP_ACTIONS.SEND_EMAIL && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email Template</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email template</label>
             <select 
               {...register('templateId')}
               disabled={isActive}
@@ -154,9 +181,9 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
           </div>
         )}
 
-        {(selectedAction === 'attach_tag' || selectedAction === 'detach_tag') && (
+        {(selectedAction === STEP_ACTIONS.ATTACH_TAG || selectedAction === STEP_ACTIONS.DETACH_TAG) && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Select Tag</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Select tag</label>
             <select 
               {...register('tagId')}
               disabled={isActive}
@@ -170,7 +197,7 @@ export default function StepForm({ step, workflowId, isActive, onSuccess }: Step
           </div>
         )}
 
-        {(selectedAction === 'conditional_split' || selectedAction === 'webhook') && (
+        {(selectedAction === STEP_ACTIONS.CONDITIONAL_SPLIT || selectedAction === STEP_ACTIONS.WEBHOOK) && (
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Configuration (JSON)</label>
             <textarea 

@@ -1,18 +1,19 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createTenantInvitationSchema, type CreateTenantInvitationDto, type RoleResponse } from '@email-automation-engine/shared';
+import { createTenantInvitationSchema, type CreateTenantInvitationDto, type RoleResponse, type TenantInvitationResponse } from '@email-automation-engine/shared';
 import * as Dialog from '@radix-ui/react-dialog';
-import { useTenant } from '../../../contexts/TenantContext';
-import api from '../../../lib/api';
+import { useTenant } from '../../contexts/TenantContext';
+import api from '../../lib/api';
+import { type AxiosError } from 'axios';
 
-interface InviteMemberModalProps {
+interface InviteMemberProps {
   isOpen: boolean;
   onClose: () => void;
   roles: RoleResponse[];
 }
 
-export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemberModalProps) {
+export default function InviteMember({ isOpen, onClose, roles }: InviteMemberProps) {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
 
@@ -22,11 +23,11 @@ export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemb
 
   const inviteMutation = useMutation({
     mutationFn: async (data: CreateTenantInvitationDto) => {
-      const res = await api.post(`/tenants/${currentTenant?.id}/invitations`, data);
+      const res = await api.post<TenantInvitationResponse>(`/tenants/${currentTenant?.id}/invitations`, data);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-invitations', currentTenant?.id] });
+      void queryClient.invalidateQueries({ queryKey: ['tenant-invitations', currentTenant?.id] });
       reset();
       onClose();
     }
@@ -40,17 +41,19 @@ export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemb
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
-        <Dialog.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl sm:rounded-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-          <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
-            Invite Team Member
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-gray-500 dark:text-zinc-400">
-            Send an invitation email to add a new member to {currentTenant?.name}.
-          </Dialog.Description>
+        <Dialog.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-6 border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl sm:rounded-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+          <div className="space-y-1.5">
+            <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
+              Invite team member
+            </Dialog.Title>
+            <Dialog.Description className="text-sm text-gray-500 dark:text-zinc-400">
+              Send an invitation email to add a new member to {currentTenant?.name}.
+            </Dialog.Description>
+          </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
+          <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email address</label>
               <input 
                 type="email" 
                 {...register('email')}
@@ -75,7 +78,7 @@ export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemb
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Personal Message (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Personal message (optional)</label>
               <textarea 
                 {...register('message')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
@@ -85,7 +88,7 @@ export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemb
             </div>
 
             {inviteMutation.isError && (
-              <p className="text-sm text-red-600">{(inviteMutation.error as any)?.response?.data?.message || 'Failed to send invitation'}</p>
+              <p className="text-sm text-red-600">{(inviteMutation.error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to send invitation'}</p>
             )}
 
             <div className="flex justify-end gap-3 pt-4">
@@ -101,7 +104,7 @@ export default function InviteMemberModal({ isOpen, onClose, roles }: InviteMemb
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
-                {isSubmitting ? 'Sending...' : 'Send Invite'}
+                {isSubmitting ? 'Sending...' : 'Send invite'}
               </button>
             </div>
           </form>

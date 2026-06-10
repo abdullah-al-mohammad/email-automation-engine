@@ -1,0 +1,69 @@
+import {
+  type WorkflowStepResponse,
+  type WorkflowTriggerResponse,
+} from '@email-automation-engine/shared';
+import Trigger from '../forms/Trigger';
+import Step from '../forms/Step';
+
+interface WorkflowSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedNode:
+    | { type: 'trigger'; data: WorkflowTriggerResponse }
+    | { type: 'step'; data: WorkflowStepResponse }
+    | null;
+  workflowId: string;
+  isActive: boolean;
+}
+
+export default function Sidebar({
+  isOpen,
+  onClose,
+  selectedNode,
+  workflowId,
+  isActive,
+}: WorkflowSidebarProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="absolute top-0 right-0 h-full w-80 bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 shadow-xl flex flex-col z-10 transition-transform">
+      <div className="h-14 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 shrink-0">
+        <h3 className="font-semibold text-gray-900 dark:text-white">
+          {selectedNode?.type === 'trigger' ? 'Configure trigger' : 'Configure step'}
+        </h3>
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        {!selectedNode ? (
+          <div className="text-sm text-gray-500">Select a node to configure</div>
+        ) : selectedNode.type === 'trigger' ? (
+          <Trigger
+            trigger={selectedNode.data}
+            workflowId={workflowId}
+            isActive={isActive}
+            onSuccess={onClose}
+          />
+        ) : (
+          <Step
+            step={selectedNode.data}
+            workflowId={workflowId}
+            isActive={isActive}
+            onSuccess={onClose}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
