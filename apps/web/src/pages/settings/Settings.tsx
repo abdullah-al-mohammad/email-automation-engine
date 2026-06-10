@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { type TenantMemberResponse, type TenantInvitationResponse, type RoleResponse } from '@email-automation-engine/shared';
-import InviteMemberModal from './components/InviteMemberModal';
+import { type TenantMemberResponse, type TenantInvitationResponse, type RoleResponse, type TenantResponse } from '@email-automation-engine/shared';
+import InviteMember from '../../components/modals/InviteMember';
 
-export default function SettingsPage() {
+export default function Settings() {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -21,11 +21,11 @@ export default function SettingsPage() {
 
   const updateTenantMutation = useMutation({
     mutationFn: async (newName: string) => {
-      const res = await api.patch(`/tenants/${currentTenant?.id}`, { name: newName });
+      const res = await api.patch<TenantResponse>(`/tenants/${currentTenant?.id}`, { name: newName });
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      void queryClient.invalidateQueries({ queryKey: ['tenants'] });
       setIsEditingName(false);
     }
   });
@@ -48,7 +48,7 @@ export default function SettingsPage() {
     enabled: !!currentTenant,
   });
 
-  const { data: roles = [], isLoading: isLoadingRoles } = useQuery({
+  const { data: roles = [] } = useQuery({
     queryKey: ['tenant-roles', currentTenant?.id],
     queryFn: async () => {
       const res = await api.get<RoleResponse[]>(`/tenants/${currentTenant?.id}/roles`);
@@ -62,7 +62,7 @@ export default function SettingsPage() {
       await api.delete(`/tenants/${currentTenant?.id}/members/${memberId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-members', currentTenant?.id] });
+      void queryClient.invalidateQueries({ queryKey: ['tenant-members', currentTenant?.id] });
     }
   });
 
@@ -71,7 +71,7 @@ export default function SettingsPage() {
       await api.delete(`/tenants/${currentTenant?.id}/invitations/${invitationId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-invitations', currentTenant?.id] });
+      void queryClient.invalidateQueries({ queryKey: ['tenant-invitations', currentTenant?.id] });
     }
   });
 
@@ -138,18 +138,18 @@ export default function SettingsPage() {
             value="invitations" 
             className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-zinc-400 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 outline-none"
           >
-            Pending Invitations
+            Pending invitations
           </Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="members" className="pt-6 outline-none">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active Members</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active members</h2>
             <button 
               onClick={() => setIsInviteModalOpen(true)}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
             >
-              Invite Member
+              Invite member
             </button>
           </div>
 
@@ -197,12 +197,12 @@ export default function SettingsPage() {
 
         <Tabs.Content value="invitations" className="pt-6 outline-none">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pending Invitations</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pending invitations</h2>
             <button 
               onClick={() => setIsInviteModalOpen(true)}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
             >
-              Invite Member
+              Invite member
             </button>
           </div>
 
@@ -212,7 +212,7 @@ export default function SettingsPage() {
                 <tr>
                   <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Email</th>
                   <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Role</th>
-                  <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Sent On</th>
+                  <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Sent on</th>
                   <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400 text-right">Actions</th>
                 </tr>
               </thead>
@@ -244,7 +244,7 @@ export default function SettingsPage() {
       </Tabs.Root>
 
       {isInviteModalOpen && (
-        <InviteMemberModal 
+        <InviteMember 
           isOpen={isInviteModalOpen} 
           onClose={() => setIsInviteModalOpen(false)} 
           roles={roles}

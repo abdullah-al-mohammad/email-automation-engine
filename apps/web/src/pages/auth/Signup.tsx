@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { isAxiosError } from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupSchema, type SignupDto } from '@email-automation-engine/shared';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function SignupPage() {
+export default function Signup() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -18,9 +19,13 @@ export default function SignupPage() {
     try {
       setError(null);
       await registerUser(data);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to sign up. Please try again.');
+      void navigate('/');
+    } catch (err: unknown) {
+      if (isAxiosError<{ message?: string }>(err)) {
+        setError(err.response?.data?.message || 'Failed to sign up. Please try again.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 
@@ -38,9 +43,9 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email address</label>
             <input 
               {...register('email')} 
               type="email" 
@@ -72,7 +77,7 @@ export default function SignupPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-zinc-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+          <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
             Sign in
           </Link>
         </p>

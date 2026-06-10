@@ -9,24 +9,20 @@ import { Plus, ChevronRight, Building } from 'lucide-react';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
-/**
- * Main Page Component
- * Acts as the controller for viewing and creating workspaces (tenants).
- */
-export default function TenantSelectionPage() {
+export default function Tenants() {
   const { tenants, setCurrentTenant, refreshTenants } = useTenant();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleSelectTenant = (tenant: TenantResponse) => {
     setCurrentTenant(tenant);
-    navigate('/');
+    void navigate('/');
   };
 
   const handleTenantCreated = async (newTenant: TenantResponse) => {
     await refreshTenants();
     setCurrentTenant(newTenant);
-    navigate('/');
+    void navigate('/');
   };
 
   const hasTenants = tenants.length > 0;
@@ -65,10 +61,6 @@ export default function TenantSelectionPage() {
     </div>
   );
 }
-
-/**
- * Presentational Components
- */
 
 function Header() {
   return (
@@ -116,7 +108,7 @@ function TenantList({ tenants, onSelect }: TenantListProps) {
 }
 
 interface CreateTenantFormProps {
-  onSuccess: (tenant: TenantResponse) => void;
+  onSuccess: (tenant: TenantResponse) => void | Promise<void>;
   onCancel: () => void;
   canCancel: boolean;
 }
@@ -136,10 +128,11 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
     try {
       setGlobalError(null);
       const response = await api.post<TenantResponse>('/tenants', data);
-      onSuccess(response.data);
+      await onSuccess(response.data);
     } catch (error: unknown) {
       if (isAxiosError(error)) {
-        setGlobalError(error.response?.data?.message || 'Failed to create workspace. Please try again.');
+        const message = (error.response?.data as { message?: string })?.message;
+        setGlobalError(message || 'Failed to create workspace. Please try again.');
       } else {
         setGlobalError('An unexpected error occurred.');
       }
@@ -158,7 +151,7 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-6">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">
             Workspace name

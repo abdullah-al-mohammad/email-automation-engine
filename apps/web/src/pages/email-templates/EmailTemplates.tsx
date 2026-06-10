@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Dialog from '@radix-ui/react-dialog';
 
-export default function EmailTemplatesListPage() {
+export default function EmailTemplates() {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function EmailTemplatesListPage() {
       await api.delete(`/tenants/${currentTenant?.id}/email-templates/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-templates', currentTenant?.id] });
+      void queryClient.invalidateQueries({ queryKey: ['email-templates', currentTenant?.id] });
     }
   });
 
@@ -34,14 +34,14 @@ export default function EmailTemplatesListPage() {
     <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-zinc-800 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Templates</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email templates</h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">Manage reusable email layouts and content.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
         >
-          Create Template
+          Create template
         </button>
       </div>
 
@@ -102,11 +102,11 @@ function CreateTemplateModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateEmailTemplateDto) => {
-      const res = await api.post(`/tenants/${currentTenant?.id}/email-templates`, data);
+      const res = await api.post<EmailTemplateResponse>(`/tenants/${currentTenant?.id}/email-templates`, data);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email-templates', currentTenant?.id] });
+      void queryClient.invalidateQueries({ queryKey: ['email-templates', currentTenant?.id] });
       reset();
       onClose();
     }
@@ -122,12 +122,12 @@ function CreateTemplateModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
         <Dialog.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl sm:rounded-2xl duration-200">
           <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
-            Create Email Template
+            Create email template
           </Dialog.Title>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2 max-h-[70vh] overflow-y-auto px-1">
+          <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-4 mt-2 max-h-[70vh] overflow-y-auto px-1">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Template Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Template name</label>
               <input 
                 type="text" 
                 {...register('name')}
@@ -138,7 +138,7 @@ function CreateTemplateModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Subject Line</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Subject line</label>
               <input 
                 type="text" 
                 {...register('subject')}
@@ -159,7 +159,7 @@ function CreateTemplateModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Plain Text Fallback (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Plain text fallback (optional)</label>
               <textarea 
                 {...register('text')}
                 className="w-full font-mono text-sm px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
@@ -180,7 +180,7 @@ function CreateTemplateModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
-                {isSubmitting ? 'Saving...' : 'Create Template'}
+                {isSubmitting ? 'Saving...' : 'Create template'}
               </button>
             </div>
           </form>

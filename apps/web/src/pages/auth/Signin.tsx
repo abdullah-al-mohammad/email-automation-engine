@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { isAxiosError } from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signinSchema, type SigninDto } from '@email-automation-engine/shared';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function LoginPage() {
+export default function Signin() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SigninDto>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SigninDto>({
     resolver: zodResolver(signinSchema),
   });
 
@@ -18,9 +23,13 @@ export default function LoginPage() {
     try {
       setError(null);
       await login(data);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login. Please try again.');
+      void navigate('/');
+    } catch (err: unknown) {
+      if (isAxiosError<{ message?: string }>(err)) {
+        setError(err.response?.data?.message || 'Failed to sign in. Please try again.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 
@@ -38,12 +47,23 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e);
+          }}
+          className="space-y-5"
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email</label>
-            <input 
-              {...register('email')} 
-              type="email" 
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5"
+            >
+              Email address
+            </label>
+            <input
+              {...register('email')}
+              id="email"
+              type="email"
               className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow"
               placeholder="you@example.com"
             />
@@ -51,18 +71,22 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Password</label>
-            <input 
-              {...register('password')} 
-              type="password" 
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              Password
+            </label>
+            <input
+              {...register('password')}
+              type="password"
               className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow"
               placeholder="••••••••"
             />
-            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSubmitting}
             className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
           >
@@ -72,7 +96,10 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-zinc-400">
           Don't have an account?{' '}
-          <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+          <Link
+            to="/signup"
+            className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+          >
             Sign up
           </Link>
         </p>

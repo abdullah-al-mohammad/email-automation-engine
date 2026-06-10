@@ -6,7 +6,7 @@ import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 import * as Dialog from '@radix-ui/react-dialog';
 
-export default function WorkflowContactsPage() {
+export default function WorkflowContacts() {
   const { workflowId } = useParams<{ workflowId: string }>();
   const { currentTenant } = useTenant();
   const [selectedContactWorkflowId, setSelectedContactWorkflowId] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function WorkflowContactsPage() {
               &larr; Back to Builder
             </Link>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Execution Summary</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Execution summary</h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">Monitor contacts currently processing through this workflow.</p>
         </div>
       </div>
@@ -39,9 +39,9 @@ export default function WorkflowContactsPage() {
           <thead className="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
             <tr>
               <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Contact ID</th>
-              <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Trigger Event</th>
+              <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Trigger event</th>
               <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Status</th>
-              <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Started At</th>
+              <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400">Started at</th>
               <th className="px-6 py-3 font-medium text-gray-500 dark:text-zinc-400 text-right">Actions</th>
             </tr>
           </thead>
@@ -72,7 +72,7 @@ export default function WorkflowContactsPage() {
                       onClick={() => setSelectedContactWorkflowId(cw.id)}
                       className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
                     >
-                      View Timeline
+                      View timeline
                     </button>
                   </td>
                 </tr>
@@ -112,7 +112,7 @@ function TimelineModal({ isOpen, onClose, contactWorkflowId, workflowId }: { isO
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
         <Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl sm:rounded-2xl flex flex-col max-h-[85vh]">
           <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Execution Timeline
+            Execution timeline
           </Dialog.Title>
 
           <div className="flex-1 overflow-y-auto pr-2 space-y-4">
@@ -122,7 +122,7 @@ function TimelineModal({ isOpen, onClose, contactWorkflowId, workflowId }: { isO
               <div className="text-center text-gray-500 py-8">No steps executed yet.</div>
             ) : (
               <div className="relative border-l border-gray-200 dark:border-zinc-700 ml-3 space-y-6">
-                {timeline.map((step, idx) => (
+                {timeline.map((step) => (
                   <div key={step.id} className="relative pl-6">
                     <span className={`absolute -left-2.5 top-1 flex h-5 w-5 items-center justify-center rounded-full ring-4 ring-white dark:ring-zinc-900 ${
                       step.status === 'finished' ? 'bg-green-500' :
