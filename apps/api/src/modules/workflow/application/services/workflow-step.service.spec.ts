@@ -1,0 +1,116 @@
+import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
+import { NotFoundException } from '@nestjs/common';
+import { WorkflowStepService } from './workflow-step.service';
+import type { WorkflowStep } from '../../domain/aggregates/workflow-step.aggregate';
+import type { Workflow } from '../../domain/aggregates/workflow.aggregate';
+import type { WorkflowService } from './workflow.service';
+
+describe('WorkflowStepService', () => {
+  let service: WorkflowStepService;
+  let stepRepo: { findByWorkflowId: Mock; save: Mock; delete: Mock };
+  let workflowService: { verifyWorkflowInactive: Mock; getWorkflowOrThrow: Mock };
+  let dataSource: { transaction: Mock };
+
+  beforeEach(() => {
+    stepRepo = {
+      findByWorkflowId: vi.fn(),
+      save: vi.fn(),
+      delete: vi.fn(),
+    };
+    workflowService = {
+      verifyWorkflowInactive: vi.fn(),
+      getWorkflowOrThrow: vi.fn(),
+    };
+    dataSource = {
+      transaction: vi.fn().mockImplementation(async (cb) => {
+        return cb({ save: vi.fn() });
+      }),
+    };
+
+    service = new WorkflowStepService(
+      stepRepo as unknown as (typeof service)['stepRepo'],
+      dataSource as unknown as (typeof service)['dataSource'],
+      workflowService as unknown as WorkflowService,
+    );
+  });
+
+  describe('reorderSteps', () => {
+    it('should update positions of steps when complete match provided', async () => {
+      workflowService.verifyWorkflowInactive.mockResolvedValue(undefined);
+      const step1 = { id: 'step-1', position: 0 } as WorkflowStep;
+      const step2 = { id: 'step-2', position: 1 } as WorkflowStep;
+      stepRepo.findByWorkflowId.mockResolvedValue([step1, step2]);
+      stepRepo.save.mockImplementation((s: WorkflowStep) => Promise.resolve(s));
+
+      await service.reorderSteps('tenant-1', 'workflow-1', { stepIds: ['step-2', 'step-1'] });
+
+      expect(step2.position).toBe(0);
+      expect(step1.position).toBe(1);
+    });
+
+    it('should reject partial lists for reorder', async () => {
+      workflowService.verifyWorkflowInactive.mockResolvedValue(undefined);
+      const step1 = { id: 'step-1', position: 0 } as WorkflowStep;
+      const step2 = { id: 'step-2', position: 1 } as WorkflowStep;
+      stepRepo.findByWorkflowId.mockResolvedValue([step1, step2]);
+
+      await expect(
+        service.reorderSteps('tenant-1', 'workflow-1', { stepIds: ['step-1'] }),
+      ).rejects.toThrow('Reorder list must contain all workflow steps exactly once');
+    });
+
+    it('should reject duplicate step IDs', async () => {
+      workflowService.verifyWorkflowInactive.mockResolvedValue(undefined);
+      const step1 = { id: 'step-1', position: 0 } as WorkflowStep;
+      const step2 = { id: 'step-2', position: 1 } as WorkflowStep;
+      stepRepo.findByWorkflowId.mockResolvedValue([step1, step2]);
+
+      await expect(
+        service.reorderSteps('tenant-1', 'workflow-1', { stepIds: ['step-1', 'step-1'] }),
+      ).rejects.toThrow('Reorder list must not contain duplicate step IDs');
+    });
+  });
+
+  describe('structural rules', () => {
+    it('should reject parentWorkflowStepId if it belongs to different workflow', async () => {
+      workflowService.verifyWorkflowInactive.mockResolvedValue(undefined);
+      stepRepo.findByWorkflowId.mockResolvedValue([{ id: 'step-1' }]);
+
+      await expect(
+        service.addStep('tenant-1', 'workflow-1', {
+          action: 'send_email',
+          parentWorkflowStepId: 'unknown-id',
+        }),
+      ).rejects.toThrow('Parent step must belong to the same workflow');
+    });
+  });
+
+  describe('findStep', () => {
+    it('should return a step by id', async () => {
+      workflowService.getWorkflowOrThrow.mockResolvedValue({ id: 'workflow-1' } as Workflow);
+      stepRepo.findByWorkflowId.mockResolvedValue([
+        {
+          id: 'step-1',
+          tenantId: 'tenant-1',
+          workflowId: 'workflow-1',
+          action: 'send_email',
+          position: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
+
+      const result = await service.findStep('tenant-1', 'workflow-1', 'step-1');
+      expect(result.id).toBe('step-1');
+    });
+
+    it('should throw NotFoundException for missing step', async () => {
+      workflowService.getWorkflowOrThrow.mockResolvedValue({ id: 'workflow-1' } as Workflow);
+      stepRepo.findByWorkflowId.mockResolvedValue([]);
+
+      await expect(service.findStep('tenant-1', 'workflow-1', 'step-1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+});

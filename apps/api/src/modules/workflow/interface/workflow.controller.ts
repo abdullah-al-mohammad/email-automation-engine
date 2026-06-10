@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Patch, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { z } from 'zod';
 import { WorkflowService } from '../application/services/workflow.service';
+import { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
+import { WorkflowStepService } from '../application/services/workflow-step.service';
+import { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
 import { AuthGuard } from '../../iam/interface/guards/auth.guard';
 import { TenantMembershipGuard } from '../../iam/interface/guards/tenant-membership.guard';
 import { PermissionsGuard } from '../../iam/interface/guards/permissions.guard';
@@ -35,7 +38,12 @@ import { ZodValidationPipe } from '../../../infrastructure/pipes/zod-validation.
 @Controller('tenants/:tenantId/workflows')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
 export class WorkflowController {
-  constructor(private readonly workflowService: WorkflowService) {}
+  constructor(
+    private readonly workflowService: WorkflowService,
+    private readonly triggerService: WorkflowTriggerService,
+    private readonly stepService: WorkflowStepService,
+    private readonly exitConditionService: WorkflowExitConditionService,
+  ) {}
 
   @Post()
   @RequirePermissions('workflows.manage')
@@ -102,7 +110,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CreateWorkflowTriggerSchema)) dto: CreateWorkflowTriggerDto,
   ): Promise<WorkflowTriggerResponse> {
-    return this.workflowService.addTrigger(tenantId, id, dto);
+    return this.triggerService.addTrigger(tenantId, id, dto);
   }
 
   @Patch(':id/triggers/:triggerId')
@@ -113,7 +121,7 @@ export class WorkflowController {
     @Param('triggerId') triggerId: string,
     @Body(new ZodValidationPipe(UpdateWorkflowTriggerSchema)) dto: UpdateWorkflowTriggerDto,
   ): Promise<WorkflowTriggerResponse> {
-    return this.workflowService.updateTrigger(tenantId, id, triggerId, dto);
+    return this.triggerService.updateTrigger(tenantId, id, triggerId, dto);
   }
 
   @Delete(':id/triggers/:triggerId')
@@ -123,7 +131,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Param('triggerId') triggerId: string,
   ): Promise<void> {
-    return this.workflowService.deleteTrigger(tenantId, id, triggerId);
+    return this.triggerService.deleteTrigger(tenantId, id, triggerId);
   }
 
   @Patch(':id/steps/reorder')
@@ -133,7 +141,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(ReorderStepsSchema)) dto: ReorderStepsDto,
   ): Promise<void> {
-    return this.workflowService.reorderSteps(tenantId, id, dto);
+    return this.stepService.reorderSteps(tenantId, id, dto);
   }
 
   @Post(':id/steps')
@@ -143,7 +151,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CreateWorkflowStepSchema)) dto: CreateWorkflowStepDto,
   ): Promise<WorkflowStepResponse> {
-    return this.workflowService.addStep(tenantId, id, dto);
+    return this.stepService.addStep(tenantId, id, dto);
   }
 
   @Get(':id/steps/:stepId')
@@ -153,7 +161,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Param('stepId') stepId: string,
   ): Promise<WorkflowStepResponse> {
-    return this.workflowService.findStep(tenantId, id, stepId);
+    return this.stepService.findStep(tenantId, id, stepId);
   }
 
   @Patch(':id/steps/:stepId')
@@ -164,7 +172,7 @@ export class WorkflowController {
     @Param('stepId') stepId: string,
     @Body(new ZodValidationPipe(UpdateWorkflowStepSchema)) dto: UpdateWorkflowStepDto,
   ): Promise<WorkflowStepResponse> {
-    return this.workflowService.updateStep(tenantId, id, stepId, dto);
+    return this.stepService.updateStep(tenantId, id, stepId, dto);
   }
 
   @Delete(':id/steps/:stepId')
@@ -174,7 +182,7 @@ export class WorkflowController {
     @Param('id') id: string,
     @Param('stepId') stepId: string,
   ): Promise<void> {
-    return this.workflowService.deleteStep(tenantId, id, stepId);
+    return this.stepService.deleteStep(tenantId, id, stepId);
   }
 
   @Get(':id/exit-conditions')
@@ -183,7 +191,7 @@ export class WorkflowController {
     @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
   ): Promise<WorkflowExitConditionResponse[]> {
-    return this.workflowService.getExitConditions(tenantId, id);
+    return this.exitConditionService.getExitConditions(tenantId, id);
   }
 
   @Put(':id/exit-conditions')
@@ -194,7 +202,7 @@ export class WorkflowController {
     @Body(new ZodValidationPipe(z.array(CreateWorkflowExitConditionSchema)))
     dtos: CreateWorkflowExitConditionDto[],
   ): Promise<WorkflowExitConditionResponse[]> {
-    return this.workflowService.replaceExitConditions(tenantId, id, dtos);
+    return this.exitConditionService.replaceExitConditions(tenantId, id, dtos);
   }
 
   @Post(':id/exit-conditions')
@@ -205,7 +213,7 @@ export class WorkflowController {
     @Body(new ZodValidationPipe(CreateWorkflowExitConditionSchema))
     dto: CreateWorkflowExitConditionDto,
   ): Promise<WorkflowExitConditionResponse> {
-    return this.workflowService.addExitCondition(tenantId, id, dto);
+    return this.exitConditionService.addExitCondition(tenantId, id, dto);
   }
 
   @Patch(':id/exit-conditions/:conditionId')
@@ -217,7 +225,7 @@ export class WorkflowController {
     @Body(new ZodValidationPipe(UpdateWorkflowExitConditionSchema))
     dto: UpdateWorkflowExitConditionDto,
   ): Promise<WorkflowExitConditionResponse> {
-    return this.workflowService.updateExitCondition(tenantId, id, conditionId, dto);
+    return this.exitConditionService.updateExitCondition(tenantId, id, conditionId, dto);
   }
 
   @Delete(':id/exit-conditions/:conditionId')
@@ -227,6 +235,6 @@ export class WorkflowController {
     @Param('id') id: string,
     @Param('conditionId') conditionId: string,
   ): Promise<void> {
-    return this.workflowService.deleteExitCondition(tenantId, id, conditionId);
+    return this.exitConditionService.deleteExitCondition(tenantId, id, conditionId);
   }
 }

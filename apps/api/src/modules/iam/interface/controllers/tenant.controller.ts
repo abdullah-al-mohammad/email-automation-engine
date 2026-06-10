@@ -1,7 +1,9 @@
-import { Controller, Post, Get, Body, Param, UseGuards, UsePipes } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Param, UseGuards, UsePipes } from '@nestjs/common';
 import {
   createTenantSchema,
+  updateTenantSchema,
   type CreateTenantDto,
+  type UpdateTenantDto,
   type TenantResponse,
 } from '@email-automation-engine/shared';
 import { TenantService } from '../../application/services/tenant.service';
@@ -40,5 +42,13 @@ export class TenantController {
     @CurrentUser() user: { id: string },
   ): Promise<TenantResponse> {
     return this.tenantService.findById(id, user.id);
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
+  @RequirePermissions('tenant.update')
+  @UsePipes(new ZodValidationPipe(updateTenantSchema))
+  async update(@Param('id') id: string, @Body() dto: UpdateTenantDto): Promise<TenantResponse> {
+    return this.tenantService.update(id, dto);
   }
 }

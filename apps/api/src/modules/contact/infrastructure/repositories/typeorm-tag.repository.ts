@@ -15,6 +15,13 @@ export class TypeOrmTagRepository implements TagRepository {
     return this.repository.findOne({ where: { id } });
   }
 
+  async findAllByTenantId(tenantId: string): Promise<Tag[]> {
+    return this.repository.find({
+      where: { tenantId },
+      order: { name: 'ASC' },
+    });
+  }
+
   async findByTenantIdAndName(tenantId: string, name: string): Promise<Tag | null> {
     return this.repository.findOne({ where: { tenantId, name } });
   }

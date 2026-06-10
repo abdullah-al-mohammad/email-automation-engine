@@ -3,6 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './interface/health.controller';
 import { WorkflowController } from './interface/workflow.controller';
 import { WorkflowService } from './application/services/workflow.service';
+import { WorkflowTriggerService } from './application/services/workflow-trigger.service';
+import { WorkflowStepService } from './application/services/workflow-step.service';
+import { WorkflowExitConditionService } from './application/services/workflow-exit-condition.service';
 import { Workflow } from './domain/aggregates/workflow.aggregate';
 import { WorkflowTrigger } from './domain/aggregates/workflow-trigger.aggregate';
 import { WorkflowStep } from './domain/aggregates/workflow-step.aggregate';
@@ -27,6 +30,9 @@ import { IamModule } from '../iam/iam.module';
   controllers: [HealthController, WorkflowController],
   providers: [
     WorkflowService,
+    WorkflowTriggerService,
+    WorkflowStepService,
+    WorkflowExitConditionService,
     {
       provide: WORKFLOW_REPOSITORY,
       useClass: TypeOrmWorkflowRepository,

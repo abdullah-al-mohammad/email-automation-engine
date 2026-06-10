@@ -28,6 +28,13 @@ export class TypeOrmContactWorkflowRepository implements ContactWorkflowReposito
     });
   }
 
+  async findManyByWorkflowId(workflowId: string): Promise<ContactWorkflow[]> {
+    return this.repository.find({
+      where: { workflowId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async save(contactWorkflow: ContactWorkflow): Promise<ContactWorkflow> {
     return this.repository.save(contactWorkflow);
   }

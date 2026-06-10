@@ -1,11 +1,14 @@
 import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { WorkflowController } from './workflow.controller';
 import type { WorkflowService } from '../application/services/workflow.service';
+import type { WorkflowStepService } from '../application/services/workflow-step.service';
+import type { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
+import type { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
 import type { WorkflowResponse } from '@email-automation-engine/shared';
 
 describe('WorkflowController', () => {
   let controller: WorkflowController;
-  let service: {
+  let workflowService: {
     create: Mock;
     findByTenantId: Mock;
     findById: Mock;
@@ -13,14 +16,20 @@ describe('WorkflowController', () => {
     activate: Mock;
     deactivate: Mock;
     delete: Mock;
+  };
+  let triggerService: {
     addTrigger: Mock;
     updateTrigger: Mock;
     deleteTrigger: Mock;
+  };
+  let stepService: {
     addStep: Mock;
     findStep: Mock;
     updateStep: Mock;
     deleteStep: Mock;
     reorderSteps: Mock;
+  };
+  let exitConditionService: {
     getExitConditions: Mock;
     replaceExitConditions: Mock;
     addExitCondition: Mock;
@@ -29,7 +38,7 @@ describe('WorkflowController', () => {
   };
 
   beforeEach(() => {
-    service = {
+    workflowService = {
       create: vi.fn(),
       findByTenantId: vi.fn(),
       findById: vi.fn(),
@@ -37,21 +46,32 @@ describe('WorkflowController', () => {
       activate: vi.fn(),
       deactivate: vi.fn(),
       delete: vi.fn(),
+    };
+    triggerService = {
       addTrigger: vi.fn(),
       updateTrigger: vi.fn(),
       deleteTrigger: vi.fn(),
+    };
+    stepService = {
       addStep: vi.fn(),
       findStep: vi.fn(),
       updateStep: vi.fn(),
       deleteStep: vi.fn(),
       reorderSteps: vi.fn(),
+    };
+    exitConditionService = {
       getExitConditions: vi.fn(),
       replaceExitConditions: vi.fn(),
       addExitCondition: vi.fn(),
       updateExitCondition: vi.fn(),
       deleteExitCondition: vi.fn(),
     };
-    controller = new WorkflowController(service as unknown as WorkflowService);
+    controller = new WorkflowController(
+      workflowService as unknown as WorkflowService,
+      triggerService as unknown as WorkflowTriggerService,
+      stepService as unknown as WorkflowStepService,
+      exitConditionService as unknown as WorkflowExitConditionService,
+    );
   });
 
   describe('create', () => {
@@ -65,41 +85,45 @@ describe('WorkflowController', () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      service.create.mockResolvedValue(mockResponse);
+      workflowService.create.mockResolvedValue(mockResponse);
 
       const result = await controller.create('tenant-1', { name: 'Welcome' });
       expect(result).toEqual(mockResponse);
-      expect(service.create).toHaveBeenCalledWith('tenant-1', { name: 'Welcome' });
+      expect(workflowService.create).toHaveBeenCalledWith('tenant-1', { name: 'Welcome' });
     });
   });
 
   describe('findStep', () => {
     it('should delegate to service findStep', async () => {
       const mockStep = { id: 'step-1', action: 'send_email' };
-      service.findStep.mockResolvedValue(mockStep);
+      stepService.findStep.mockResolvedValue(mockStep);
 
       const result = await controller.findStep('tenant-1', 'workflow-1', 'step-1');
       expect(result).toEqual(mockStep);
-      expect(service.findStep).toHaveBeenCalledWith('tenant-1', 'workflow-1', 'step-1');
+      expect(stepService.findStep).toHaveBeenCalledWith('tenant-1', 'workflow-1', 'step-1');
     });
   });
 
   describe('exit conditions', () => {
     it('should delegate getExitConditions to service', async () => {
-      service.getExitConditions.mockResolvedValue([]);
+      exitConditionService.getExitConditions.mockResolvedValue([]);
 
       const result = await controller.getExitConditions('tenant-1', 'workflow-1');
       expect(result).toEqual([]);
-      expect(service.getExitConditions).toHaveBeenCalledWith('tenant-1', 'workflow-1');
+      expect(exitConditionService.getExitConditions).toHaveBeenCalledWith('tenant-1', 'workflow-1');
     });
 
     it('should delegate replaceExitConditions to service', async () => {
       const dtos = [{ type: 'tag', resource: 'unsubscribed', operator: 'equals', value: 'true' }];
-      service.replaceExitConditions.mockResolvedValue([]);
+      exitConditionService.replaceExitConditions.mockResolvedValue([]);
 
       const result = await controller.replaceExitConditions('tenant-1', 'workflow-1', dtos);
       expect(result).toEqual([]);
-      expect(service.replaceExitConditions).toHaveBeenCalledWith('tenant-1', 'workflow-1', dtos);
+      expect(exitConditionService.replaceExitConditions).toHaveBeenCalledWith(
+        'tenant-1',
+        'workflow-1',
+        dtos,
+      );
     });
   });
 });

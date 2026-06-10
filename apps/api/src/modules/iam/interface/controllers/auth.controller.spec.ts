@@ -3,12 +3,13 @@ import { AuthController } from './auth.controller';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let authService: { signup: Mock; signin: Mock };
+  let authService: { signup: Mock; signin: Mock; getMe: Mock };
 
   beforeEach(() => {
     authService = {
       signup: vi.fn(),
       signin: vi.fn(),
+      getMe: vi.fn(),
     };
     controller = new AuthController(authService as unknown as (typeof controller)['authService']);
   });
@@ -39,6 +40,24 @@ describe('AuthController', () => {
       const result = await controller.signin(dto);
 
       expect(authService.signin).toHaveBeenCalledWith(dto);
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('getMe', () => {
+    it('should call authService.getMe and return the result', async () => {
+      const response = {
+        id: 'u1',
+        email: 'test@example.com',
+        status: 'active' as const,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      authService.getMe.mockResolvedValue(response);
+
+      const result = await controller.getMe({ id: 'u1' });
+
+      expect(authService.getMe).toHaveBeenCalledWith('u1');
       expect(result).toEqual(response);
     });
   });

@@ -1,29 +1,55 @@
 import { z } from 'zod';
 
+export const STEP_ACTIONS = {
+  DELAY: 'delay',
+  SEND_EMAIL: 'send_email',
+  ATTACH_TAG: 'attach_tag',
+  DETACH_TAG: 'detach_tag',
+  UNSUBSCRIBE_CONTACT: 'unsubscribe_contact',
+  DELETE_CONTACT: 'delete_contact',
+  CONDITIONAL_SPLIT: 'conditional_split',
+  WEBHOOK: 'webhook',
+} as const;
+
 export const SUPPORTED_STEP_ACTIONS = [
-  'delay',
-  'send_email',
-  'attach_tag',
-  'detach_tag',
-  'unsubscribe_contact',
-  'delete_contact',
-  'conditional_split',
-  'webhook',
+  STEP_ACTIONS.DELAY,
+  STEP_ACTIONS.SEND_EMAIL,
+  STEP_ACTIONS.ATTACH_TAG,
+  STEP_ACTIONS.DETACH_TAG,
+  STEP_ACTIONS.UNSUBSCRIBE_CONTACT,
+  STEP_ACTIONS.DELETE_CONTACT,
+  STEP_ACTIONS.CONDITIONAL_SPLIT,
+  STEP_ACTIONS.WEBHOOK,
 ] as const;
 
+export const TRIGGER_EVENTS = {
+  CONTACT_SUBSCRIBED: 'contact.subscribed',
+  CONTACT_UNSUBSCRIBED: 'contact.unsubscribed',
+  TAG_ATTACHED: 'tag.attached',
+  TAG_DETACHED: 'tag.detached',
+  EMAIL_SENT: 'email.sent',
+  EMAIL_DELIVERED: 'email.delivered',
+  EMAIL_BOUNCED: 'email.bounced',
+  EMAIL_COMPLAINED: 'email.complained',
+  EMAIL_OPENED: 'email.opened',
+  EMAIL_LINK_CLICKED: 'email.link_clicked',
+  FORM_SUBMITTED: 'form.submitted',
+  CUSTOM_EVENT: 'custom.event',
+} as const;
+
 export const SUPPORTED_TRIGGER_EVENTS = [
-  'contact.subscribed',
-  'contact.unsubscribed',
-  'tag.attached',
-  'tag.detached',
-  'email.sent',
-  'email.delivered',
-  'email.bounced',
-  'email.complained',
-  'email.opened',
-  'email.link_clicked',
-  'form.submitted',
-  'custom.event',
+  TRIGGER_EVENTS.CONTACT_SUBSCRIBED,
+  TRIGGER_EVENTS.CONTACT_UNSUBSCRIBED,
+  TRIGGER_EVENTS.TAG_ATTACHED,
+  TRIGGER_EVENTS.TAG_DETACHED,
+  TRIGGER_EVENTS.EMAIL_SENT,
+  TRIGGER_EVENTS.EMAIL_DELIVERED,
+  TRIGGER_EVENTS.EMAIL_BOUNCED,
+  TRIGGER_EVENTS.EMAIL_COMPLAINED,
+  TRIGGER_EVENTS.EMAIL_OPENED,
+  TRIGGER_EVENTS.EMAIL_LINK_CLICKED,
+  TRIGGER_EVENTS.FORM_SUBMITTED,
+  TRIGGER_EVENTS.CUSTOM_EVENT,
 ] as const;
 
 export const CreateWorkflowSchema = z.object({

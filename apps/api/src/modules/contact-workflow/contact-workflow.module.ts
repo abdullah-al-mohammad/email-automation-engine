@@ -6,9 +6,11 @@ import { TypeOrmContactWorkflowRepository } from './infrastructure/repositories/
 import { TypeOrmContactWorkflowStepRepository } from './infrastructure/repositories/typeorm-contact-workflow-step.repository';
 import { CONTACT_WORKFLOW_REPOSITORY, CONTACT_WORKFLOW_STEP_REPOSITORY } from './constants/tokens';
 import { ContactWorkflowService } from './application/services/contact-workflow.service';
+import { ExecutionSummaryController } from './interface/http/controllers/execution-summary.controller';
+import { IamModule } from '../iam/iam.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContactWorkflow, ContactWorkflowStep])],
+  imports: [TypeOrmModule.forFeature([ContactWorkflow, ContactWorkflowStep]), IamModule],
   providers: [
     {
       provide: CONTACT_WORKFLOW_REPOSITORY,
@@ -20,6 +22,7 @@ import { ContactWorkflowService } from './application/services/contact-workflow.
     },
     ContactWorkflowService,
   ],
+  controllers: [ExecutionSummaryController],
   exports: [CONTACT_WORKFLOW_REPOSITORY, CONTACT_WORKFLOW_STEP_REPOSITORY, ContactWorkflowService],
 })
 export class ContactWorkflowModule {}

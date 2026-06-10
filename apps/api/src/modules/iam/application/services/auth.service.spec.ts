@@ -12,7 +12,7 @@ vi.mock('bcrypt', () => ({
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userRepo: { findByEmail: Mock; save: Mock };
+  let userRepo: { findByEmail: Mock; findById: Mock; save: Mock };
   let jwtService: { signAsync: Mock };
   let configService: { getOrThrow: Mock };
   let encryptionService: { encrypt: Mock; decrypt: Mock };
@@ -27,6 +27,7 @@ describe('AuthService', () => {
 
     userRepo = {
       findByEmail: vi.fn(),
+      findById: vi.fn(),
       save: vi.fn(),
     };
 
@@ -166,6 +167,36 @@ describe('AuthService', () => {
           password: 'password123',
         }),
       ).rejects.toThrow(new ForbiddenException('Your account has been blocked'));
+    });
+  });
+
+  describe('getMe', () => {
+    it('should return user info if user is found', async () => {
+      const u = new User();
+      u.id = 'u1';
+      u.email = 'alice@example.com';
+      u.status = 'active';
+      u.createdAt = new Date('2026-01-01T00:00:00Z');
+      u.updatedAt = new Date('2026-01-01T00:00:00Z');
+
+      userRepo.findById.mockResolvedValue(u);
+
+      const result = await service.getMe('u1');
+
+      expect(userRepo.findById).toHaveBeenCalledWith('u1');
+      expect(result).toEqual({
+        id: 'u1',
+        email: 'alice@example.com',
+        status: 'active',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      });
+    });
+
+    it('should throw UnauthorizedException if user not found', async () => {
+      userRepo.findById.mockResolvedValue(null);
+
+      await expect(service.getMe('bad-uuid')).rejects.toThrow(UnauthorizedException);
     });
   });
 });

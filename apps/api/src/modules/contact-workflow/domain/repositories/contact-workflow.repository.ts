@@ -6,5 +6,6 @@ export interface ContactWorkflowRepository {
     contactId: string,
     workflowId: string,
   ): Promise<ContactWorkflow | null>;
+  findManyByWorkflowId(workflowId: string): Promise<ContactWorkflow[]>;
   save(contactWorkflow: ContactWorkflow): Promise<ContactWorkflow>;
 }
