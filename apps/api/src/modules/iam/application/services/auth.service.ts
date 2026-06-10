@@ -37,7 +37,7 @@ export class AuthService {
     const emailNormalized = dto.email.toLowerCase().trim();
     const existingUser = await this.userRepo.findByEmail(emailNormalized);
     if (existingUser) {
-      throw new ConflictException('This email address is already in use');
+      throw new ConflictException('Unable to create account. Please try again or sign in.');
     }
 
     const saltRounds = this.config.getOrThrow<number>(BCRYPT_SALT_ROUNDS);
