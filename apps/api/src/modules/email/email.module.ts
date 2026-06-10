@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { IamModule } from '../iam/iam.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailTemplate } from './domain/aggregates/email-template.aggregate';
 import { EmailMessage } from './domain/aggregates/email-message.aggregate';
@@ -10,7 +11,10 @@ import { EmailTemplateController } from './interface/http/controllers/email-temp
 import { EmailMessageService } from './application/services/email-message.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EmailTemplate, EmailMessage, EmailEvent])],
+  imports: [
+    TypeOrmModule.forFeature([EmailTemplate, EmailMessage, EmailEvent]),
+    IamModule,
+  ],
   controllers: [EmailTemplateController],
   providers: [
     {
