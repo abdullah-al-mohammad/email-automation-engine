@@ -57,7 +57,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    fetchTenants();
+    void fetchTenants();
   }, [isAuthenticated]);
 
   const setCurrentTenant = (tenant: TenantResponse | null) => {

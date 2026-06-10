@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,13 +17,13 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  (error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
       localStorage.removeItem('auth_token');
       // Dispatch an event so the AuthContext can listen and log the user out
       window.dispatchEvent(new Event('auth_unauthorized'));
     }
-    return Promise.reject(error);
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   }
 );
 
