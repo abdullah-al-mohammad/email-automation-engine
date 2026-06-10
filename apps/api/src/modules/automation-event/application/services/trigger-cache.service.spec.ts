@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { TriggerCacheService } from './trigger-cache.service';
+import type { ICacheService } from '../../../../infrastructure/cache/cache.interface';
+import type { WorkflowTriggerRepository } from '../../../workflow/domain/repositories/workflow-trigger.repository';
 
 describe('TriggerCacheService', () => {
   let service: TriggerCacheService;
-  let cacheService: any;
-  let triggerRepository: any;
+  let cacheService: { get: Mock; set: Mock; del: Mock };
+  let triggerRepository: { findActiveByEvent: Mock };
 
   beforeEach(() => {
     cacheService = {
@@ -15,7 +17,10 @@ describe('TriggerCacheService', () => {
     triggerRepository = {
       findActiveByEvent: vi.fn(),
     };
-    service = new TriggerCacheService(cacheService, triggerRepository);
+    service = new TriggerCacheService(
+      cacheService as unknown as ICacheService,
+      triggerRepository as unknown as WorkflowTriggerRepository
+    );
   });
 
   it('should return from cache if hit', async () => {

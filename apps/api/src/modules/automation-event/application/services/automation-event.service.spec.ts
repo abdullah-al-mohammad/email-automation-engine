@@ -1,11 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { AutomationEventService } from './automation-event.service';
+import type { TriggerCacheService } from './trigger-cache.service';
+import type { ConfigService } from '@nestjs/config';
+import type { IQueueService } from '../../../../infrastructure/queue/queue.interface';
 
 describe('AutomationEventService', () => {
   let service: AutomationEventService;
-  let triggerCache: any;
-  let queueService: any;
-  let configService: any;
+  let triggerCache: { getMatchingTriggers: Mock };
+  let queueService: { sendMessage: Mock };
+  let configService: { get: Mock };
 
   beforeEach(() => {
     triggerCache = {
@@ -17,7 +20,11 @@ describe('AutomationEventService', () => {
     configService = {
       get: vi.fn().mockReturnValue('automation-events'),
     };
-    service = new AutomationEventService(triggerCache, queueService, configService);
+    service = new AutomationEventService(
+      triggerCache as unknown as TriggerCacheService,
+      queueService as unknown as IQueueService,
+      configService as unknown as ConfigService
+    );
   });
 
   it('should return early if no triggers match', async () => {
