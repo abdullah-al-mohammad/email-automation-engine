@@ -7,6 +7,7 @@ import { ContactWorkflowRepository } from '../../domain/repositories/contact-wor
 import { ContactWorkflowStepRepository } from '../../domain/repositories/contact-workflow-step.repository';
 import { ContactWorkflow } from '../../domain/aggregates/contact-workflow.aggregate';
 import { ContactWorkflowStep } from '../../domain/aggregates/contact-workflow-step.aggregate';
+import { type ContactWorkflowResponse, type ContactWorkflowStepResponse } from '@email-automation-engine/shared';
 
 @Injectable()
 export class ContactWorkflowService {
@@ -38,6 +39,23 @@ export class ContactWorkflowService {
     workflowId: string,
   ): Promise<ContactWorkflow | null> {
     return this.contactWorkflowRepository.findActiveByContactAndWorkflow(contactId, workflowId);
+  }
+
+  async findManyByWorkflowId(workflowId: string): Promise<ContactWorkflowResponse[]> {
+    const records = await this.contactWorkflowRepository.findManyByWorkflowId(workflowId);
+    return records.map(r => ({
+      id: r.id,
+      tenantId: r.tenantId,
+      workflowId: r.workflowId,
+      workflowTriggerId: r.workflowTriggerId,
+      contactId: r.contactId,
+      triggerEvent: r.triggerEvent,
+      status: r.status as ContactWorkflowResponse['status'],
+      startedAt: r.startedAt?.toISOString(),
+      finishedAt: r.finishedAt?.toISOString(),
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    }));
   }
 
   async markInProgress(id: string): Promise<ContactWorkflow | null> {
@@ -95,5 +113,20 @@ export class ContactWorkflowService {
 
   async findDueSteps(now: Date): Promise<ContactWorkflowStep[]> {
     return this.contactWorkflowStepRepository.findDueSteps(now);
+  }
+
+  async findAllStepsByContactWorkflowId(contactWorkflowId: string): Promise<ContactWorkflowStepResponse[]> {
+    const steps = await this.contactWorkflowStepRepository.findAllByContactWorkflowId(contactWorkflowId);
+    return steps.map(s => ({
+      id: s.id,
+      tenantId: s.tenantId,
+      contactWorkflowId: s.contactWorkflowId,
+      workflowStepId: s.workflowStepId,
+      status: s.status as ContactWorkflowStepResponse['status'],
+      scheduledAt: s.scheduledAt?.toISOString(),
+      finishedAt: s.finishedAt?.toISOString(),
+      createdAt: s.createdAt.toISOString(),
+      updatedAt: s.updatedAt.toISOString(),
+    }));
   }
 }

@@ -8,4 +8,5 @@ export interface ContactWorkflowStepRepository {
   ): Promise<ContactWorkflowStep | null>;
   save(contactWorkflowStep: ContactWorkflowStep): Promise<ContactWorkflowStep>;
   findDueSteps(now: Date): Promise<ContactWorkflowStep[]>;
+  findAllByContactWorkflowId(contactWorkflowId: string): Promise<ContactWorkflowStep[]>;
 }
