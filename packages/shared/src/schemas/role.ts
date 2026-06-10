@@ -27,6 +27,14 @@ export const createRoleSchema = z.object({
 
 export type CreateRoleDto = z.infer<typeof createRoleSchema>;
 
+export const updateRoleSchema = z.object({
+  name: z.string().min(1, 'Role name is required').max(50, 'Role name is too long').optional(),
+  description: z.string().max(255).optional().nullable(),
+  permissions: z.array(z.enum(permissionsCatalog)).optional(),
+});
+
+export type UpdateRoleDto = z.infer<typeof updateRoleSchema>;
+
 export const roleResponseSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string().uuid(),

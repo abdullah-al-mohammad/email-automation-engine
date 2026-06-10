@@ -19,3 +19,13 @@ export const authResponseSchema = z.object({
 });
 
 export type AuthResponse = z.infer<typeof authResponseSchema>;
+
+export const userResponseSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  status: z.enum(['new', 'active', 'blocked']),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type UserResponse = z.infer<typeof userResponseSchema>;
