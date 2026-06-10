@@ -14,8 +14,20 @@ export class TypeOrmRoleRepository implements RoleRepository {
     private readonly permissionRepo: Repository<RolePermission>,
   ) {}
 
+  async findById(id: string): Promise<Role | null> {
+    return this.roleRepo.findOne({ where: { id } });
+  }
+
+  async findAllByTenantId(tenantId: string): Promise<Role[]> {
+    return this.roleRepo.find({ where: { tenantId }, order: { createdAt: 'ASC' } });
+  }
+
   async save(role: Role): Promise<Role> {
     return this.roleRepo.save(role);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.roleRepo.delete(id);
   }
 
   async savePermission(permission: RolePermission): Promise<RolePermission> {

@@ -12,6 +12,7 @@ import {
   type SignupDto,
   type SigninDto,
   type AuthResponse,
+  type UserResponse,
   USER_NEW,
   USER_BLOCKED,
 } from '@email-automation-engine/shared';
@@ -79,5 +80,19 @@ export class AuthService {
 
     const accessToken = this.encryptionService.encrypt(signedToken);
     return { accessToken };
+  }
+
+  async getMe(userId: string): Promise<UserResponse> {
+    const user = await this.userRepo.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return {
+      id: user.id,
+      email: user.email,
+      status: user.status as UserResponse['status'],
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
   }
 }

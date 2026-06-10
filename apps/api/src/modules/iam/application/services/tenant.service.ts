@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import {
   type CreateTenantDto,
+  type UpdateTenantDto,
   type TenantResponse,
   permissionsCatalog,
 } from '@email-automation-engine/shared';
@@ -121,6 +122,18 @@ export class TenantService {
     }
 
     return tenants.map((t) => this.mapToResponse(t));
+  }
+
+  async update(id: string, dto: UpdateTenantDto): Promise<TenantResponse> {
+    const tenant = await this.tenantRepo.findById(id);
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+    if (dto.name) {
+      tenant.name = dto.name;
+    }
+    const updated = await this.tenantRepo.save(tenant);
+    return this.mapToResponse(updated);
   }
 
   private mapToResponse(tenant: Tenant): TenantResponse {

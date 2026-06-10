@@ -19,7 +19,15 @@ export class TypeOrmTenantMembershipRepository implements TenantMembershipReposi
     return this.repo.find({ where: { userId } });
   }
 
+  async findMembershipsByTenant(tenantId: string): Promise<TenantMembership[]> {
+    return this.repo.find({ where: { tenantId } });
+  }
+
   async save(membership: TenantMembership): Promise<TenantMembership> {
     return this.repo.save(membership);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 }
