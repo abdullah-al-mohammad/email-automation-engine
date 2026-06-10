@@ -17,10 +17,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   const [tenants, setTenants] = useState<TenantResponse[]>([]);
   const [currentTenant, setCurrentTenantState] = useState<TenantResponse | null>(null);
-  const [isLoadingTenants, setIsLoadingTenants] = useState(false);
+  const [isLoadingTenants, setIsLoadingTenants] = useState(true);
 
   const fetchTenants = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      setIsLoadingTenants(false);
+      return;
+    }
     setIsLoadingTenants(true);
     try {
       const response = await api.get<TenantResponse[]>('/tenants');
