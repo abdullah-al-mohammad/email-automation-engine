@@ -24,7 +24,7 @@ api.interceptors.response.use(
       window.dispatchEvent(new Event('auth_unauthorized'));
     }
     return Promise.reject(error instanceof Error ? error : new Error(String(error)));
-  }
+  },
 );
 
 export default api;

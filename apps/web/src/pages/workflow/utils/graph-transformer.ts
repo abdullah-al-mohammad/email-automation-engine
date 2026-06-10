@@ -1,4 +1,7 @@
-import { type WorkflowTriggerResponse, type WorkflowStepResponse } from '@email-automation-engine/shared';
+import {
+  type WorkflowTriggerResponse,
+  type WorkflowStepResponse,
+} from '@email-automation-engine/shared';
 import { type Node, type Edge } from '@xyflow/react';
 import dagre from 'dagre';
 
@@ -7,7 +10,7 @@ const nodeHeight = 80;
 
 export function generateWorkflowGraph(
   triggers: WorkflowTriggerResponse[],
-  steps: WorkflowStepResponse[]
+  steps: WorkflowStepResponse[],
 ): { nodes: Node[]; edges: Edge[] } {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -20,7 +23,7 @@ export function generateWorkflowGraph(
   // Multiple triggers all point to the first step (or an implicit start node if there are no steps)
   // To keep it simple, if multiple triggers exist, we link them to a dummy "Start" node or just straight to first step
   // Let's find the first step (step without parent)
-  const firstStep = steps.find(s => !s.parentWorkflowStepId);
+  const firstStep = steps.find((s) => !s.parentWorkflowStepId);
 
   triggers.forEach((trigger, idx) => {
     const id = `trigger-${trigger.id}`;
@@ -81,7 +84,7 @@ export function generateWorkflowGraph(
     } else {
       // Find the next linear step (the step whose parent is this step)
       // Note: A conditional split doesn't have a linear next step. Its children are set via trueStepId/falseStepId.
-      const nextStep = steps.find(s => s.parentWorkflowStepId === step.id);
+      const nextStep = steps.find((s) => s.parentWorkflowStepId === step.id);
       if (nextStep) {
         edges.push({
           id: `edge-${id}-${nextStep.id}`,

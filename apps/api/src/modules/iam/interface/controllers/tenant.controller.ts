@@ -48,10 +48,7 @@ export class TenantController {
   @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
   @RequirePermissions('tenant.update')
   @UsePipes(new ZodValidationPipe(updateTenantSchema))
-  async update(
-    @Param('id') id: string,
-    @Body() dto: UpdateTenantDto,
-  ): Promise<TenantResponse> {
+  async update(@Param('id') id: string, @Body() dto: UpdateTenantDto): Promise<TenantResponse> {
     return this.tenantService.update(id, dto);
   }
 }

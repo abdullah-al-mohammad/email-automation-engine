@@ -119,7 +119,11 @@ describe('WorkflowController', () => {
 
       const result = await controller.replaceExitConditions('tenant-1', 'workflow-1', dtos);
       expect(result).toEqual([]);
-      expect(exitConditionService.replaceExitConditions).toHaveBeenCalledWith('tenant-1', 'workflow-1', dtos);
+      expect(exitConditionService.replaceExitConditions).toHaveBeenCalledWith(
+        'tenant-1',
+        'workflow-1',
+        dtos,
+      );
     });
   });
 });

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, UsePipes, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UsePipes,
+  HttpCode,
+} from '@nestjs/common';
 import {
   createRoleSchema,
   updateRoleSchema,
@@ -48,10 +59,7 @@ export class RoleController {
   @Delete(':id')
   @HttpCode(204)
   @RequirePermissions('settings.manage')
-  async delete(
-    @Param('tenantId') tenantId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async delete(@Param('tenantId') tenantId: string, @Param('id') id: string): Promise<void> {
     return this.roleService.delete(tenantId, id);
   }
 }

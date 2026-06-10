@@ -95,11 +95,14 @@ export default function WorkflowBuilder() {
         parentId = steps[steps.length - 1]?.id;
       }
 
-      const res = await api.post<WorkflowStepResponse>(`/tenants/${currentTenant?.id}/workflows/${workflowId}/steps`, {
-        action: 'delay',
-        config: { durationValue: 1, durationUnit: 'days' },
-        parentWorkflowStepId: parentId,
-      });
+      const res = await api.post<WorkflowStepResponse>(
+        `/tenants/${currentTenant?.id}/workflows/${workflowId}/steps`,
+        {
+          action: 'delay',
+          config: { durationValue: 1, durationUnit: 'days' },
+          parentWorkflowStepId: parentId,
+        },
+      );
       return res.data;
     },
     onSuccess: () => {

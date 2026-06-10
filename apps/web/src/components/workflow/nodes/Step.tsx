@@ -1,5 +1,9 @@
 import { Handle, Position } from '@xyflow/react';
-import { type WorkflowStepResponse, SUPPORTED_STEP_ACTIONS, STEP_ACTIONS } from '@email-automation-engine/shared';
+import {
+  type WorkflowStepResponse,
+  SUPPORTED_STEP_ACTIONS,
+  STEP_ACTIONS,
+} from '@email-automation-engine/shared';
 
 const ICONS: Record<string, React.ReactNode> = {
   [STEP_ACTIONS.SEND_EMAIL]: (

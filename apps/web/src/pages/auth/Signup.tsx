@@ -11,7 +11,11 @@ export default function Signup() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignupDto>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupDto>({
     resolver: zodResolver(signupSchema),
   });
 
@@ -34,7 +38,9 @@ export default function Signup() {
       <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create an account</h1>
-          <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2">Start automating your emails today</p>
+          <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2">
+            Start automating your emails today
+          </p>
         </div>
 
         {error && (
@@ -43,12 +49,19 @@ export default function Signup() {
           </div>
         )}
 
-        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="space-y-5">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e);
+          }}
+          className="space-y-5"
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email address</label>
-            <input 
-              {...register('email')} 
-              type="email" 
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              Email address
+            </label>
+            <input
+              {...register('email')}
+              type="email"
               className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow"
               placeholder="you@example.com"
             />
@@ -56,18 +69,22 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Password</label>
-            <input 
-              {...register('password')} 
-              type="password" 
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              Password
+            </label>
+            <input
+              {...register('password')}
+              type="password"
               className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow"
               placeholder="••••••••"
             />
-            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSubmitting}
             className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
           >
@@ -77,7 +94,10 @@ export default function Signup() {
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-zinc-400">
           Already have an account?{' '}
-          <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+          <Link
+            to="/signin"
+            className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+          >
             Sign in
           </Link>
         </p>

@@ -282,5 +282,4 @@ describe('WorkflowService', () => {
       );
     });
   });
-
 });

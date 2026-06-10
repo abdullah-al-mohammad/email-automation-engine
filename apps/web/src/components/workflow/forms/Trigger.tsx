@@ -36,12 +36,7 @@ function formatEventName(event: string) {
   return TRIGGER_EVENT_LABELS[event] || event;
 }
 
-export default function Trigger({
-  trigger,
-  workflowId,
-  isActive,
-  onSuccess,
-}: TriggerFormProps) {
+export default function Trigger({ trigger, workflowId, isActive, onSuccess }: TriggerFormProps) {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
 

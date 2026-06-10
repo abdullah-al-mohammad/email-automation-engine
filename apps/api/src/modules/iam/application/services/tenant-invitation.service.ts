@@ -2,7 +2,10 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { TENANT_INVITATION_REPOSITORY } from '../../constants/tokens';
 import { TenantInvitationRepository } from '../../domain/repositories/tenant-invitation.repository';
 import { TenantInvitation } from '../../domain/aggregates/tenant-invitation.aggregate';
-import { type TenantInvitationResponse, type CreateTenantInvitationDto } from '@email-automation-engine/shared';
+import {
+  type TenantInvitationResponse,
+  type CreateTenantInvitationDto,
+} from '@email-automation-engine/shared';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -14,10 +17,14 @@ export class TenantInvitationService {
 
   async findAllByTenantId(tenantId: string): Promise<TenantInvitationResponse[]> {
     const invitations = await this.invitationRepo.findAllByTenantId(tenantId);
-    return invitations.map(i => this.mapToResponse(i));
+    return invitations.map((i) => this.mapToResponse(i));
   }
 
-  async create(tenantId: string, senderId: string, dto: CreateTenantInvitationDto): Promise<TenantInvitationResponse> {
+  async create(
+    tenantId: string,
+    senderId: string,
+    dto: CreateTenantInvitationDto,
+  ): Promise<TenantInvitationResponse> {
     const invitation = new TenantInvitation();
     invitation.tenantId = tenantId;
     invitation.senderId = senderId;
@@ -25,7 +32,7 @@ export class TenantInvitationService {
     invitation.email = dto.email;
     invitation.message = dto.message ?? null;
     invitation.invitationToken = crypto.randomBytes(32).toString('hex');
-    
+
     const saved = await this.invitationRepo.save(invitation);
     return this.mapToResponse(saved);
   }

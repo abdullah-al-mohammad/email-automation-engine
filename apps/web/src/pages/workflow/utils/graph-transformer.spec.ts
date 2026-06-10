@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { generateWorkflowGraph } from './graph-transformer';
-import { type WorkflowStepResponse, type WorkflowTriggerResponse } from '@email-automation-engine/shared';
+import {
+  type WorkflowStepResponse,
+  type WorkflowTriggerResponse,
+} from '@email-automation-engine/shared';
 
 describe('graph-transformer', () => {
   it('should transform a simple workflow with trigger and no steps', () => {
@@ -18,7 +21,7 @@ describe('graph-transformer', () => {
 
     expect(result.nodes).toHaveLength(1);
     expect(result.edges).toHaveLength(0);
-    
+
     const triggerNode = result.nodes[0];
     expect(triggerNode).toBeDefined();
     expect(triggerNode!.id).toBe('trigger-trigger-1');
@@ -58,7 +61,7 @@ describe('graph-transformer', () => {
         config: { templateId: 'tpl-1' },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      }
+      },
     ];
 
     const result = generateWorkflowGraph([trigger], steps);
@@ -67,14 +70,18 @@ describe('graph-transformer', () => {
     expect(result.edges).toHaveLength(2); // trigger -> step-1 -> step-2
 
     // Check Trigger Node
-    expect(result.nodes.find(n => n.id === 'trigger-trigger-1')).toBeDefined();
-    
+    expect(result.nodes.find((n) => n.id === 'trigger-trigger-1')).toBeDefined();
+
     // Check Edges
-    expect(result.edges.find(e => e.source === 'trigger-trigger-1' && e.target === 'step-step-1')).toBeDefined();
-    expect(result.edges.find(e => e.source === 'step-step-1' && e.target === 'step-step-2')).toBeDefined();
+    expect(
+      result.edges.find((e) => e.source === 'trigger-trigger-1' && e.target === 'step-step-1'),
+    ).toBeDefined();
+    expect(
+      result.edges.find((e) => e.source === 'step-step-1' && e.target === 'step-step-2'),
+    ).toBeDefined();
 
     // Check positions (Dagre layout should assign coordinates)
-    const step1Node = result.nodes.find(n => n.id === 'step-step-1')!;
+    const step1Node = result.nodes.find((n) => n.id === 'step-step-1')!;
     expect(step1Node.position.x).toBeDefined();
     expect(step1Node.position.y).toBeDefined();
   });

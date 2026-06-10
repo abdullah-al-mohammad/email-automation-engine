@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { type UserResponse, type SigninDto, type SignupDto, type AuthResponse } from '@email-automation-engine/shared';
+import {
+  type UserResponse,
+  type SigninDto,
+  type SignupDto,
+  type AuthResponse,
+} from '@email-automation-engine/shared';
 import api from '../lib/api';
 
 interface AuthContextType {

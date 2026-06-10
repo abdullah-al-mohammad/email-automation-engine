@@ -12,7 +12,7 @@ export class TenantMemberService {
 
   async findAllByTenantId(tenantId: string): Promise<TenantMemberResponse[]> {
     const memberships = await this.membershipRepo.findMembershipsByTenant(tenantId);
-    return memberships.map(m => ({
+    return memberships.map((m) => ({
       id: m.id,
       tenantId: m.tenantId,
       userId: m.userId,

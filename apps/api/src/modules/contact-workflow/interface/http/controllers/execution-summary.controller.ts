@@ -1,5 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { type ContactWorkflowResponse, type ContactWorkflowStepResponse } from '@email-automation-engine/shared';
+import {
+  type ContactWorkflowResponse,
+  type ContactWorkflowStepResponse,
+} from '@email-automation-engine/shared';
 import { ContactWorkflowService } from '../../../application/services/contact-workflow.service';
 import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
 import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Delete, Body, Param, UseGuards, UsePipes, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UsePipes,
+  HttpCode,
+} from '@nestjs/common';
 import {
   createTenantInvitationSchema,
   type CreateTenantInvitationDto,
@@ -37,10 +47,7 @@ export class TenantInvitationController {
   @Delete(':id')
   @HttpCode(204)
   @RequirePermissions('members.manage')
-  async delete(
-    @Param('tenantId') tenantId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async delete(@Param('tenantId') tenantId: string, @Param('id') id: string): Promise<void> {
     return this.invitationService.delete(tenantId, id);
   }
 }

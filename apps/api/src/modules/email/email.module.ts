@@ -11,10 +11,7 @@ import { EmailTemplateController } from './interface/http/controllers/email-temp
 import { EmailMessageService } from './application/services/email-message.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([EmailTemplate, EmailMessage, EmailEvent]),
-    IamModule,
-  ],
+  imports: [TypeOrmModule.forFeature([EmailTemplate, EmailMessage, EmailEvent]), IamModule],
   controllers: [EmailTemplateController],
   providers: [
     {

@@ -23,7 +23,7 @@ describe('AutomationEventService', () => {
     service = new AutomationEventService(
       triggerCache as unknown as TriggerCacheService,
       queueService as unknown as IQueueService,
-      configService as unknown as ConfigService
+      configService as unknown as ConfigService,
     );
   });
 

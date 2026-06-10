@@ -125,7 +125,6 @@ export class WorkflowService {
     await this.workflowRepo.delete(workflowId);
   }
 
-
   async verifyWorkflowInactive(tenantId: string, workflowId: string): Promise<void> {
     const workflow = await this.getWorkflowOrThrow(tenantId, workflowId);
     if (workflow.isActive) {
@@ -210,7 +209,10 @@ export class WorkflowService {
         }
       }
 
-      if ((step.action === STEP_ACTIONS.ATTACH_TAG || step.action === STEP_ACTIONS.DETACH_TAG) && !step.config?.tagId) {
+      if (
+        (step.action === STEP_ACTIONS.ATTACH_TAG || step.action === STEP_ACTIONS.DETACH_TAG) &&
+        !step.config?.tagId
+      ) {
         throw new BadRequestException(`Tag step ${step.id} requires a tag reference`);
       }
 

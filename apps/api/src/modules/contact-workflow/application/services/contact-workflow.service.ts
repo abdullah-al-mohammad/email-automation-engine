@@ -7,7 +7,10 @@ import { ContactWorkflowRepository } from '../../domain/repositories/contact-wor
 import { ContactWorkflowStepRepository } from '../../domain/repositories/contact-workflow-step.repository';
 import { ContactWorkflow } from '../../domain/aggregates/contact-workflow.aggregate';
 import { ContactWorkflowStep } from '../../domain/aggregates/contact-workflow-step.aggregate';
-import { type ContactWorkflowResponse, type ContactWorkflowStepResponse } from '@email-automation-engine/shared';
+import {
+  type ContactWorkflowResponse,
+  type ContactWorkflowStepResponse,
+} from '@email-automation-engine/shared';
 
 @Injectable()
 export class ContactWorkflowService {
@@ -43,7 +46,7 @@ export class ContactWorkflowService {
 
   async findManyByWorkflowId(workflowId: string): Promise<ContactWorkflowResponse[]> {
     const records = await this.contactWorkflowRepository.findManyByWorkflowId(workflowId);
-    return records.map(r => ({
+    return records.map((r) => ({
       id: r.id,
       tenantId: r.tenantId,
       workflowId: r.workflowId,
@@ -115,9 +118,12 @@ export class ContactWorkflowService {
     return this.contactWorkflowStepRepository.findDueSteps(now);
   }
 
-  async findAllStepsByContactWorkflowId(contactWorkflowId: string): Promise<ContactWorkflowStepResponse[]> {
-    const steps = await this.contactWorkflowStepRepository.findAllByContactWorkflowId(contactWorkflowId);
-    return steps.map(s => ({
+  async findAllStepsByContactWorkflowId(
+    contactWorkflowId: string,
+  ): Promise<ContactWorkflowStepResponse[]> {
+    const steps =
+      await this.contactWorkflowStepRepository.findAllByContactWorkflowId(contactWorkflowId);
+    return steps.map((s) => ({
       id: s.id,
       tenantId: s.tenantId,
       contactWorkflowId: s.contactWorkflowId,

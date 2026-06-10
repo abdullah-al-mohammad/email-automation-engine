@@ -28,11 +28,11 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.get<TenantResponse[]>('/tenants');
       setTenants(response.data);
-      
+
       // Auto-select first tenant if none is selected
       const savedTenantId = localStorage.getItem('current_tenant_id');
       if (savedTenantId) {
-        const found = response.data.find(t => t.id === savedTenantId);
+        const found = response.data.find((t) => t.id === savedTenantId);
         if (found) {
           setCurrentTenantState(found);
         } else if (response.data.length > 0) {

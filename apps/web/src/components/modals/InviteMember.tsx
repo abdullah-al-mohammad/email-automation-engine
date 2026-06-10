@@ -1,7 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createTenantInvitationSchema, type CreateTenantInvitationDto, type RoleResponse, type TenantInvitationResponse } from '@email-automation-engine/shared';
+import {
+  createTenantInvitationSchema,
+  type CreateTenantInvitationDto,
+  type RoleResponse,
+  type TenantInvitationResponse,
+} from '@email-automation-engine/shared';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
@@ -17,20 +22,28 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<CreateTenantInvitationDto>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateTenantInvitationDto>({
     resolver: zodResolver(createTenantInvitationSchema),
   });
 
   const inviteMutation = useMutation({
     mutationFn: async (data: CreateTenantInvitationDto) => {
-      const res = await api.post<TenantInvitationResponse>(`/tenants/${currentTenant?.id}/invitations`, data);
+      const res = await api.post<TenantInvitationResponse>(
+        `/tenants/${currentTenant?.id}/invitations`,
+        data,
+      );
       return res.data;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['tenant-invitations', currentTenant?.id] });
       reset();
       onClose();
-    }
+    },
   });
 
   const onSubmit = (data: CreateTenantInvitationDto) => {
@@ -53,9 +66,11 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
 
           <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Email address</label>
-              <input 
-                type="email" 
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                Email address
+              </label>
+              <input
+                type="email"
                 {...register('email')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                 placeholder="colleague@example.com"
@@ -64,22 +79,30 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Role</label>
-              <select 
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                Role
+              </label>
+              <select
                 {...register('roleId')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
               >
                 <option value="">Select a role...</option>
-                {roles.map(role => (
-                  <option key={role.id} value={role.id}>{role.name}</option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
                 ))}
               </select>
-              {errors.roleId && <p className="mt-1 text-sm text-red-600">{errors.roleId.message}</p>}
+              {errors.roleId && (
+                <p className="mt-1 text-sm text-red-600">{errors.roleId.message}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Personal message (optional)</label>
-              <textarea 
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                Personal message (optional)
+              </label>
+              <textarea
                 {...register('message')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                 placeholder="Join us on the Email Engine!"
@@ -88,19 +111,22 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
             </div>
 
             {inviteMutation.isError && (
-              <p className="text-sm text-red-600">{(inviteMutation.error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to send invitation'}</p>
+              <p className="text-sm text-red-600">
+                {(inviteMutation.error as AxiosError<{ message: string }>)?.response?.data
+                  ?.message || 'Failed to send invitation'}
+              </p>
             )}
 
             <div className="flex justify-end gap-3 pt-4">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >

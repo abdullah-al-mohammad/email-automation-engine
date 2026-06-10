@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { createTenantSchema, type CreateTenantDto, type TenantResponse } from '@email-automation-engine/shared';
+import {
+  createTenantSchema,
+  type CreateTenantDto,
+  type TenantResponse,
+} from '@email-automation-engine/shared';
 import { isAxiosError } from 'axios';
 import { Plus, ChevronRight, Building } from 'lucide-react';
 
@@ -33,18 +37,13 @@ export default function Tenants() {
       <div className="max-w-xl w-full">
         <Header />
 
-        {showList && (
-          <TenantList 
-            tenants={tenants} 
-            onSelect={handleSelectTenant} 
-          />
-        )}
+        {showList && <TenantList tenants={tenants} onSelect={handleSelectTenant} />}
 
         {isCreating ? (
-          <CreateTenantForm 
-            onSuccess={handleTenantCreated} 
-            onCancel={() => setIsCreating(false)} 
-            canCancel={hasTenants} 
+          <CreateTenantForm
+            onSuccess={handleTenantCreated}
+            onCancel={() => setIsCreating(false)}
+            canCancel={hasTenants}
           />
         ) : (
           <div className="text-center mt-6">
@@ -68,9 +67,7 @@ function Header() {
       <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl mb-4">
         <Building className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        Choose your workspace
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Choose your workspace</h1>
       <p className="text-gray-500 dark:text-zinc-400 mt-2">
         Select an existing workspace or create a new one to continue.
       </p>
@@ -141,9 +138,7 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-        Create new workspace
-      </h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Create new workspace</h2>
 
       {globalError && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-xl text-sm flex items-start">
@@ -153,7 +148,10 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
 
       <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5"
+          >
             Workspace name
           </label>
           <input
@@ -161,16 +159,14 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
             type="text"
             {...register('name')}
             className={`w-full px-4 py-2.5 border rounded-xl bg-white dark:bg-zinc-950 text-gray-900 dark:text-white outline-none transition-shadow ${
-              errors.name 
-                ? 'border-red-300 dark:border-red-500/50 focus:ring-2 focus:ring-red-500/20' 
+              errors.name
+                ? 'border-red-300 dark:border-red-500/50 focus:ring-2 focus:ring-red-500/20'
                 : 'border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
             }`}
             placeholder="e.g. Acme corporation"
           />
           {errors.name && (
-            <p className="mt-2 text-sm text-red-500 font-medium">
-              {errors.name.message}
-            </p>
+            <p className="mt-2 text-sm text-red-500 font-medium">{errors.name.message}</p>
           )}
         </div>
 
@@ -182,7 +178,7 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
           >
             {isSubmitting ? 'Creating...' : 'Create workspace'}
           </button>
-          
+
           {canCancel && (
             <button
               type="button"

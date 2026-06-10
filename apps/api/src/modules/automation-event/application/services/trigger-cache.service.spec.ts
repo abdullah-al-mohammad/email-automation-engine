@@ -19,7 +19,7 @@ describe('TriggerCacheService', () => {
     };
     service = new TriggerCacheService(
       cacheService as unknown as ICacheService,
-      triggerRepository as unknown as WorkflowTriggerRepository
+      triggerRepository as unknown as WorkflowTriggerRepository,
     );
   });
 

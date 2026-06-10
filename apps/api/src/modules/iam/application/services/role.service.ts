@@ -3,7 +3,11 @@ import { ROLE_REPOSITORY } from '../../constants/tokens';
 import { RoleRepository } from '../../domain/repositories/role.repository';
 import { Role } from '../../domain/aggregates/role.aggregate';
 import { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
-import { type RoleResponse, type CreateRoleDto, type UpdateRoleDto } from '@email-automation-engine/shared';
+import {
+  type RoleResponse,
+  type CreateRoleDto,
+  type UpdateRoleDto,
+} from '@email-automation-engine/shared';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -16,7 +20,7 @@ export class RoleService {
 
   async findAllByTenantId(tenantId: string): Promise<RoleResponse[]> {
     const roles = await this.roleRepo.findAllByTenantId(tenantId);
-    return Promise.all(roles.map(r => this.mapToResponse(r)));
+    return Promise.all(roles.map((r) => this.mapToResponse(r)));
   }
 
   async findById(tenantId: string, id: string): Promise<RoleResponse> {
@@ -31,8 +35,8 @@ export class RoleService {
     role.name = dto.name;
     role.slug = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     role.description = dto.description ?? null;
-    
-    return this.dataSource.transaction(async manager => {
+
+    return this.dataSource.transaction(async (manager) => {
       const savedRole = await manager.save(role);
       for (const p of dto.permissions) {
         const rp = new RolePermission();
@@ -55,9 +59,9 @@ export class RoleService {
       role.description = dto.description;
     }
 
-    return this.dataSource.transaction(async manager => {
+    return this.dataSource.transaction(async (manager) => {
       const savedRole = await manager.save(role);
-      
+
       if (dto.permissions) {
         await manager.delete(RolePermission, { roleId: role.id });
         for (const p of dto.permissions) {
@@ -79,7 +83,8 @@ export class RoleService {
   }
 
   private async mapToResponse(role: Role, permissions?: string[]): Promise<RoleResponse> {
-    const perms = permissions ?? (await this.roleRepo.findPermissionsByRole(role.id)).map(p => p.permission);
+    const perms =
+      permissions ?? (await this.roleRepo.findPermissionsByRole(role.id)).map((p) => p.permission);
     return {
       id: role.id,
       tenantId: role.tenantId,

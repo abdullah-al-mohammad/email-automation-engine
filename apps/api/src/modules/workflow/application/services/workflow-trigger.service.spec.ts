@@ -28,9 +28,9 @@ describe('WorkflowTriggerService', () => {
   describe('structural rules', () => {
     it('should reject addTrigger if workflow is active', async () => {
       workflowService.verifyWorkflowInactive.mockRejectedValue(
-        new Error('Cannot modify structural fields of an active workflow')
+        new Error('Cannot modify structural fields of an active workflow'),
       );
-      
+
       await expect(
         service.addTrigger('tenant-1', 'workflow-1', { event: 'contact.subscribed' }),
       ).rejects.toThrow('Cannot modify structural fields of an active workflow');
@@ -45,7 +45,9 @@ describe('WorkflowTriggerService', () => {
         return Promise.resolve(t);
       });
 
-      const result = await service.addTrigger('tenant-1', 'workflow-1', { event: 'contact.subscribed' });
+      const result = await service.addTrigger('tenant-1', 'workflow-1', {
+        event: 'contact.subscribed',
+      });
       expect(result.id).toBe('trigger-1');
       expect(result.event).toBe('contact.subscribed');
     });
@@ -62,9 +64,9 @@ describe('WorkflowTriggerService', () => {
       workflowService.verifyWorkflowInactive.mockResolvedValue(undefined);
       triggerRepo.findByWorkflowId.mockResolvedValue([]);
 
-      await expect(
-        service.deleteTrigger('tenant-1', 'workflow-1', 'trigger-1'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteTrigger('tenant-1', 'workflow-1', 'trigger-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
