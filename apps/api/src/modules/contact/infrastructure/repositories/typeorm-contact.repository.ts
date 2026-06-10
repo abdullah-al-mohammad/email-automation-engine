@@ -15,6 +15,13 @@ export class TypeOrmContactRepository implements ContactRepository {
     return this.repository.findOne({ where: { id } });
   }
 
+  async findAllByTenantId(tenantId: string): Promise<Contact[]> {
+    return this.repository.find({
+      where: { tenantId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async findByTenantIdAndEmail(tenantId: string, email: string): Promise<Contact | null> {
     return this.repository.findOne({ where: { tenantId, email } });
   }
