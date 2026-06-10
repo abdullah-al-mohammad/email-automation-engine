@@ -15,16 +15,10 @@ import {
   type CreateWorkflowDto,
   type UpdateWorkflowDto,
   type WorkflowResponse,
-  type CreateWorkflowTriggerDto,
-  type UpdateWorkflowTriggerDto,
   type WorkflowTriggerResponse,
-  type CreateWorkflowStepDto,
-  type UpdateWorkflowStepDto,
   type WorkflowStepResponse,
-  type ReorderStepsDto,
-  type CreateWorkflowExitConditionDto,
-  type UpdateWorkflowExitConditionDto,
   type WorkflowExitConditionResponse,
+  STEP_ACTIONS,
 } from '@email-automation-engine/shared';
 import {
   WORKFLOW_REPOSITORY,
@@ -131,284 +125,8 @@ export class WorkflowService {
     await this.workflowRepo.delete(workflowId);
   }
 
-  async addTrigger(
-    tenantId: string,
-    workflowId: string,
-    dto: CreateWorkflowTriggerDto,
-  ): Promise<WorkflowTriggerResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
 
-    const trigger = new WorkflowTrigger();
-    trigger.tenantId = tenantId;
-    trigger.workflowId = workflowId;
-    trigger.event = dto.event;
-    trigger.filters = dto.filters;
-    const saved = await this.triggerRepo.save(trigger);
-    return this.mapTriggerToResponse(saved);
-  }
-
-  async updateTrigger(
-    tenantId: string,
-    workflowId: string,
-    triggerId: string,
-    dto: UpdateWorkflowTriggerDto,
-  ): Promise<WorkflowTriggerResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
-    const trigger = triggers.find((t) => t.id === triggerId);
-    if (!trigger) {
-      throw new NotFoundException('Trigger not found');
-    }
-
-    if (dto.event !== undefined) trigger.event = dto.event;
-    if (dto.filters !== undefined) trigger.filters = dto.filters;
-
-    const saved = await this.triggerRepo.save(trigger);
-    return this.mapTriggerToResponse(saved);
-  }
-
-  async deleteTrigger(tenantId: string, workflowId: string, triggerId: string): Promise<void> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
-    if (!triggers.some((t) => t.id === triggerId)) {
-      throw new NotFoundException('Trigger not found');
-    }
-
-    await this.triggerRepo.delete(triggerId);
-  }
-
-  async addStep(
-    tenantId: string,
-    workflowId: string,
-    dto: CreateWorkflowStepDto,
-  ): Promise<WorkflowStepResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    if (dto.parentWorkflowStepId || dto.trueStepId || dto.falseStepId) {
-      const steps = await this.stepRepo.findByWorkflowId(workflowId);
-      if (dto.parentWorkflowStepId && !steps.some((s) => s.id === dto.parentWorkflowStepId)) {
-        throw new BadRequestException('Parent step must belong to the same workflow');
-      }
-      if (dto.trueStepId && !steps.some((s) => s.id === dto.trueStepId)) {
-        throw new BadRequestException('True step must belong to the same workflow');
-      }
-      if (dto.falseStepId && !steps.some((s) => s.id === dto.falseStepId)) {
-        throw new BadRequestException('False step must belong to the same workflow');
-      }
-    }
-
-    const step = new WorkflowStep();
-    step.tenantId = tenantId;
-    step.workflowId = workflowId;
-    step.action = dto.action;
-    step.config = dto.config;
-    step.position = dto.position ?? 0;
-    if (dto.parentWorkflowStepId) {
-      step.parentWorkflowStepId = dto.parentWorkflowStepId;
-    }
-    if (dto.trueStepId) {
-      step.trueStepId = dto.trueStepId;
-    }
-    if (dto.falseStepId) {
-      step.falseStepId = dto.falseStepId;
-    }
-    const saved = await this.stepRepo.save(step);
-    return this.mapStepToResponse(saved);
-  }
-
-  async updateStep(
-    tenantId: string,
-    workflowId: string,
-    stepId: string,
-    dto: UpdateWorkflowStepDto,
-  ): Promise<WorkflowStepResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const steps = await this.stepRepo.findByWorkflowId(workflowId);
-    const step = steps.find((s) => s.id === stepId);
-    if (!step) {
-      throw new NotFoundException('Step not found');
-    }
-
-    if (dto.action !== undefined) step.action = dto.action;
-    if (dto.config !== undefined) step.config = dto.config;
-    if (dto.trueStepId !== undefined) {
-      if (dto.trueStepId && !steps.some((s) => s.id === dto.trueStepId)) {
-        throw new BadRequestException('True step must belong to the same workflow');
-      }
-      step.trueStepId = dto.trueStepId ?? undefined;
-    }
-    if (dto.falseStepId !== undefined) {
-      if (dto.falseStepId && !steps.some((s) => s.id === dto.falseStepId)) {
-        throw new BadRequestException('False step must belong to the same workflow');
-      }
-      step.falseStepId = dto.falseStepId ?? undefined;
-    }
-
-    const saved = await this.stepRepo.save(step);
-    return this.mapStepToResponse(saved);
-  }
-
-  async deleteStep(tenantId: string, workflowId: string, stepId: string): Promise<void> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const steps = await this.stepRepo.findByWorkflowId(workflowId);
-    if (!steps.some((s) => s.id === stepId)) {
-      throw new NotFoundException('Step not found');
-    }
-
-    await this.stepRepo.delete(stepId);
-  }
-
-  async reorderSteps(tenantId: string, workflowId: string, dto: ReorderStepsDto): Promise<void> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const steps = await this.stepRepo.findByWorkflowId(workflowId);
-    const stepIds = new Set(steps.map((s) => s.id));
-
-    if (dto.stepIds.length !== stepIds.size) {
-      throw new BadRequestException('Reorder list must contain all workflow steps exactly once');
-    }
-
-    const uniqueIds = new Set(dto.stepIds);
-    if (uniqueIds.size !== dto.stepIds.length) {
-      throw new BadRequestException('Reorder list must not contain duplicate step IDs');
-    }
-
-    for (const id of dto.stepIds) {
-      if (!stepIds.has(id)) {
-        throw new BadRequestException(`Step ${id} does not belong to this workflow`);
-      }
-    }
-
-    const execute = async (saveFn: (step: WorkflowStep) => Promise<WorkflowStep>) => {
-      for (let i = 0; i < dto.stepIds.length; i++) {
-        const step = steps.find((s) => s.id === dto.stepIds[i]);
-        if (step) {
-          step.position = i;
-          await saveFn(step);
-        }
-      }
-    };
-
-    if (this.dataSource) {
-      await this.dataSource.transaction(async (manager) => {
-        await execute((step) => manager.save(step));
-      });
-    } else {
-      await execute((step) => this.stepRepo.save(step));
-    }
-  }
-
-  async addExitCondition(
-    tenantId: string,
-    workflowId: string,
-    dto: CreateWorkflowExitConditionDto,
-  ): Promise<WorkflowExitConditionResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const condition = new WorkflowExitCondition();
-    condition.tenantId = tenantId;
-    condition.workflowId = workflowId;
-    condition.type = dto.type;
-    condition.resource = dto.resource;
-    condition.operator = dto.operator;
-    condition.value = dto.value ?? null;
-    const saved = await this.exitConditionRepo.save(condition);
-    return this.mapExitConditionToResponse(saved);
-  }
-
-  async updateExitCondition(
-    tenantId: string,
-    workflowId: string,
-    conditionId: string,
-    dto: UpdateWorkflowExitConditionDto,
-  ): Promise<WorkflowExitConditionResponse> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const conditions = await this.exitConditionRepo.findByWorkflowId(workflowId);
-    const condition = conditions.find((c) => c.id === conditionId);
-    if (!condition) {
-      throw new NotFoundException('Exit condition not found');
-    }
-
-    if (dto.type !== undefined) condition.type = dto.type;
-    if (dto.resource !== undefined) condition.resource = dto.resource;
-    if (dto.operator !== undefined) condition.operator = dto.operator;
-    if (dto.value !== undefined) condition.value = dto.value ?? null;
-
-    const saved = await this.exitConditionRepo.save(condition);
-    return this.mapExitConditionToResponse(saved);
-  }
-
-  async deleteExitCondition(
-    tenantId: string,
-    workflowId: string,
-    conditionId: string,
-  ): Promise<void> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-
-    const conditions = await this.exitConditionRepo.findByWorkflowId(workflowId);
-    if (!conditions.some((c) => c.id === conditionId)) {
-      throw new NotFoundException('Exit condition not found');
-    }
-
-    await this.exitConditionRepo.delete(conditionId);
-  }
-
-  async findStep(
-    tenantId: string,
-    workflowId: string,
-    stepId: string,
-  ): Promise<WorkflowStepResponse> {
-    await this.getWorkflowOrThrow(tenantId, workflowId);
-    const steps = await this.stepRepo.findByWorkflowId(workflowId);
-    const step = steps.find((s) => s.id === stepId);
-    if (!step) {
-      throw new NotFoundException('Step not found');
-    }
-    return this.mapStepToResponse(step);
-  }
-
-  async getExitConditions(
-    tenantId: string,
-    workflowId: string,
-  ): Promise<WorkflowExitConditionResponse[]> {
-    await this.getWorkflowOrThrow(tenantId, workflowId);
-    const conditions = await this.exitConditionRepo.findByWorkflowId(workflowId);
-    return conditions.map((c) => this.mapExitConditionToResponse(c));
-  }
-
-  async replaceExitConditions(
-    tenantId: string,
-    workflowId: string,
-    dtos: CreateWorkflowExitConditionDto[],
-  ): Promise<WorkflowExitConditionResponse[]> {
-    await this.verifyWorkflowInactive(tenantId, workflowId);
-    await this.exitConditionRepo.deleteByWorkflowId(workflowId);
-
-    const conditionsToSave = dtos.map((dto) => {
-      const condition = new WorkflowExitCondition();
-      condition.tenantId = tenantId;
-      condition.workflowId = workflowId;
-      condition.type = dto.type;
-      condition.resource = dto.resource;
-      condition.operator = dto.operator;
-      condition.value = dto.value ?? null;
-      return condition;
-    });
-
-    let saved: WorkflowExitCondition[] = [];
-    if (conditionsToSave.length > 0) {
-      saved = await this.exitConditionRepo.save(conditionsToSave);
-    }
-
-    return saved.map((c) => this.mapExitConditionToResponse(c));
-  }
-
-  private async verifyWorkflowInactive(tenantId: string, workflowId: string): Promise<void> {
+  async verifyWorkflowInactive(tenantId: string, workflowId: string): Promise<void> {
     const workflow = await this.getWorkflowOrThrow(tenantId, workflowId);
     if (workflow.isActive) {
       throw new BadRequestException('Cannot modify structural fields of an active workflow');
@@ -429,7 +147,7 @@ export class WorkflowService {
     }
   }
 
-  private async getWorkflowOrThrow(tenantId: string, workflowId: string): Promise<Workflow> {
+  async getWorkflowOrThrow(tenantId: string, workflowId: string): Promise<Workflow> {
     const workflow = await this.workflowRepo.findById(workflowId);
     if (!workflow || workflow.tenantId !== tenantId) {
       throw new NotFoundException('Workflow not found');
@@ -454,11 +172,11 @@ export class WorkflowService {
         throw new BadRequestException(`Step ${step.id} has no action configured`);
       }
 
-      if (step.action === 'delay' && (!step.config?.amount || !step.config?.unit)) {
+      if (step.action === STEP_ACTIONS.DELAY && (!step.config?.amount || !step.config?.unit)) {
         throw new BadRequestException(`Delay step ${step.id} requires amount and unit`);
       }
 
-      if (step.action === 'conditional_split') {
+      if (step.action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
         if (!step.trueStepId || !step.falseStepId) {
           // Check if conditions exist in workflow_step_conditions
           const conditionsCount = await this.dataSource.query<{ count: string }[]>(
@@ -473,7 +191,7 @@ export class WorkflowService {
         }
       }
 
-      if (step.action === 'send_email') {
+      if (step.action === STEP_ACTIONS.SEND_EMAIL) {
         if (!step.config?.templateId && (!step.config?.subject || !step.config?.html)) {
           throw new BadRequestException(
             `Email step ${step.id} requires either templateId OR (subject and html)`,
@@ -492,11 +210,11 @@ export class WorkflowService {
         }
       }
 
-      if ((step.action === 'attach_tag' || step.action === 'detach_tag') && !step.config?.tagId) {
+      if ((step.action === STEP_ACTIONS.ATTACH_TAG || step.action === STEP_ACTIONS.DETACH_TAG) && !step.config?.tagId) {
         throw new BadRequestException(`Tag step ${step.id} requires a tag reference`);
       }
 
-      if (step.action === 'webhook') {
+      if (step.action === STEP_ACTIONS.WEBHOOK) {
         const urlStr = typeof step.config?.url === 'string' ? step.config.url : '';
         if (!urlStr) {
           throw new BadRequestException(`Webhook step ${step.id} requires a valid URL`);
@@ -554,7 +272,7 @@ export class WorkflowService {
     }
 
     const lastStep = [...steps].sort((a, b) => a.position - b.position)[steps.length - 1];
-    if (lastStep?.action === 'delay') {
+    if (lastStep?.action === STEP_ACTIONS.DELAY) {
       throw new BadRequestException('A delay cannot be the final step in a workflow');
     }
   }
