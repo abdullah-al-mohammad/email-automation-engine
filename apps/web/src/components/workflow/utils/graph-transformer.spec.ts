@@ -17,10 +17,16 @@ describe('graph-transformer', () => {
       updatedAt: new Date().toISOString(),
     };
 
-    const result = generateWorkflowGraph([trigger], []);
+    const result = generateWorkflowGraph(
+      [trigger],
+      [],
+      false,
+      () => {},
+      () => {},
+    );
 
-    expect(result.nodes).toHaveLength(1);
-    expect(result.edges).toHaveLength(0);
+    expect(result.nodes).toHaveLength(3);
+    expect(result.edges).toHaveLength(1);
 
     const triggerNode = result.nodes[0];
     expect(triggerNode).toBeDefined();
@@ -47,7 +53,7 @@ describe('graph-transformer', () => {
         parentWorkflowStepId: null,
         action: 'delay',
         position: 0,
-        config: { durationValue: 1, durationUnit: 'days' },
+        config: { amount: 1, unit: 'days' },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -64,20 +70,37 @@ describe('graph-transformer', () => {
       },
     ];
 
-    const result = generateWorkflowGraph([trigger], steps);
+    const result = generateWorkflowGraph(
+      [trigger],
+      steps,
+      false,
+      () => {},
+      () => {},
+    );
 
-    expect(result.nodes).toHaveLength(3); // 1 trigger + 2 steps
-    expect(result.edges).toHaveLength(2); // trigger -> step-1 -> step-2
+    expect(result.nodes).toHaveLength(7); // 1 trigger, 1 add first step, 2 steps, 2 add step btns, 1 add trigger
+    expect(result.edges).toHaveLength(5); // trigger->addFirst, addFirst->step1, step1->addStep1, addStep1->step2, step2->addStep2
 
     // Check Trigger Node
     expect(result.nodes.find((n) => n.id === 'trigger-trigger-1')).toBeDefined();
 
     // Check Edges
     expect(
-      result.edges.find((e) => e.source === 'trigger-trigger-1' && e.target === 'step-step-1'),
+      result.edges.find(
+        (e) => e.source === 'trigger-trigger-1' && e.target === 'add-first-step-btn',
+      ),
     ).toBeDefined();
     expect(
-      result.edges.find((e) => e.source === 'step-step-1' && e.target === 'step-step-2'),
+      result.edges.find((e) => e.source === 'add-first-step-btn' && e.target === 'step-step-1'),
+    ).toBeDefined();
+    expect(
+      result.edges.find((e) => e.source === 'step-step-1' && e.target === 'add-step-step-1-linear'),
+    ).toBeDefined();
+    expect(
+      result.edges.find((e) => e.source === 'add-step-step-1-linear' && e.target === 'step-step-2'),
+    ).toBeDefined();
+    expect(
+      result.edges.find((e) => e.source === 'step-step-2' && e.target === 'add-step-step-2-linear'),
     ).toBeDefined();
 
     // Check positions (Dagre layout should assign coordinates)

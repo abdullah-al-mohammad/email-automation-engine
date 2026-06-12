@@ -20,6 +20,7 @@ describe('WorkflowStepService', () => {
     workflowService = {
       verifyWorkflowInactive: vi.fn(),
       getWorkflowOrThrow: vi.fn(),
+      findById: vi.fn(),
     };
     dataSource = {
       transaction: vi.fn().mockImplementation(async (cb) => {
@@ -32,6 +33,34 @@ describe('WorkflowStepService', () => {
       dataSource as unknown as (typeof service)['dataSource'],
       workflowService as unknown as WorkflowService,
     );
+  });
+
+  describe('getSteps', () => {
+    it('should return mapped steps', async () => {
+      workflowService.findById.mockResolvedValue({});
+      const mockSteps = [
+        {
+          id: 'step-1',
+          tenantId: 'tenant-1',
+          workflowId: 'workflow-1',
+          action: 'send_email',
+          position: 0,
+          config: {},
+          parentWorkflowStepId: null,
+          trueStepId: null,
+          falseStepId: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      stepRepo.findByWorkflowId.mockResolvedValue(mockSteps);
+
+      const result = await service.getSteps('tenant-1', 'workflow-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('step-1');
+      expect(result[0].parentWorkflowStepId).toBeNull();
+      expect(stepRepo.findByWorkflowId).toHaveBeenCalledWith('workflow-1');
+    });
   });
 
   describe('reorderSteps', () => {

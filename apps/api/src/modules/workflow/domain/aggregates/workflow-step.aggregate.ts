@@ -26,7 +26,7 @@ export class WorkflowStep {
   workflowId!: string;
 
   @Column({ type: 'uuid', nullable: true })
-  parentWorkflowStepId?: string;
+  parentWorkflowStepId!: string | null;
 
   @Column({ type: 'varchar', length: 100 })
   action!: string;
@@ -38,10 +38,10 @@ export class WorkflowStep {
   position!: number;
 
   @Column({ type: 'uuid', nullable: true })
-  trueStepId?: string;
+  trueStepId!: string | null;
 
   @Column({ type: 'uuid', nullable: true })
-  falseStepId?: string;
+  falseStepId!: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;

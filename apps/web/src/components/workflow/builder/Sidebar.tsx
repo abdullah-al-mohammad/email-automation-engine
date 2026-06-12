@@ -2,8 +2,8 @@ import {
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import Trigger from '../forms/Trigger';
-import Step from '../forms/Step';
+import EditTrigger, { TRIGGER_EVENT_LABELS } from './EditTrigger';
+import EditStep, { STEP_ACTION_LABELS } from './EditStep';
 
 interface WorkflowSidebarProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ interface WorkflowSidebarProps {
     | null;
   workflowId: string;
   isActive: boolean;
+  triggersCount: number;
 }
 
 export default function Sidebar({
@@ -22,6 +23,7 @@ export default function Sidebar({
   selectedNode,
   workflowId,
   isActive,
+  triggersCount,
 }: WorkflowSidebarProps) {
   if (!isOpen) return null;
 
@@ -29,7 +31,11 @@ export default function Sidebar({
     <div className="absolute top-0 right-0 h-full w-80 bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 shadow-xl flex flex-col z-10 transition-transform">
       <div className="h-14 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 shrink-0">
         <h3 className="font-semibold text-gray-900 dark:text-white">
-          {selectedNode?.type === 'trigger' ? 'Configure trigger' : 'Configure step'}
+          {selectedNode?.type === 'trigger'
+            ? TRIGGER_EVENT_LABELS[selectedNode.data.event] || 'Trigger'
+            : selectedNode?.type === 'step'
+              ? STEP_ACTION_LABELS[selectedNode.data.action] || 'Step'
+              : 'Settings'}
         </h3>
         <button
           onClick={onClose}
@@ -49,14 +55,17 @@ export default function Sidebar({
         {!selectedNode ? (
           <div className="text-sm text-gray-500">Select a node to configure</div>
         ) : selectedNode.type === 'trigger' ? (
-          <Trigger
+          <EditTrigger
+            key={`trigger-${selectedNode.data.id}`}
             trigger={selectedNode.data}
             workflowId={workflowId}
             isActive={isActive}
             onSuccess={onClose}
+            canDelete={triggersCount > 1}
           />
         ) : (
-          <Step
+          <EditStep
+            key={`step-${selectedNode.data.id}`}
             step={selectedNode.data}
             workflowId={workflowId}
             isActive={isActive}

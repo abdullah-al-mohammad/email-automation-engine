@@ -2,7 +2,6 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   type WorkflowStepResponse,
-  SUPPORTED_STEP_ACTIONS,
   STEP_ACTIONS,
   type TagResponse,
   type EmailTemplateResponse,
@@ -11,7 +10,7 @@ import { useTenant } from '../../../contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../../lib/api';
 
-const STEP_ACTION_LABELS: Record<string, string> = {
+export const STEP_ACTION_LABELS: Record<string, string> = {
   [STEP_ACTIONS.DELAY]: 'Delay',
   [STEP_ACTIONS.SEND_EMAIL]: 'Send email',
   [STEP_ACTIONS.ATTACH_TAG]: 'Attach tag',
@@ -23,8 +22,8 @@ const STEP_ACTION_LABELS: Record<string, string> = {
 };
 
 interface StepConfigPayload {
-  durationValue?: number;
-  durationUnit?: string;
+  amount?: number;
+  unit?: string;
   templateId?: string;
   tagId?: string;
 }
@@ -32,8 +31,8 @@ interface StepConfigPayload {
 interface StepFormData {
   action: string;
   config: string;
-  durationValue: number | string;
-  durationUnit: string;
+  amount: number | string;
+  unit: string;
   templateId: string;
   tagId: string;
 }
@@ -45,7 +44,7 @@ interface StepFormProps {
   onSuccess: () => void;
 }
 
-export default function Step({ step, workflowId, isActive, onSuccess }: StepFormProps) {
+export default function EditStep({ step, workflowId, isActive, onSuccess }: StepFormProps) {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
 
@@ -53,14 +52,14 @@ export default function Step({ step, workflowId, isActive, onSuccess }: StepForm
     register,
     handleSubmit,
     watch,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<StepFormData>({
     defaultValues: {
       action: step.action,
       config: JSON.stringify(step.config, null, 2),
       // Individual fields for specific actions
-      durationValue: (step.config as StepConfigPayload)?.durationValue || 1,
-      durationUnit: (step.config as StepConfigPayload)?.durationUnit || 'days',
+      amount: (step.config as StepConfigPayload)?.amount || 15,
+      unit: (step.config as StepConfigPayload)?.unit || 'minutes',
       templateId: (step.config as StepConfigPayload)?.templateId || '',
       tagId: (step.config as StepConfigPayload)?.tagId || '',
     },
@@ -100,8 +99,8 @@ export default function Step({ step, workflowId, isActive, onSuccess }: StepForm
       // Build config based on selected action
       if (data.action === STEP_ACTIONS.DELAY) {
         finalConfig = {
-          durationValue: Number(data.durationValue),
-          durationUnit: data.durationUnit,
+          amount: Number(data.amount),
+          unit: data.unit,
         };
       } else if (data.action === STEP_ACTIONS.SEND_EMAIL) {
         finalConfig = { templateId: data.templateId };
@@ -156,24 +155,10 @@ export default function Step({ step, workflowId, isActive, onSuccess }: StepForm
     <form
       onSubmit={(e) => void handleSubmit(onSubmit)(e)}
       className="space-y-4 flex flex-col h-full"
+      noValidate
     >
       <div className="flex-1 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
-            Action type
-          </label>
-          <select
-            {...register('action')}
-            disabled={isActive}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"
-          >
-            {SUPPORTED_STEP_ACTIONS.map((action) => (
-              <option key={action} value={action}>
-                {STEP_ACTION_LABELS[action] || action}
-              </option>
-            ))}
-          </select>
-        </div>
+        <input type="hidden" {...register('action')} />
 
         {selectedAction === STEP_ACTIONS.DELAY && (
           <div className="flex gap-2">
@@ -183,17 +168,37 @@ export default function Step({ step, workflowId, isActive, onSuccess }: StepForm
               </label>
               <input
                 type="number"
-                {...register('durationValue')}
+                {...register('amount', {
+                  validate: (value) => {
+                    const num = Number(value);
+                    if (watch('unit') === 'minutes') {
+                      if (num < 15) return 'Minimum 15 minutes';
+                      if (num % 15 !== 0) return 'Must be a multiple of 15';
+                    } else if (num < 1) {
+                      return 'Must be at least 1';
+                    }
+                    return true;
+                  },
+                })}
+                min={watch('unit') === 'minutes' ? 15 : 1}
+                step={watch('unit') === 'minutes' ? 15 : 1}
                 disabled={isActive}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"
+                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 ${
+                  errors.amount
+                    ? 'border-red-300 dark:border-red-900 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 dark:border-zinc-700'
+                }`}
               />
+              {errors.amount && (
+                <p className="mt-1 text-xs text-red-500">{errors.amount.message as string}</p>
+              )}
             </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                 Time unit
               </label>
               <select
-                {...register('durationUnit')}
+                {...register('unit')}
                 disabled={isActive}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"
               >

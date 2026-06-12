@@ -1,6 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { TENANT_MEMBERSHIP_REPOSITORY } from '../../constants/tokens';
+import { TENANT_MEMBERSHIP_REPOSITORY, USER_REPOSITORY } from '../../constants/tokens';
 import { TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
+import { UserRepository } from '../../domain/repositories/user.repository';
 import { type TenantMemberResponse } from '@email-automation-engine/shared';
 
 @Injectable()
@@ -8,19 +9,30 @@ export class TenantMemberService {
   constructor(
     @Inject(TENANT_MEMBERSHIP_REPOSITORY)
     private readonly membershipRepo: TenantMembershipRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepo: UserRepository,
   ) {}
 
   async findAllByTenantId(tenantId: string): Promise<TenantMemberResponse[]> {
     const memberships = await this.membershipRepo.findMembershipsByTenant(tenantId);
-    return memberships.map((m) => ({
-      id: m.id,
-      tenantId: m.tenantId,
-      userId: m.userId,
-      roleId: m.roleId,
-      status: 'active',
-      createdAt: m.createdAt.toISOString(),
-      updatedAt: m.updatedAt.toISOString(),
-    }));
+
+    // Fetch users to populate email
+    const responses: TenantMemberResponse[] = [];
+    for (const m of memberships) {
+      const user = await this.userRepo.findById(m.userId);
+      responses.push({
+        id: m.id,
+        tenantId: m.tenantId,
+        userId: m.userId,
+        roleId: m.roleId,
+        status: 'active',
+        user: user ? { email: user.email } : undefined,
+        createdAt: m.createdAt.toISOString(),
+        updatedAt: m.updatedAt.toISOString(),
+      });
+    }
+
+    return responses;
   }
 
   async delete(tenantId: string, userId: string): Promise<void> {

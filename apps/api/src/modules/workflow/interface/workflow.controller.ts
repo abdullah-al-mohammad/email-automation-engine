@@ -103,6 +103,15 @@ export class WorkflowController {
     return this.workflowService.deactivate(tenantId, id);
   }
 
+  @Get(':id/triggers')
+  @RequirePermissions('workflows.read')
+  async getTriggers(
+    @CurrentTenant('id') tenantId: string,
+    @Param('id') id: string,
+  ): Promise<WorkflowTriggerResponse[]> {
+    return this.triggerService.getTriggers(tenantId, id);
+  }
+
   @Post(':id/triggers')
   @RequirePermissions('workflows.manage')
   async addTrigger(
@@ -142,6 +151,15 @@ export class WorkflowController {
     @Body(new ZodValidationPipe(ReorderStepsSchema)) dto: ReorderStepsDto,
   ): Promise<void> {
     return this.stepService.reorderSteps(tenantId, id, dto);
+  }
+
+  @Get(':id/steps')
+  @RequirePermissions('workflows.read')
+  async getSteps(
+    @CurrentTenant('id') tenantId: string,
+    @Param('id') id: string,
+  ): Promise<WorkflowStepResponse[]> {
+    return this.stepService.getSteps(tenantId, id);
   }
 
   @Post(':id/steps')

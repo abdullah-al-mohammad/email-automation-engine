@@ -226,7 +226,13 @@ describe('WorkflowService', () => {
       triggerRepo.findByWorkflowId.mockResolvedValue([{ id: 'trigger-1' }]);
       stepRepo.findByWorkflowId.mockResolvedValue([
         { id: 'step-1', action: 'delay', position: 0, config: {} },
-        { id: 'step-2', action: 'send_email', position: 1, config: { templateId: 't1' } },
+        {
+          id: 'step-2',
+          action: 'send_email',
+          position: 1,
+          config: { templateId: 't1' },
+          parentWorkflowStepId: 'step-1',
+        },
       ]);
 
       await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(

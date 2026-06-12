@@ -7,7 +7,7 @@ import type { WorkflowService } from './workflow.service';
 describe('WorkflowTriggerService', () => {
   let service: WorkflowTriggerService;
   let triggerRepo: { findByWorkflowId: Mock; save: Mock; delete: Mock };
-  let workflowService: { verifyWorkflowInactive: Mock };
+  let workflowService: { verifyWorkflowInactive: Mock; findById: Mock };
 
   beforeEach(() => {
     triggerRepo = {
@@ -17,12 +17,36 @@ describe('WorkflowTriggerService', () => {
     };
     workflowService = {
       verifyWorkflowInactive: vi.fn(),
+      findById: vi.fn(),
     };
 
     service = new WorkflowTriggerService(
       triggerRepo as unknown as (typeof service)['triggerRepo'],
       workflowService as unknown as WorkflowService,
     );
+  });
+
+  describe('getTriggers', () => {
+    it('should return mapped triggers', async () => {
+      workflowService.findById.mockResolvedValue({});
+      const mockTriggers = [
+        {
+          id: 'trigger-1',
+          tenantId: 'tenant-1',
+          workflowId: 'workflow-1',
+          event: 'contact.subscribed',
+          config: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      triggerRepo.findByWorkflowId.mockResolvedValue(mockTriggers);
+
+      const result = await service.getTriggers('tenant-1', 'workflow-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('trigger-1');
+      expect(triggerRepo.findByWorkflowId).toHaveBeenCalledWith('workflow-1');
+    });
   });
 
   describe('structural rules', () => {

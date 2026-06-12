@@ -18,11 +18,13 @@ describe('WorkflowController', () => {
     delete: Mock;
   };
   let triggerService: {
+    getTriggers: Mock;
     addTrigger: Mock;
     updateTrigger: Mock;
     deleteTrigger: Mock;
   };
   let stepService: {
+    getSteps: Mock;
     addStep: Mock;
     findStep: Mock;
     updateStep: Mock;
@@ -48,11 +50,13 @@ describe('WorkflowController', () => {
       delete: vi.fn(),
     };
     triggerService = {
+      getTriggers: vi.fn(),
       addTrigger: vi.fn(),
       updateTrigger: vi.fn(),
       deleteTrigger: vi.fn(),
     };
     stepService = {
+      getSteps: vi.fn(),
       addStep: vi.fn(),
       findStep: vi.fn(),
       updateStep: vi.fn(),
@@ -90,6 +94,26 @@ describe('WorkflowController', () => {
       const result = await controller.create('tenant-1', { name: 'Welcome' });
       expect(result).toEqual(mockResponse);
       expect(workflowService.create).toHaveBeenCalledWith('tenant-1', { name: 'Welcome' });
+    });
+  });
+
+  describe('triggers', () => {
+    it('should delegate getTriggers to service', async () => {
+      triggerService.getTriggers.mockResolvedValue([]);
+
+      const result = await controller.getTriggers('tenant-1', 'workflow-1');
+      expect(result).toEqual([]);
+      expect(triggerService.getTriggers).toHaveBeenCalledWith('tenant-1', 'workflow-1');
+    });
+  });
+
+  describe('steps', () => {
+    it('should delegate getSteps to service', async () => {
+      stepService.getSteps.mockResolvedValue([]);
+
+      const result = await controller.getSteps('tenant-1', 'workflow-1');
+      expect(result).toEqual([]);
+      expect(stepService.getSteps).toHaveBeenCalledWith('tenant-1', 'workflow-1');
     });
   });
 

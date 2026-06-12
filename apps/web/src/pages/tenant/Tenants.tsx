@@ -11,6 +11,7 @@ import { isAxiosError } from 'axios';
 import { Plus, ChevronRight, Building } from 'lucide-react';
 
 import { useTenant } from '../../contexts/TenantContext';
+import { useAuth } from '../../contexts/AuthContext';
 import api from '../../lib/api';
 
 export default function Tenants() {
@@ -20,20 +21,30 @@ export default function Tenants() {
 
   const handleSelectTenant = (tenant: TenantResponse) => {
     setCurrentTenant(tenant);
-    void navigate('/');
+    void navigate('/workflows');
   };
 
   const handleTenantCreated = async (newTenant: TenantResponse) => {
     await refreshTenants();
     setCurrentTenant(newTenant);
-    void navigate('/');
+    void navigate('/workflows');
   };
 
   const hasTenants = tenants.length > 0;
   const showList = hasTenants && !isCreating;
 
+  const { logout } = useAuth();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4 relative">
+      <div className="absolute top-6 right-6">
+        <button
+          onClick={logout}
+          className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          Sign out
+        </button>
+      </div>
       <div className="max-w-xl w-full">
         <Header />
 

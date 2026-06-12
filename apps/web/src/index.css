@@ -118,4 +118,36 @@
   body {
     @apply bg-background text-foreground;
   }
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+/* React Flow Controls Override */
+.react-flow__controls {
+  @apply !bg-white dark:!bg-zinc-900 !border !border-gray-200 dark:!border-zinc-800 !rounded-lg !shadow-sm overflow-hidden;
+}
+
+.react-flow__controls-button {
+  @apply !bg-transparent !border-b !border-gray-200 dark:!border-zinc-800 hover:!bg-gray-50 dark:hover:!bg-zinc-800 transition-colors !text-gray-600 dark:!text-zinc-300;
+}
+
+.react-flow__controls-button:last-child {
+  @apply !border-b-0;
+}
+
+.react-flow__controls-button svg {
+  @apply !fill-current;
+}
+
+/* React Flow Edges Override */
+.react-flow__edge-path {
+  @apply stroke-gray-200! dark:stroke-zinc-800!;
+  stroke-width: 2 !important;
+}
+
+marker polyline,
+marker path {
+  @apply fill-none! stroke-gray-200! dark:stroke-zinc-800!;
+  stroke-width: 2 !important;
 }

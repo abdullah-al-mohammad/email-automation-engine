@@ -1,11 +1,13 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 import {
   type WorkflowResponse,
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
+  STEP_ACTIONS,
 } from '@email-automation-engine/shared';
 import {
   ReactFlow,
@@ -13,20 +15,34 @@ import {
   Controls,
   useNodesState,
   useEdgesState,
+  MarkerType,
   type Node,
   type Edge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useEffect, useState, useCallback, type MouseEvent } from 'react';
-import { generateWorkflowGraph } from './utils/graph-transformer';
-import { Trigger as TriggerNode } from '../../components/workflow/nodes/Trigger';
-import { Step as StepNode } from '../../components/workflow/nodes/Step';
-import Sidebar from '../../components/workflow/sidebar/Sidebar';
+import { generateWorkflowGraph } from '../../components/workflow/utils/graph-transformer';
+import { StepNode } from '../../components/workflow/builder/StepNode';
+import { TriggerNode } from '../../components/workflow/builder/TriggerNode';
+import { AddTrigger as AddTriggerNode } from '../../components/workflow/builder/AddTrigger';
+import { AddStep as AddStepNode } from '../../components/workflow/builder/AddStep';
+import Sidebar from '../../components/workflow/builder/Sidebar';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import BuilderHeader from '../../components/workflow/builder/BuilderHeader';
+
+import AddNode from '../../components/modals/AddNode';
+import AddTrigger from '../../components/modals/AddTrigger';
+import EmptyCanvas from '../../components/workflow/builder/EmptyCanvas';
+import Alert from '../../components/modals/Alert';
+
+import { Exit as ExitNode } from '../../components/workflow/builder/Exit';
 
 const nodeTypes = {
   triggerNode: TriggerNode,
   stepNode: StepNode,
+  addTriggerNode: AddTriggerNode,
+  addStepNode: AddStepNode,
+  exitNode: ExitNode,
 };
 
 export default function WorkflowBuilder() {
@@ -40,6 +56,12 @@ export default function WorkflowBuilder() {
     | null
   >(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [addNodeConfig, setAddNodeConfig] = useState<{
+    parentId: string | null;
+    branch: 'linear' | true | false;
+  } | null>(null);
+  const [isAddTriggerModalOpen, setIsAddTriggerModalOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const { data: workflow, isLoading: isLoadingWorkflow } = useQuery({
     queryKey: ['workflow', currentTenant?.id, workflowId],
@@ -77,33 +99,102 @@ export default function WorkflowBuilder() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
+  const handleAddNode = useCallback((parentId: string | null, branch: 'linear' | true | false) => {
+    setAddNodeConfig({ parentId, branch });
+  }, []);
+
+  const handleAddTrigger = useCallback(() => {
+    setIsAddTriggerModalOpen(true);
+  }, []);
+
   useEffect(() => {
     if (triggers.length >= 0 && steps.length >= 0) {
-      const graph = generateWorkflowGraph(triggers, steps);
+      const graph = generateWorkflowGraph(
+        triggers,
+        steps,
+        workflow?.isActive ?? false,
+        handleAddNode,
+        handleAddTrigger,
+      );
       setNodes(graph.nodes);
-      setEdges(graph.edges);
+      setEdges(
+        graph.edges.map((edge) => ({
+          ...edge,
+          markerEnd: edge.target.startsWith('add-') ? undefined : { type: MarkerType.Arrow },
+        })),
+      );
     }
-  }, [triggers, steps]);
+  }, [triggers, steps, workflow?.isActive, handleAddNode]);
 
   const addStepMutation = useMutation({
-    mutationFn: async () => {
-      // Find the last linear step to append to.
-      // If none, append to null (first step)
-      let parentId: string | undefined;
-      if (steps.length > 0) {
-        // Just grab the last created step for simplicity
-        parentId = steps[steps.length - 1]?.id;
+    mutationFn: async ({
+      action,
+      parentId,
+      branch,
+    }: {
+      action: string;
+      parentId: string | null;
+      branch: 'linear' | true | false;
+    }) => {
+      let existingChild: WorkflowStepResponse | undefined;
+
+      if (parentId === null) {
+        existingChild = steps.find(
+          (s) =>
+            !s.parentWorkflowStepId &&
+            !steps.some((p) => p.trueStepId === s.id || p.falseStepId === s.id),
+        );
+      } else {
+        const parentStep = steps.find((s) => s.id === parentId);
+        if (parentStep) {
+          if (branch === true) {
+            existingChild = steps.find((s) => s.id === parentStep.trueStepId);
+          } else if (branch === false) {
+            existingChild = steps.find((s) => s.id === parentStep.falseStepId);
+          } else {
+            existingChild = steps.find((s) => s.parentWorkflowStepId === parentId);
+          }
+        }
       }
+
+      let config = {};
+      if (action === STEP_ACTIONS.DELAY) config = { amount: 15, unit: 'minutes' };
 
       const res = await api.post<WorkflowStepResponse>(
         `/tenants/${currentTenant?.id}/workflows/${workflowId}/steps`,
         {
-          action: 'delay',
-          config: { durationValue: 1, durationUnit: 'days' },
-          parentWorkflowStepId: parentId,
+          action,
+          config,
+          parentWorkflowStepId: branch === 'linear' ? parentId : undefined,
+          trueStepId:
+            action === STEP_ACTIONS.CONDITIONAL_SPLIT && existingChild
+              ? existingChild.id
+              : undefined,
         },
       );
-      return res.data;
+      const newStep = res.data;
+
+      if (parentId && (branch === true || branch === false)) {
+        await api.patch(`/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${parentId}`, {
+          [branch === true ? 'trueStepId' : 'falseStepId']: newStep.id,
+        });
+      }
+
+      if (existingChild) {
+        if (action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
+          await api.patch(
+            `/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${existingChild.id}`,
+            { parentWorkflowStepId: null },
+          );
+        } else {
+          await api.patch(
+            `/tenants/${currentTenant?.id}/workflows/${workflowId}/steps/${existingChild.id}`,
+            { parentWorkflowStepId: newStep.id },
+          );
+        }
+      }
+
+      return newStep;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
@@ -112,7 +203,48 @@ export default function WorkflowBuilder() {
     },
   });
 
+  const addTriggerMutation = useMutation({
+    mutationFn: async (event: string) => {
+      const res = await api.post<WorkflowTriggerResponse>(
+        `/tenants/${currentTenant?.id}/workflows/${workflowId}/triggers`,
+        {
+          event,
+          filters: {},
+        },
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['workflow-triggers', currentTenant?.id, workflowId],
+      });
+      setIsAddTriggerModalOpen(false);
+    },
+  });
+
+  const toggleActiveMutation = useMutation({
+    mutationFn: async () => {
+      const endpoint = workflow?.isActive ? 'deactivate' : 'activate';
+      const res = await api.patch<WorkflowResponse>(
+        `/tenants/${currentTenant?.id}/workflows/${workflowId}/${endpoint}`,
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['workflow', currentTenant?.id, workflowId],
+      });
+    },
+    onError: (err: AxiosError<{ message: string }>) => {
+      setAlertMessage(err?.response?.data?.message || err.message || 'Failed to toggle activation');
+    },
+  });
+
   const onNodeClick = useCallback((_: MouseEvent, node: Node) => {
+    if (node.type === 'addTriggerNode' || node.type === 'addStepNode' || node.type === 'exitNode') {
+      return;
+    }
+
     if (node.type === 'triggerNode') {
       setSelectedNode({
         type: 'trigger',
@@ -144,40 +276,12 @@ export default function WorkflowBuilder() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] -m-6">
-      {/* Header bar */}
-      <div className="h-14 border-b bg-white dark:bg-zinc-900 flex items-center px-4 justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/workflows"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            &larr; Back
-          </Link>
-          <div className="h-4 w-px bg-gray-300 dark:bg-zinc-700" />
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-            {workflow.name}
-          </h2>
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-              workflow.isActive
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-gray-100 text-gray-800 dark:bg-zinc-800 dark:text-zinc-300'
-            }`}
-          >
-            {workflow.isActive ? 'Active' : 'Draft'}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="px-3 py-1.5 border border-gray-300 dark:border-zinc-700 rounded-md shadow-sm text-sm font-medium bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700">
-            Settings
-          </button>
-          <button className="px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-            {workflow.isActive ? 'Deactivate' : 'Activate'}
-          </button>
-        </div>
-      </div>
+      <BuilderHeader
+        workflow={workflow}
+        onToggleActive={() => toggleActiveMutation.mutate()}
+        isTogglingActive={toggleActiveMutation.isPending}
+      />
 
-      {/* React Flow Canvas */}
       <div className="flex-1 w-full h-full bg-gray-50/50 dark:bg-zinc-950/50 relative">
         <ReactFlow
           nodes={nodes}
@@ -194,34 +298,53 @@ export default function WorkflowBuilder() {
           nodesConnectable={false}
           elementsSelectable={true}
         >
-          <Background color="#ccc" gap={16} />
-          <Controls />
+          <Background
+            color="currentColor"
+            className="text-gray-300 dark:text-zinc-700"
+            gap={16}
+            size={1.2}
+          />
+          <Controls showInteractive={false} />
         </ReactFlow>
+
+        <EmptyCanvas
+          show={triggers.length === 0 && steps.length === 0 && !isLoading}
+          onAddTrigger={handleAddTrigger}
+          isAddingTrigger={false}
+        />
 
         <Sidebar
           isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
           selectedNode={selectedNode}
-          workflowId={workflowId as string}
+          workflowId={workflowId!}
+          onClose={() => setIsSidebarOpen(false)}
           isActive={workflow.isActive}
+          triggersCount={triggers.length}
         />
 
-        {!workflow.isActive && (
-          <button
-            onClick={() => addStepMutation.mutate()}
-            disabled={addStepMutation.isPending}
-            className="absolute bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-indigo-700 transition-transform hover:scale-105 z-10 disabled:opacity-50"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
-        )}
+        <AddNode
+          config={addNodeConfig}
+          onClose={() => setAddNodeConfig(null)}
+          onSelectAction={(action, parentId, branch) => {
+            addStepMutation.mutate({ action, parentId, branch });
+            setAddNodeConfig(null);
+          }}
+          isPending={addStepMutation.isPending}
+        />
+
+        <AddTrigger
+          isOpen={isAddTriggerModalOpen}
+          onClose={() => setIsAddTriggerModalOpen(false)}
+          onSelectTrigger={(event) => addTriggerMutation.mutate(event)}
+          isPending={addTriggerMutation.isPending}
+        />
+
+        <Alert
+          isOpen={!!alertMessage}
+          onClose={() => setAlertMessage(null)}
+          title="Activation Failed"
+          description={alertMessage || ''}
+        />
       </div>
     </div>
   );
