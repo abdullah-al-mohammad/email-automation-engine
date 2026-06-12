@@ -17,6 +17,12 @@ export class WorkflowTriggerService {
     private readonly workflowService: WorkflowService,
   ) {}
 
+  async getTriggers(tenantId: string, workflowId: string): Promise<WorkflowTriggerResponse[]> {
+    await this.workflowService.findById(tenantId, workflowId);
+    const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
+    return triggers.map((t) => this.mapTriggerToResponse(t));
+  }
+
   async addTrigger(
     tenantId: string,
     workflowId: string,
