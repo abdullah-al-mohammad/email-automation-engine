@@ -165,14 +165,62 @@ export class WorkflowService {
       throw new BadRequestException('Workflow must have at least one step to be activated');
     }
 
+    const firstSteps = steps.filter(
+      (s) =>
+        !s.parentWorkflowStepId &&
+        !steps.some((p) => p.trueStepId === s.id || p.falseStepId === s.id),
+    );
+
+    if (firstSteps.length > 1) {
+      throw new BadRequestException(
+        'Multiple disconnected root steps found. Every step must have a parent node, except the first step.',
+      );
+    }
+
+    if (firstSteps.length === 1 && firstSteps[0]) {
+      const firstStep = firstSteps[0];
+      const reachable = new Set<string>();
+      const queue = [firstStep.id];
+
+      while (queue.length > 0) {
+        const currentId = queue.shift()!;
+        reachable.add(currentId);
+
+        const currentStep = steps.find((s) => s.id === currentId);
+        if (currentStep) {
+          const linearChildren = steps.filter((s) => s.parentWorkflowStepId === currentId);
+          for (const child of linearChildren) {
+            queue.push(child.id);
+          }
+
+          if (currentStep.trueStepId) queue.push(currentStep.trueStepId);
+          if (currentStep.falseStepId) queue.push(currentStep.falseStepId);
+        }
+      }
+
+      if (reachable.size !== steps.length) {
+        throw new BadRequestException('Every step must have a parent node, except the first step.');
+      }
+    } else if (steps.length > 0) {
+      throw new BadRequestException(
+        'Workflow steps must form a valid tree connected to a single root step.',
+      );
+    }
+
     // Extended validation per requirements
     for (const step of steps) {
       if (!step.action) {
-        throw new BadRequestException(`Step ${step.id} has no action configured`);
+        throw new BadRequestException(`A step has no action configured`);
       }
 
-      if (step.action === STEP_ACTIONS.DELAY && (!step.config?.amount || !step.config?.unit)) {
-        throw new BadRequestException(`Delay step ${step.id} requires amount and unit`);
+      if (step.action === STEP_ACTIONS.DELAY) {
+        if (!step.config?.amount || !step.config?.unit) {
+          throw new BadRequestException(`Delay step ${step.id} requires amount and unit`);
+        }
+        const hasNextStep = steps.some((s) => s.parentWorkflowStepId === step.id);
+        if (!hasNextStep) {
+          throw new BadRequestException('A delay cannot be the final step in a workflow');
+        }
       }
 
       if (step.action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
@@ -184,7 +232,7 @@ export class WorkflowService {
           );
           if (!conditionsCount || parseInt(conditionsCount[0]?.count ?? '0') === 0) {
             throw new BadRequestException(
-              `Conditional split step ${step.id} must have both true and false step routing or valid conditions in the database`,
+              `A conditional split step must have both true and false step routing or valid conditions in the database`,
             );
           }
         }
@@ -193,7 +241,7 @@ export class WorkflowService {
       if (step.action === STEP_ACTIONS.SEND_EMAIL) {
         if (!step.config?.templateId && (!step.config?.subject || !step.config?.html)) {
           throw new BadRequestException(
-            `Email step ${step.id} requires either templateId OR (subject and html)`,
+            `An email step requires either templateId OR (subject and html)`,
           );
         }
         if (step.config?.templateId) {
@@ -203,7 +251,7 @@ export class WorkflowService {
           );
           if (!templateExists || templateExists.length === 0) {
             throw new BadRequestException(
-              `Email step ${step.id} references a deleted or non-existent template`,
+              `An email step references a deleted or non-existent template`,
             );
           }
         }
@@ -213,13 +261,13 @@ export class WorkflowService {
         (step.action === STEP_ACTIONS.ATTACH_TAG || step.action === STEP_ACTIONS.DETACH_TAG) &&
         !step.config?.tagId
       ) {
-        throw new BadRequestException(`Tag step ${step.id} requires a tag reference`);
+        throw new BadRequestException(`A tag step requires a tag reference`);
       }
 
       if (step.action === STEP_ACTIONS.WEBHOOK) {
         const urlStr = typeof step.config?.url === 'string' ? step.config.url : '';
         if (!urlStr) {
-          throw new BadRequestException(`Webhook step ${step.id} requires a valid URL`);
+          throw new BadRequestException(`A webhook step requires a valid URL`);
         }
         try {
           const parsedUrl = new URL(urlStr);
@@ -238,7 +286,7 @@ export class WorkflowService {
             /^\[[fF][cC0-9a-fA-F]{3}:/.test(hostname) || // fc00::/7
             /^\[[fF][eE][89aAbB][0-9a-fA-F]:/.test(hostname) // fe80::/10
           ) {
-            throw new BadRequestException(`Webhook step ${step.id} has an invalid or private URL`);
+            throw new BadRequestException(`A webhook step has an invalid or private URL`);
           }
 
           // DNS resolution check
@@ -258,17 +306,17 @@ export class WorkflowService {
               /^[fF][cC0-9a-fA-F]{3}:/.test(address) ||
               /^[fF][eE][89aAbB][0-9a-fA-F]:/.test(address)
             ) {
-              throw new BadRequestException(`Webhook step ${step.id} resolves to a private IP`);
+              throw new BadRequestException(`A webhook step resolves to a private IP`);
             }
           } catch (dnsError) {
             // If DNS resolution fails, block it or let it pass?
             // Usually, if it doesn't resolve, we block it to prevent targeting internal unresolved names.
             if (dnsError instanceof BadRequestException) throw dnsError;
-            throw new BadRequestException(`Webhook step ${step.id} domain could not be resolved`);
+            throw new BadRequestException(`A webhook step domain could not be resolved`);
           }
         } catch (e) {
           if (e instanceof BadRequestException) throw e;
-          throw new BadRequestException(`Webhook step ${step.id} has a malformed URL`);
+          throw new BadRequestException(`A webhook step has a malformed URL`);
         }
       }
     }
@@ -310,12 +358,12 @@ export class WorkflowService {
       id: step.id,
       tenantId: step.tenantId,
       workflowId: step.workflowId,
-      parentWorkflowStepId: step.parentWorkflowStepId ?? undefined,
+      parentWorkflowStepId: step.parentWorkflowStepId ?? null,
       action: step.action,
       config: step.config ?? undefined,
       position: step.position,
-      trueStepId: step.trueStepId ?? undefined,
-      falseStepId: step.falseStepId ?? undefined,
+      trueStepId: step.trueStepId ?? null,
+      falseStepId: step.falseStepId ?? null,
       createdAt: step.createdAt.toISOString(),
       updatedAt: step.updatedAt.toISOString(),
     };
