@@ -120,6 +120,7 @@ export type CreateWorkflowStepDto = z.infer<typeof CreateWorkflowStepSchema>;
 export const UpdateWorkflowStepSchema = z.object({
   action: z.enum(SUPPORTED_STEP_ACTIONS).optional(),
   config: z.record(z.string(), z.unknown()).optional(),
+  parentWorkflowStepId: z.string().uuid().optional().nullable(),
   trueStepId: z.string().uuid().optional().nullable(),
   falseStepId: z.string().uuid().optional().nullable(),
 });

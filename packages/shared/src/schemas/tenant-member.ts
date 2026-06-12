@@ -6,6 +6,7 @@ export const tenantMemberResponseSchema = z.object({
   userId: z.string(),
   roleId: z.string(),
   status: z.string(),
+  user: z.object({ email: z.string() }).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
