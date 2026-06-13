@@ -155,14 +155,16 @@ export class WorkflowService {
   }
 
   private async validateForActivation(workflowId: string): Promise<void> {
+    const errors: string[] = [];
     const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
+
     if (triggers.length === 0) {
-      throw new BadRequestException('Workflow must have at least one trigger to be activated');
+      errors.push('Workflow must have at least one trigger to be activated');
     }
 
     const steps = await this.stepRepo.findByWorkflowId(workflowId);
     if (steps.length === 0) {
-      throw new BadRequestException('Workflow must have at least one step to be activated');
+      errors.push('Workflow must have at least one step to be activated');
     }
 
     const firstSteps = steps.filter(
@@ -172,7 +174,7 @@ export class WorkflowService {
     );
 
     if (firstSteps.length > 1) {
-      throw new BadRequestException(
+      errors.push(
         'Multiple disconnected root steps found. Every step must have a parent node, except the first step.',
       );
     }
@@ -199,60 +201,51 @@ export class WorkflowService {
       }
 
       if (reachable.size !== steps.length) {
-        throw new BadRequestException('Every step must have a parent node, except the first step.');
+        errors.push('Every step must have a parent node, except the first step.');
       }
-    } else if (steps.length > 0) {
-      throw new BadRequestException(
-        'Workflow steps must form a valid tree connected to a single root step.',
-      );
+    } else if (steps.length > 0 && firstSteps.length === 0) {
+      errors.push('Workflow steps must form a valid tree connected to a single root step.');
     }
 
     // Extended validation per requirements
     for (const step of steps) {
       if (!step.action) {
-        throw new BadRequestException(`A step has no action configured`);
+        errors.push(`Step ${step.id} has no action configured`);
+        continue;
       }
 
       if (step.action === STEP_ACTIONS.DELAY) {
         if (!step.config?.amount || !step.config?.unit) {
-          throw new BadRequestException(`Delay step ${step.id} requires amount and unit`);
+          errors.push(`Delay step requires an amount and a unit.`);
         }
         const hasNextStep = steps.some((s) => s.parentWorkflowStepId === step.id);
         if (!hasNextStep) {
-          throw new BadRequestException('A delay cannot be the final step in a workflow');
+          errors.push('A delay cannot be the final step in a workflow');
         }
       }
 
       if (step.action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
         if (!step.trueStepId || !step.falseStepId) {
-          // Check if conditions exist in workflow_step_conditions
           const conditionsCount = await this.dataSource.query<{ count: string }[]>(
             `SELECT COUNT(*) FROM workflow_step_conditions WHERE workflow_step_id = $1`,
             [step.id],
           );
           if (!conditionsCount || parseInt(conditionsCount[0]?.count ?? '0') === 0) {
-            throw new BadRequestException(
-              `A conditional split step must have both true and false step routing or valid conditions in the database`,
-            );
+            errors.push('A conditional split step must have valid conditions configured');
           }
         }
       }
 
       if (step.action === STEP_ACTIONS.SEND_EMAIL) {
         if (!step.config?.templateId && (!step.config?.subject || !step.config?.html)) {
-          throw new BadRequestException(
-            `An email step requires either templateId OR (subject and html)`,
-          );
-        }
-        if (step.config?.templateId) {
+          errors.push('An email step requires either a template or a subject and html body');
+        } else if (step.config?.templateId) {
           const templateExists = await this.dataSource.query<{ id: string }[]>(
             `SELECT id FROM email_templates WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL LIMIT 1`,
             [step.config.templateId, step.tenantId],
           );
           if (!templateExists || templateExists.length === 0) {
-            throw new BadRequestException(
-              `An email step references a deleted or non-existent template`,
-            );
+            errors.push('An email step references a deleted or non-existent template');
           }
         }
       }
@@ -261,69 +254,72 @@ export class WorkflowService {
         (step.action === STEP_ACTIONS.ATTACH_TAG || step.action === STEP_ACTIONS.DETACH_TAG) &&
         !step.config?.tagId
       ) {
-        throw new BadRequestException(`A tag step requires a tag reference`);
+        errors.push('A tag step requires a tag reference');
       }
 
       if (step.action === STEP_ACTIONS.WEBHOOK) {
         const urlStr = typeof step.config?.url === 'string' ? step.config.url : '';
         if (!urlStr) {
-          throw new BadRequestException(`A webhook step requires a valid URL`);
-        }
-        try {
-          const parsedUrl = new URL(urlStr);
-          const hostname = parsedUrl.hostname;
-          if (
-            hostname === 'localhost' ||
-            hostname === '127.0.0.1' ||
-            hostname === '0.0.0.0' ||
-            hostname === '[::1]' ||
-            hostname === '[::]' ||
-            hostname.startsWith('10.') ||
-            hostname.startsWith('192.168.') ||
-            hostname.startsWith('169.254.') ||
-            /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
-            /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(hostname) || // CGN 100.64.0.0/10
-            /^\[[fF][cC0-9a-fA-F]{3}:/.test(hostname) || // fc00::/7
-            /^\[[fF][eE][89aAbB][0-9a-fA-F]:/.test(hostname) // fe80::/10
-          ) {
-            throw new BadRequestException(`A webhook step has an invalid or private URL`);
-          }
-
-          // DNS resolution check
+          errors.push('A webhook step requires a valid URL');
+        } else {
           try {
-            const dnsResult = await lookup(hostname);
-            const address = dnsResult.address;
+            const parsedUrl = new URL(urlStr);
+            const hostname = parsedUrl.hostname;
             if (
-              address === '127.0.0.1' ||
-              address === '0.0.0.0' ||
-              address === '::1' ||
-              address === '::' ||
-              address.startsWith('10.') ||
-              address.startsWith('192.168.') ||
-              address.startsWith('169.254.') ||
-              /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(address) ||
-              /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(address) ||
-              /^[fF][cC0-9a-fA-F]{3}:/.test(address) ||
-              /^[fF][eE][89aAbB][0-9a-fA-F]:/.test(address)
+              hostname === 'localhost' ||
+              hostname === '127.0.0.1' ||
+              hostname === '0.0.0.0' ||
+              hostname === '[::1]' ||
+              hostname === '[::]' ||
+              hostname.startsWith('10.') ||
+              hostname.startsWith('192.168.') ||
+              hostname.startsWith('169.254.') ||
+              /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+              /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(hostname) ||
+              /^\[[fF][cC0-9a-fA-F]{3}:/.test(hostname) ||
+              /^\[[fF][eE][89aAbB][0-9a-fA-F]:/.test(hostname)
             ) {
-              throw new BadRequestException(`A webhook step resolves to a private IP`);
+              errors.push('A webhook step has an invalid or private URL');
+            } else {
+              try {
+                const dnsResult = await lookup(hostname);
+                const address = dnsResult.address;
+                if (
+                  address === '127.0.0.1' ||
+                  address === '0.0.0.0' ||
+                  address === '::1' ||
+                  address === '::' ||
+                  address.startsWith('10.') ||
+                  address.startsWith('192.168.') ||
+                  address.startsWith('169.254.') ||
+                  /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(address) ||
+                  /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(address) ||
+                  /^[fF][cC0-9a-fA-F]{3}:/.test(address) ||
+                  /^[fF][eE][89aAbB][0-9a-fA-F]:/.test(address)
+                ) {
+                  errors.push('A webhook step resolves to a private IP');
+                }
+              } catch {
+                errors.push('A webhook step domain could not be resolved');
+              }
             }
-          } catch (dnsError) {
-            // If DNS resolution fails, block it or let it pass?
-            // Usually, if it doesn't resolve, we block it to prevent targeting internal unresolved names.
-            if (dnsError instanceof BadRequestException) throw dnsError;
-            throw new BadRequestException(`A webhook step domain could not be resolved`);
+          } catch {
+            errors.push('A webhook step has a malformed URL');
           }
-        } catch (error) {
-          if (error instanceof BadRequestException) throw error;
-          throw new BadRequestException(`A webhook step has a malformed URL`);
         }
       }
     }
 
     const lastStep = [...steps].sort((a, b) => a.position - b.position)[steps.length - 1];
-    if (lastStep?.action === STEP_ACTIONS.DELAY) {
-      throw new BadRequestException('A delay cannot be the final step in a workflow');
+    if (
+      lastStep?.action === STEP_ACTIONS.DELAY &&
+      !errors.includes('A delay cannot be the final step in a workflow')
+    ) {
+      errors.push('A delay cannot be the final step in a workflow');
+    }
+
+    if (errors.length > 0) {
+      throw new BadRequestException({ message: errors, error: 'Bad Request', statusCode: 400 });
     }
   }
 

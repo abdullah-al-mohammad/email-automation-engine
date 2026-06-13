@@ -183,8 +183,17 @@ describe('WorkflowService', () => {
     it('should throw BadRequestException if activating without triggers', async () => {
       workflowRepo.findById.mockResolvedValue({ ...mockWorkflow });
       triggerRepo.findByWorkflowId.mockResolvedValue([]);
+      stepRepo.findByWorkflowId.mockResolvedValue([]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(BadRequestException);
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain(
+          'Workflow must have at least one trigger to be activated',
+        );
+      }
     });
 
     it('should throw BadRequestException if activating without steps', async () => {
@@ -192,7 +201,15 @@ describe('WorkflowService', () => {
       triggerRepo.findByWorkflowId.mockResolvedValue([{ id: 'trigger-1' }]);
       stepRepo.findByWorkflowId.mockResolvedValue([]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(BadRequestException);
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain(
+          'Workflow must have at least one step to be activated',
+        );
+      }
     });
 
     it('should activate successfully if valid triggers and steps exist', async () => {
@@ -216,9 +233,13 @@ describe('WorkflowService', () => {
         { id: 'step-1', action: 'delay', position: 0, config: { amount: 10, unit: 'minutes' } },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'A delay cannot be the final step in a workflow',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain('A delay cannot be the final step in a workflow');
+      }
     });
 
     it('should fail if delay step is missing amount/unit', async () => {
@@ -235,9 +256,13 @@ describe('WorkflowService', () => {
         },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'Delay step step-1 requires amount and unit',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain('Delay step requires an amount and a unit.');
+      }
     });
 
     it('should fail if conditional_split step is missing routing', async () => {
@@ -247,9 +272,15 @@ describe('WorkflowService', () => {
         { id: 'step-1', action: 'conditional_split', position: 0 },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'must have both true and false step routing',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain(
+          'A conditional split step must have valid conditions configured',
+        );
+      }
     });
 
     it('should fail if email step is missing template config', async () => {
@@ -259,9 +290,15 @@ describe('WorkflowService', () => {
         { id: 'step-1', action: 'send_email', position: 0, config: {} },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'requires either templateId OR (subject and html)',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain(
+          'An email step requires either a template or a subject and html body',
+        );
+      }
     });
 
     it('should fail if tag step is missing tagId', async () => {
@@ -271,9 +308,13 @@ describe('WorkflowService', () => {
         { id: 'step-1', action: 'attach_tag', position: 0, config: {} },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'requires a tag reference',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain('A tag step requires a tag reference');
+      }
     });
 
     it('should fail if webhook step is missing url', async () => {
@@ -283,9 +324,13 @@ describe('WorkflowService', () => {
         { id: 'step-1', action: 'webhook', position: 0, config: {} },
       ]);
 
-      await expect(service.activate('tenant-1', 'workflow-1')).rejects.toThrow(
-        'requires a valid URL',
-      );
+      try {
+        await service.activate('tenant-1', 'workflow-1');
+        expect.fail('Should have thrown');
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect(e.getResponse().message).toContain('A webhook step requires a valid URL');
+      }
     });
   });
 });
