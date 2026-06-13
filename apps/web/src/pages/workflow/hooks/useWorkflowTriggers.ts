@@ -74,10 +74,12 @@ export function useWorkflowTriggers(workflowId: string | undefined) {
   });
 
   return {
-    triggers: query.data || [],
+    triggers: query.data || EMPTY_TRIGGERS,
     isLoading: query.isLoading,
     addTrigger,
     updateTrigger,
     deleteTrigger,
   };
 }
+
+const EMPTY_TRIGGERS: WorkflowTriggerResponse[] = [];
