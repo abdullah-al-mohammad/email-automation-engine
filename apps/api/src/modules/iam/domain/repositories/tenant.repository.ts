@@ -5,4 +5,5 @@ export interface TenantRepository {
   findByIds(ids: string[]): Promise<Tenant[]>;
   save(tenant: Tenant): Promise<Tenant>;
   findByCreatorId(creatorId: string): Promise<Tenant[]>;
+  delete(id: string): Promise<void>;
 }

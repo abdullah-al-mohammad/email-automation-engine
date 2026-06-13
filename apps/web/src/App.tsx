@@ -19,6 +19,7 @@ import CreateWorkflow from './pages/workflow/CreateWorkflow';
 import EditWorkflow from './pages/workflow/EditWorkflow';
 import WorkflowBuilder from './pages/workflow/WorkflowBuilder';
 import WorkflowContacts from './pages/workflow/WorkflowContacts';
+import ExecutionSummary from './pages/workflow/ExecutionSummary';
 import Settings from './pages/settings/Settings';
 import EmailTemplates from './pages/email-templates/EmailTemplates';
 
@@ -30,6 +31,7 @@ const appRoutes = [
   { path: '/workflows/create', element: <CreateWorkflow /> },
   { path: '/workflows/:workflowId', element: <WorkflowBuilder /> },
   { path: '/workflows/:workflowId/edit', element: <EditWorkflow /> },
+  { path: '/workflows/:workflowId/summary', element: <ExecutionSummary /> },
   { path: '/workflows/:workflowId/contacts', element: <WorkflowContacts /> },
   { path: '/email-templates', element: <EmailTemplates /> },
   { path: '/email-templates/create', element: <CreateEmailTemplate /> },

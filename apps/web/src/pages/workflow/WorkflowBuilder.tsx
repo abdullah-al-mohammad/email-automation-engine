@@ -5,7 +5,7 @@ import {
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import { ReactFlow, Background, Controls, type Node } from '@xyflow/react';
+import { ReactFlow, ReactFlowProvider, Background, Controls, type Node } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useState, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
 
@@ -46,7 +46,7 @@ type AddNodeConfig = {
   branch: 'linear' | true | false;
 } | null;
 
-export default function WorkflowBuilder() {
+function WorkflowBuilderContent() {
   const { workflowId } = useParams<{ workflowId: string }>();
   const { currentTenant } = useTenant();
 
@@ -55,7 +55,7 @@ export default function WorkflowBuilder() {
   const [addNodeConfig, setAddNodeConfig] = useState<AddNodeConfig>(null);
   const [isAddTriggerModalOpen, setIsAddTriggerModalOpen] = useState(false);
   const [isExitConditionsModalOpen, setIsExitConditionsModalOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | string[] | null>(null);
 
   const { workflow, isLoading: isLoadingWorkflow, toggleActive } = useWorkflow(workflowId);
   const { steps, isLoading: isLoadingSteps, addStep } = useWorkflowSteps(workflowId);
@@ -110,7 +110,7 @@ export default function WorkflowBuilder() {
   const handleToggleActive = () => {
     toggleActive.mutate(undefined, {
       onError: (err: Error) => {
-        const axiosErr = err as AxiosError<{ message: string }>;
+        const axiosErr = err as AxiosError<{ message: string | string[] }>;
         setAlertMessage(
           axiosErr?.response?.data?.message || err.message || 'Failed to toggle activation',
         );
@@ -211,5 +211,13 @@ export default function WorkflowBuilder() {
         />
       </div>
     </div>
+  );
+}
+
+export default function WorkflowBuilder() {
+  return (
+    <ReactFlowProvider>
+      <WorkflowBuilderContent />
+    </ReactFlowProvider>
   );
 }

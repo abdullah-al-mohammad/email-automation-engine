@@ -4,7 +4,7 @@ interface AlertProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  description: string;
+  description: string | string[];
 }
 
 export default function Alert({ isOpen, onClose, title, description }: AlertProps) {
@@ -12,13 +12,32 @@ export default function Alert({ isOpen, onClose, title, description }: AlertProp
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
             <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">{description}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{title}</h3>
+
+          {(() => {
+            let messages: string[] = [];
+            if (Array.isArray(description)) {
+              messages = description;
+            } else {
+              messages = [description];
+            }
+
+            if (messages.length > 1) {
+              return (
+                <ul className="list-disc pl-5 space-y-1.5 text-sm text-gray-600 dark:text-zinc-400">
+                  {messages.map((desc, i) => (
+                    <li key={i}>{desc}</li>
+                  ))}
+                </ul>
+              );
+            }
+            return <p className="text-sm text-gray-600 dark:text-zinc-400">{messages[0]}</p>;
+          })()}
 
           <div className="mt-6 flex justify-end gap-3">
             <button

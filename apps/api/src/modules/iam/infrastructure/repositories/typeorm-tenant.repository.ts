@@ -27,4 +27,8 @@ export class TypeOrmTenantRepository implements TenantRepository {
   async findByCreatorId(creatorId: string): Promise<Tenant[]> {
     return this.repo.find({ where: { creatorId } });
   }
+
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
+  }
 }

@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom';
 import { type WorkflowResponse } from '@email-automation-engine/shared';
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Edit2, Trash2, Workflow as WorkflowIcon } from 'lucide-react';
+import {
+  MoreVertical,
+  Edit2,
+  Trash2,
+  Workflow as WorkflowIcon,
+  Clock,
+  Activity,
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 function WorkflowListItem({
   workflow,
@@ -35,27 +43,40 @@ function WorkflowListItem({
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-1">
-              <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 truncate">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                 {workflow.name}
               </p>
               <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
                   workflow.isActive
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-gray-100 text-gray-800 dark:bg-zinc-800 dark:text-zinc-300'
+                    ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50'
+                    : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
                 }`}
               >
-                {workflow.isActive ? 'Active' : 'Draft'}
+                {workflow.isActive ? (
+                  <>
+                    <Activity className="w-3 h-3 mr-1" />
+                    Active
+                  </>
+                ) : (
+                  'Draft'
+                )}
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 truncate">
+            <p className="text-sm text-gray-500 dark:text-zinc-400 truncate mb-2">
               {workflow.description || 'No description provided'}
             </p>
+            <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-zinc-500 font-medium">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                Updated {formatDistanceToNow(new Date(workflow.updatedAt), { addSuffix: true })}
+              </div>
+            </div>
           </div>
         </div>
       </Link>
 
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative ml-4 shrink-0" ref={dropdownRef}>
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -72,18 +93,26 @@ function WorkflowListItem({
           <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-xl shadow-lg border border-gray-100 dark:border-zinc-700 py-1 z-20">
             <Link
               to={`/workflows/${workflow.id}`}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700/50 flex items-center transition-colors"
+              className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700/50 flex items-center transition-colors"
             >
               <WorkflowIcon className="w-4 h-4 mr-2" />
               Open builder
             </Link>
             <Link
+              to={`/workflows/${workflow.id}/summary`}
+              className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700/50 flex items-center transition-colors"
+            >
+              <Activity className="w-4 h-4 mr-2" />
+              Execution summary
+            </Link>
+            <Link
               to={`/workflows/${workflow.id}/edit`}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700/50 flex items-center transition-colors"
+              className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700/50 flex items-center transition-colors"
             >
               <Edit2 className="w-4 h-4 mr-2" />
               Edit workflow
             </Link>
+            <div className="h-px bg-gray-100 dark:bg-zinc-700 my-1"></div>
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -91,7 +120,7 @@ function WorkflowListItem({
                 setIsDropdownOpen(false);
                 onDelete(workflow.id);
               }}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
+              className="w-full text-left px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete workflow
@@ -111,8 +140,8 @@ export default function Workflows({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm">
-      <ul className="divide-y divide-gray-200 dark:divide-zinc-800">
+    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+      <ul className="divide-y divide-gray-100 dark:divide-zinc-800/50">
         {workflows.map((workflow) => (
           <WorkflowListItem key={workflow.id} workflow={workflow} onDelete={onDelete} />
         ))}

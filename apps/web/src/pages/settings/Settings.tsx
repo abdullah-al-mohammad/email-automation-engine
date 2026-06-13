@@ -10,6 +10,7 @@ import {
   type TenantResponse,
 } from '@email-automation-engine/shared';
 import InviteMember from '../../components/modals/InviteMember';
+import Confirm from '../../components/modals/Confirm';
 import Members from '../../components/settings/Members';
 import Invitations from '../../components/settings/Invitations';
 
@@ -36,6 +37,22 @@ export default function Settings() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['tenants'] });
       setIsEditingName(false);
+    },
+  });
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const deleteTenantMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/tenants/${currentTenant?.id}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      window.location.href = '/';
+    },
+    onError: (err: unknown) => {
+      setIsDeleteModalOpen(false);
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to delete workspace');
     },
   });
 
@@ -192,6 +209,35 @@ export default function Settings() {
           roles={roles}
         />
       )}
+
+      {/* Danger Zone */}
+      <div className="mt-12 pt-8 border-t border-red-200 dark:border-red-900/30">
+        <h2 className="text-lg font-semibold text-red-600 dark:text-red-500 mb-2">Danger Zone</h2>
+        <div className="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-medium text-red-900 dark:text-red-400">Delete workspace</h3>
+            <p className="text-sm text-red-700 dark:text-red-500 mt-1">
+              Once you delete a workspace, there is no going back. Please be certain.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0"
+          >
+            Delete workspace
+          </button>
+        </div>
+      </div>
+
+      <Confirm
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteTenantMutation.mutate()}
+        title="Delete workspace"
+        description="Are you absolutely sure? This action cannot be undone. This will permanently delete the workspace, all workflows, and remove all member associations."
+        confirmText="Yes, delete workspace"
+        isConfirming={deleteTenantMutation.isPending}
+      />
     </div>
   );
 }

@@ -124,10 +124,12 @@ export function useWorkflowSteps(workflowId: string | undefined) {
   });
 
   return {
-    steps: query.data || [],
+    steps: query.data || EMPTY_STEPS,
     isLoading: query.isLoading,
     addStep,
     updateStep,
     deleteStep,
   };
 }
+
+const EMPTY_STEPS: WorkflowStepResponse[] = [];
