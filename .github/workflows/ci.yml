@@ -81,3 +81,23 @@ jobs:
         env:
           DATABASE_URL: postgres://engine_user:engine_password@localhost:5432/engine_db
         run: pnpm test:integration
+
+  terraform-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive infra/terraform
+
+      - name: Terraform Init & Validate Example Environment
+        working-directory: infra/terraform/environments/example
+        run: |
+          terraform init -backend=false
+          terraform validate
