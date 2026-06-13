@@ -1,7 +1,7 @@
 data "archive_file" "dummy_lambda" {
   type        = "zip"
   output_path = "${path.module}/dummy_lambda.zip"
-  
+
   source {
     content  = "exports.handler = async (event) => { console.log('Dummy handler running', event); return 'OK'; };"
     filename = "index.js"
@@ -71,14 +71,14 @@ module "webhook_deliveries_queue" {
 # ==========================================
 locals {
   worker_env_vars = merge(local.common_env_vars, {
-    AUTOMATION_EVENTS_QUEUE_URL      = module.automation_events_queue.queue_url
-    WAITING_STEPS_QUEUE_URL          = module.waiting_steps_queue.queue_url
-    FINISHED_STEPS_QUEUE_URL         = module.finished_steps_queue.queue_url
-    WORKFLOW_EMAILS_QUEUE_URL        = module.workflow_emails_queue.queue_url
-    EMAIL_TRACKING_EVENTS_QUEUE_URL  = module.email_tracking_events_queue.queue_url
-    CONDITIONAL_SPLIT_QUEUE_URL      = module.conditional_split_queue.queue_url
-    WEBHOOK_STEPS_QUEUE_URL          = module.webhook_steps_queue.queue_url
-    WEBHOOK_DELIVERIES_QUEUE_URL     = module.webhook_deliveries_queue.queue_url
+    AUTOMATION_EVENTS_QUEUE_URL     = module.automation_events_queue.queue_url
+    WAITING_STEPS_QUEUE_URL         = module.waiting_steps_queue.queue_url
+    FINISHED_STEPS_QUEUE_URL        = module.finished_steps_queue.queue_url
+    WORKFLOW_EMAILS_QUEUE_URL       = module.workflow_emails_queue.queue_url
+    EMAIL_TRACKING_EVENTS_QUEUE_URL = module.email_tracking_events_queue.queue_url
+    CONDITIONAL_SPLIT_QUEUE_URL     = module.conditional_split_queue.queue_url
+    WEBHOOK_STEPS_QUEUE_URL         = module.webhook_steps_queue.queue_url
+    WEBHOOK_DELIVERIES_QUEUE_URL    = module.webhook_deliveries_queue.queue_url
   })
 }
 
