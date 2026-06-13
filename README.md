@@ -6,11 +6,11 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Status
 
-This project is currently in the active development phase. The repository contains architecture, API, worker, infrastructure, testing, and contribution workflow documents, and the core domain slices are actively being implemented.
+This project has successfully completed its core development phases and is ready for public release. The repository contains the fully functioning architecture, API, worker, infrastructure, and front-end builder components.
 
-See [Project Status](docs/project-status.md) for the current phase and next task.
+See [Project Status](docs/project-status.md) for the detailed phase breakdown.
 
-## Planned Features
+## Features
 
 - Workflow creation and management.
 - Tenant creation and management.
