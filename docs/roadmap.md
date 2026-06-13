@@ -104,5 +104,4 @@
 - Security policy.
 - Open-source safety scan.
 - Complete test suite passing in CI.
-- Example app.
 - Demo deployment guide.
