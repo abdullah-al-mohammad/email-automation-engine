@@ -120,6 +120,16 @@ Phase 6: Terraform completed.
   - Implemented `useWorkflowExitConditions` hook and `ExitConditionsModal` component with dynamic fields.
   - Implemented the full backend layer for `workflow_step_conditions` (Zod schemas, TypeORM Repository, Service, and Controller).
   - Implemented `useWorkflowStepConditions` hook and `StepConditionsEditor` inside the builder sidebar for Conditional Split configuration.
+  - Added comprehensive frontend unit tests fixing text match and context mock issues.
+
+- Implemented Phase 6 Terraform Setup:
+  - Added full environment variables configurations.
+  - Added CI validation tests.
+
+- Implemented Phase 7 Public Release Readiness:
+  - Added `SECURITY.md` for vulnerability reporting.
+  - Added `docs/demo-deployment.md` demo guide.
+  - Finalized test suite running fully in CI.
 
 - Implemented Phase 6 Terraform Infrastructure-as-Code:
   - Standardized the module structure into `infra/terraform/modules/`.
@@ -148,43 +158,9 @@ Phase 6: Terraform completed.
 
 ## Files Touched In Current Planning Task
 
-- `README.md`
-- `LICENSE`
-- `CONTRIBUTING.md`
-- `docs/open-source-scope.md`
-- `docs/architecture.md`
-- `docs/data-model.md`
-- `docs/api-spec.md`
-- `docs/auth-and-permissions.md`
-- `docs/worker-flow.md`
-- `docs/frontend-builder.md`
-- `docs/terraform.md`
-- `docs/tooling.md`
-- `docs/queue-and-cache.md`
-- `docs/edge-cases.md`
-- `docs/testing.md`
-- `docs/development-workflow.md`
-- `docs/engineering-rules.md`
-- `docs/roadmap.md`
+- `SECURITY.md`
+- `docs/demo-deployment.md`
 - `docs/project-status.md`
-- `.gitignore`
-- `.node-version`
-- `.npmrc`
-- `.nvmrc`
-- `.prettierignore`
-- `.prettierrc.json`
-- `eslint.config.mjs`
-- `package.json`
-- `pnpm-lock.yaml`
-- `pnpm-workspace.yaml`
-- `tsconfig.base.json`
-- `tsconfig.json`
-- `turbo.json`
-- `apps/api`
-- `apps/web`
-- `apps/worker`
-- `packages/shared`
-- `infra/terraform`
 
 ## Next Exact Task
 
