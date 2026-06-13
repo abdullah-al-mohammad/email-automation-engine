@@ -136,6 +136,20 @@ export class TenantService {
     return this.mapToResponse(updated);
   }
 
+  async delete(id: string, userId: string): Promise<void> {
+    const tenant = await this.tenantRepo.findById(id);
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+
+    // Only the creator can delete the tenant
+    if (tenant.creatorId !== userId) {
+      throw new ForbiddenException('Only the workspace creator can delete it');
+    }
+
+    await this.tenantRepo.delete(id);
+  }
+
   private mapToResponse(tenant: Tenant): TenantResponse {
     return {
       id: tenant.id,

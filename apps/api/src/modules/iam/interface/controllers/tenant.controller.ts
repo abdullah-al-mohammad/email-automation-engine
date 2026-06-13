@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Patch, Body, Param, UseGuards, UsePipes } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import {
   createTenantSchema,
   updateTenantSchema,
@@ -50,5 +60,12 @@ export class TenantController {
   @UsePipes(new ZodValidationPipe(updateTenantSchema))
   async update(@Param('id') id: string, @Body() dto: UpdateTenantDto): Promise<TenantResponse> {
     return this.tenantService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
+  @RequirePermissions('tenant.update')
+  async delete(@Param('id') id: string, @CurrentUser() user: { id: string }): Promise<void> {
+    return this.tenantService.delete(id, user.id);
   }
 }
