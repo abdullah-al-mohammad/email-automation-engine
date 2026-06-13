@@ -1,13 +1,14 @@
-import type { UseFormRegister } from 'react-hook-form';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { type StepFormData } from '@email-automation-engine/shared';
 import { useEmailTemplates } from '../../../../pages/workflow/hooks/useEmailTemplates';
 
 interface EmailProps {
   register: UseFormRegister<StepFormData>;
+  errors: FieldErrors<StepFormData>;
   isActive: boolean;
 }
 
-export default function Email({ register, isActive }: EmailProps) {
+export default function Email({ register, errors, isActive }: EmailProps) {
   const { data: templates = [] } = useEmailTemplates();
 
   return (
@@ -18,7 +19,11 @@ export default function Email({ register, isActive }: EmailProps) {
       <select
         {...register('config.templateId')}
         disabled={isActive}
-        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"
+        className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 ${
+          errors.config?.templateId
+            ? 'border-red-300 dark:border-red-900 focus:ring-red-500 focus:border-red-500'
+            : 'border-gray-300 dark:border-zinc-700'
+        }`}
       >
         <option value="">Select a template</option>
         {templates.map((t) => (
@@ -27,6 +32,9 @@ export default function Email({ register, isActive }: EmailProps) {
           </option>
         ))}
       </select>
+      {errors.config?.templateId && (
+        <p className="mt-1 text-xs text-red-500">{errors.config.templateId.message as string}</p>
+      )}
     </div>
   );
 }

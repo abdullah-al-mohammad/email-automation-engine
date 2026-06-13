@@ -138,12 +138,12 @@ export default function EditStep({ step, workflowId, isActive, onSuccess }: Step
         )}
 
         {selectedAction === STEP_ACTIONS.SEND_EMAIL && (
-          <Email register={register} isActive={isActive} />
+          <Email register={register} errors={errors} isActive={isActive} />
         )}
 
         {(selectedAction === STEP_ACTIONS.ATTACH_TAG ||
           selectedAction === STEP_ACTIONS.DETACH_TAG) && (
-          <Tag register={register} isActive={isActive} />
+          <Tag register={register} errors={errors} isActive={isActive} />
         )}
 
         {selectedAction === STEP_ACTIONS.CONDITIONAL_SPLIT && (

@@ -1,13 +1,14 @@
-import type { UseFormRegister } from 'react-hook-form';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { type StepFormData } from '@email-automation-engine/shared';
 import { useTags } from '../../../../pages/workflow/hooks/useTags';
 
 interface TagProps {
   register: UseFormRegister<StepFormData>;
+  errors: FieldErrors<StepFormData>;
   isActive: boolean;
 }
 
-export default function Tag({ register, isActive }: TagProps) {
+export default function Tag({ register, errors, isActive }: TagProps) {
   const { data: tags = [] } = useTags();
 
   return (
@@ -18,7 +19,11 @@ export default function Tag({ register, isActive }: TagProps) {
       <select
         {...register('config.tagId')}
         disabled={isActive}
-        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"
+        className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 ${
+          errors.config?.tagId
+            ? 'border-red-300 dark:border-red-900 focus:ring-red-500 focus:border-red-500'
+            : 'border-gray-300 dark:border-zinc-700'
+        }`}
       >
         <option value="">Select a tag...</option>
         {tags.map((t) => (
@@ -27,6 +32,9 @@ export default function Tag({ register, isActive }: TagProps) {
           </option>
         ))}
       </select>
+      {errors.config?.tagId && (
+        <p className="mt-1 text-xs text-red-500">{errors.config.tagId.message as string}</p>
+      )}
     </div>
   );
 }
