@@ -5,11 +5,16 @@ import WebhookStepForm from './Webhook';
 import { useForm } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
-export function TestFormWrapper({ children, defaultValues }: { children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode; defaultValues?: Partial<StepFormData> }) {
+export function TestFormWrapper({
+  children,
+  defaultValues,
+}: {
+  children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode;
+  defaultValues?: Partial<StepFormData>;
+}) {
   const methods = useForm<StepFormData>({ defaultValues });
   return <form>{children(methods)}</form>;
 }
-
 
 describe('WebhookStepForm', () => {
   afterEach(() => {

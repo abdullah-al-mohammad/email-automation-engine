@@ -5,11 +5,16 @@ import EmailStepForm from './Email';
 import { useForm } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
-export function TestFormWrapper({ children, defaultValues }: { children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode; defaultValues?: Partial<StepFormData> }) {
+export function TestFormWrapper({
+  children,
+  defaultValues,
+}: {
+  children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode;
+  defaultValues?: Partial<StepFormData>;
+}) {
   const methods = useForm<StepFormData>({ defaultValues });
   return <form>{children(methods)}</form>;
 }
-
 
 vi.mock('../../../../pages/workflow/hooks/useEmailTemplates', () => ({
   useEmailTemplates: () => ({ data: [{ id: 'tmp-1', name: 'Test Template' }] }),

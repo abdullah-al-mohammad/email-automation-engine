@@ -9,7 +9,6 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
-
 afterEach(() => {
   cleanup();
 });

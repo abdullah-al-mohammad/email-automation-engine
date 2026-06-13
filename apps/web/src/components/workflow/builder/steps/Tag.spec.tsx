@@ -5,11 +5,16 @@ import TagStepForm from './Tag';
 import { useForm } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
-export function TestFormWrapper({ children, defaultValues }: { children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode; defaultValues?: Partial<StepFormData> }) {
+export function TestFormWrapper({
+  children,
+  defaultValues,
+}: {
+  children: (methods: ReturnType<typeof useForm<StepFormData>>) => React.ReactNode;
+  defaultValues?: Partial<StepFormData>;
+}) {
   const methods = useForm<StepFormData>({ defaultValues });
   return <form>{children(methods)}</form>;
 }
-
 
 vi.mock('../../../../pages/workflow/hooks/useTags', () => ({
   useTags: () => ({ data: [{ id: 'tag-1', name: 'Test Tag' }] }),
