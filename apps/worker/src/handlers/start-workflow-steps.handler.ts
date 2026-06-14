@@ -47,7 +47,7 @@ async function processStartWorkflowStep(
 ): Promise<void> {
   const { queueService, dataSource } = deps;
   const cws = await dataSource.query<Array<{ id: string; status: string }>>(
-    `SELECT id, status FROM contact_workflows WHERE id = `,
+    `SELECT id, status FROM contact_workflows WHERE id = $1`,
     [message.contactWorkflowId],
   );
   if (cws.length === 0 || !cws[0] || cws[0].status === 'finished' || cws[0].status === 'error') {
@@ -58,8 +58,7 @@ async function processStartWorkflowStep(
   const stepInsert = await dataSource.query<Array<{ id: string }>>(
     `
   INSERT INTO contact_workflow_steps (id, tenant_id, contact_workflow_id, workflow_step_id, status, created_at, updated_at)
-  VALUES (dataSource.query<Array<{ id: string }>>(
-        , $2, $3, $4, 'pending', now(), now())
+  VALUES ($1, $2, $3, $4, 'pending', now(), now())
   ON CONFLICT (contact_workflow_id, workflow_step_id) WHERE status != 'finished' DO NOTHING
   RETURNING id
 `,
@@ -82,7 +81,7 @@ async function processStartWorkflowStep(
 
   if (cws[0]?.status === 'pending') {
     await dataSource.query(
-      `UPDATE contact_workflows SET status = 'in_progress', started_at = COALESCE(started_at, now()), updated_at = now() WHERE id = `,
+      `UPDATE contact_workflows SET status = 'in_progress', started_at = COALESCE(started_at, now()), updated_at = now() WHERE id = $1`,
       [message.contactWorkflowId],
     );
   }
@@ -110,7 +109,7 @@ async function processStartWorkflowStep(
   switch (message.action) {
     case STEP_ACTIONS.DELAY: {
       const currentStepRecord = await dataSource.query<Array<{ scheduled_at: Date | null }>>(
-        `SELECT scheduled_at FROM contact_workflow_steps WHERE id = `,
+        `SELECT scheduled_at FROM contact_workflow_steps WHERE id = $1`,
         [stepId],
       );
       if (
@@ -125,8 +124,7 @@ async function processStartWorkflowStep(
         const interval = `${amount} ${unit}`;
 
         await dataSource.query(
-          `UPDATE contact_workflow_steps SET status = 'scheduled', scheduled_at = now() + dataSource.query(
-              ::interval, updated_at = now() WHERE id = $2`,
+          `UPDATE contact_workflow_steps SET status = 'scheduled', scheduled_at = now() + $1::interval, updated_at = now() WHERE id = $2`,
           [interval, stepId],
         );
       }
@@ -135,7 +133,7 @@ async function processStartWorkflowStep(
     case STEP_ACTIONS.ATTACH_TAG: {
       if (config.tagId) {
         await dataSource.query(
-          `INSERT INTO contact_tags (contact_id, tag_id, created_at) VALUES (, $2, now()) ON CONFLICT DO NOTHING`,
+          `INSERT INTO contact_tags (contact_id, tag_id, created_at) VALUES ($1, $2, now()) ON CONFLICT DO NOTHING`,
           [message.contactId, config.tagId],
         );
       }
@@ -144,7 +142,7 @@ async function processStartWorkflowStep(
     }
     case STEP_ACTIONS.DETACH_TAG: {
       if (config.tagId) {
-        await dataSource.query(`DELETE FROM contact_tags WHERE contact_id = AND tag_id = $2`, [
+        await dataSource.query(`DELETE FROM contact_tags WHERE contact_id = $1 AND tag_id = $2`, [
           message.contactId,
           config.tagId,
         ]);
@@ -154,7 +152,7 @@ async function processStartWorkflowStep(
     }
     case STEP_ACTIONS.UNSUBSCRIBE_CONTACT: {
       await dataSource.query(
-        `UPDATE contacts SET subscribed = false, updated_at = now() WHERE id = `,
+        `UPDATE contacts SET subscribed = false, updated_at = now() WHERE id = $1`,
         [message.contactId],
       );
       enqueueFinish = true;
@@ -162,7 +160,7 @@ async function processStartWorkflowStep(
     }
     case STEP_ACTIONS.DELETE_CONTACT: {
       await dataSource.query(
-        `UPDATE contacts SET deleted_at = now(), updated_at = now() WHERE id = `,
+        `UPDATE contacts SET deleted_at = now(), updated_at = now() WHERE id = $1`,
         [message.contactId],
       );
       enqueueFinish = true;
