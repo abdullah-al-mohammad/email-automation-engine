@@ -28,7 +28,7 @@ export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<S
         // Attempt to mark as failed if we have the step info
         try {
           await deps.dataSource.query(
-            `UPDATE email_messages SET status = 'failed' WHERE contact_workflow_step_id = `,
+            `UPDATE email_messages SET status = 'failed' WHERE contact_workflow_step_id = $1`,
             [record.message.contactWorkflowStepId],
           );
         } catch (e) {
@@ -52,7 +52,7 @@ async function processSendWorkflowEmail(
 
   // 1. Check if email is already sent
   const existing = await dataSource.query<{ id: string; status: string }[]>(
-    `SELECT id, status FROM email_messages WHERE contact_workflow_step_id = LIMIT 1`,
+    `SELECT id, status FROM email_messages WHERE contact_workflow_step_id = $1 LIMIT 1`,
     [message.contactWorkflowStepId],
   );
 
@@ -84,7 +84,7 @@ async function processSendWorkflowEmail(
 
   // 3. Load step config and optional template
   const stepQuery = await dataSource.query<Array<{ config: Record<string, unknown> }>>(
-    `SELECT config FROM workflow_steps WHERE id = `,
+    `SELECT config FROM workflow_steps WHERE id = $1`,
     [message.workflowStepId],
   );
   const stepConfig = stepQuery[0]?.config || {};
@@ -115,8 +115,7 @@ async function processSendWorkflowEmail(
     await dataSource.query(
       `
   INSERT INTO email_messages (id, tenant_id, contact_id, contact_workflow_id, contact_workflow_step_id, workflow_id, workflow_step_id, template_id, subject, status) 
-  VALUES (, $2, $3, $4, $5, $6, $7, $8, $9, dataSource.query(
-          0)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 `,
       [
         emailMessageId,
@@ -155,7 +154,7 @@ async function processSendWorkflowEmail(
 
   // Update EmailMessage
   await dataSource.query(
-    `UPDATE email_messages SET status = 'sent', sent_at = now(), ses_message_id = WHERE id = $2`,
+    `UPDATE email_messages SET status = 'sent', sent_at = now(), ses_message_id = $1 WHERE id = $2`,
     [sesResponse.MessageId, emailMessageId],
   );
 

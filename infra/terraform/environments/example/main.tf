@@ -1,19 +1,15 @@
-data "archive_file" "dummy_lambda" {
+data "archive_file" "worker_lambda" {
   type        = "zip"
-  output_path = "${path.module}/dummy_lambda.zip"
-
-  source {
-    content  = "exports.handler = async (event) => { console.log('Dummy handler running', event); return 'OK'; };"
-    filename = "index.js"
-  }
+  output_path = "${path.module}/worker_lambda.zip"
+  source_dir  = "${path.module}/../../../../apps/worker/dist"
 }
 
 locals {
   common_env_vars = {
-    NODE_ENV       = "production"
-    DATABASE_URL   = var.database_url
-    REDIS_URL      = var.redis_url
-    SES_FROM_EMAIL = var.ses_from_email
+    NODE_ENV           = "production"
+    DATABASE_URL       = var.database_url
+    REDIS_URL          = var.redis_url
+    FROM_EMAIL_ADDRESS = var.ses_from_email
   }
 }
 
@@ -86,8 +82,8 @@ module "worker_start_workflows" {
   source                = "../../modules/lambda-worker"
   function_name         = "${var.project_prefix}-start-workflows"
   handler               = "index.handler"
-  filename              = data.archive_file.dummy_lambda.output_path
-  source_code_hash      = data.archive_file.dummy_lambda.output_base64sha256
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
   environment_variables = local.worker_env_vars
   sqs_trigger_arn       = module.automation_events_queue.queue_arn
 }
@@ -96,8 +92,8 @@ module "worker_start_workflow_steps" {
   source                = "../../modules/lambda-worker"
   function_name         = "${var.project_prefix}-start-workflow-steps"
   handler               = "index.handler"
-  filename              = data.archive_file.dummy_lambda.output_path
-  source_code_hash      = data.archive_file.dummy_lambda.output_base64sha256
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
   environment_variables = local.worker_env_vars
   sqs_trigger_arn       = module.waiting_steps_queue.queue_arn
 }
@@ -106,8 +102,8 @@ module "worker_watch_workflow_steps" {
   source                = "../../modules/lambda-worker"
   function_name         = "${var.project_prefix}-watch-workflow-steps"
   handler               = "index.handler"
-  filename              = data.archive_file.dummy_lambda.output_path
-  source_code_hash      = data.archive_file.dummy_lambda.output_base64sha256
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
   environment_variables = local.worker_env_vars
   # No sqs_trigger_arn, this is triggered by EventBridge
 }
@@ -116,10 +112,50 @@ module "worker_send_workflow_email" {
   source                = "../../modules/lambda-worker"
   function_name         = "${var.project_prefix}-send-workflow-email"
   handler               = "index.handler"
-  filename              = data.archive_file.dummy_lambda.output_path
-  source_code_hash      = data.archive_file.dummy_lambda.output_base64sha256
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
   environment_variables = local.worker_env_vars
   sqs_trigger_arn       = module.workflow_emails_queue.queue_arn
+}
+
+module "worker_conditional_split" {
+  source                = "../../modules/lambda-worker"
+  function_name         = "${var.project_prefix}-conditional-split"
+  handler               = "handlers/conditional-split.handler"
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
+  environment_variables = local.worker_env_vars
+  sqs_trigger_arn       = module.conditional_split_queue.queue_arn
+}
+
+module "worker_webhook_steps" {
+  source                = "../../modules/lambda-worker"
+  function_name         = "${var.project_prefix}-webhook-steps"
+  handler               = "handlers/webhook-steps.handler"
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
+  environment_variables = local.worker_env_vars
+  sqs_trigger_arn       = module.webhook_steps_queue.queue_arn
+}
+
+module "worker_email_tracking_events" {
+  source                = "../../modules/lambda-worker"
+  function_name         = "${var.project_prefix}-email-tracking-events"
+  handler               = "handlers/email-tracking-events.handler"
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
+  environment_variables = local.worker_env_vars
+  sqs_trigger_arn       = module.email_tracking_events_queue.queue_arn
+}
+
+module "worker_webhook_deliveries" {
+  source                = "../../modules/lambda-worker"
+  function_name         = "${var.project_prefix}-webhook-deliveries"
+  handler               = "handlers/webhook-deliveries.handler"
+  filename              = data.archive_file.worker_lambda.output_path
+  source_code_hash      = data.archive_file.worker_lambda.output_base64sha256
+  environment_variables = local.worker_env_vars
+  sqs_trigger_arn       = module.webhook_deliveries_queue.queue_arn
 }
 
 # Add IAM Policy for SES

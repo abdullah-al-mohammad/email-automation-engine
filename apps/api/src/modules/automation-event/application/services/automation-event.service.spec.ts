@@ -29,7 +29,7 @@ describe('AutomationEventService', () => {
 
   it('should return early if no triggers match', async () => {
     triggerCache.getMatchingTriggers.mockResolvedValue([]);
-    await service.ingest({
+    await service.ingest('tenant-1', {
       tenantId: 'tenant-1',
       contactId: 'contact-1',
       event: 'contact.subscribed',
@@ -43,7 +43,7 @@ describe('AutomationEventService', () => {
       { id: 'trig1', workflowId: 'workflow-1' },
       { id: 'trig2', workflowId: 'workflow-1' },
     ]);
-    await service.ingest({
+    await service.ingest('tenant-1', {
       tenantId: 'tenant-1',
       contactId: 'contact-1',
       event: 'contact.subscribed',

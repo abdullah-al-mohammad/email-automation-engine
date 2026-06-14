@@ -8,6 +8,16 @@ import { EmailMessage } from '../../../../email/domain/aggregates/email-message.
 import type { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
+vi.mock('sns-validator', () => {
+  return {
+    default: class MessageValidator {
+      validate(payload: unknown, cb: (err: Error | null) => void) {
+        cb(null);
+      }
+    },
+  };
+});
+
 describe('SesWebhookController', () => {
   let controller: SesWebhookController;
   let queueService: Mocked<IQueueService>;
@@ -45,6 +55,7 @@ describe('SesWebhookController', () => {
       emailMessageService.findBySesMessageId.mockResolvedValue(emailMessage);
 
       const snsPayload = {
+        Type: 'Notification',
         Message: JSON.stringify({
           mail: { messageId: 'ses-123' },
           eventType: 'Delivery',
@@ -66,8 +77,11 @@ describe('SesWebhookController', () => {
 
     it('should warn and ignore if eventType is unknown', async () => {
       await controller.handleSesWebhook({
-        mail: { messageId: 'ses-123' },
-        eventType: 'UnknownEvent',
+        Type: 'Notification',
+        Message: {
+          mail: { messageId: 'ses-123' },
+          eventType: 'UnknownEvent',
+        },
       });
 
       expect(Logger.warn).toHaveBeenCalledWith('Unknown SES event type: UnknownEvent');
@@ -78,8 +92,11 @@ describe('SesWebhookController', () => {
       emailMessageService.findBySesMessageId.mockResolvedValue(null);
 
       await controller.handleSesWebhook({
-        mail: { messageId: 'ses-123' },
-        eventType: 'Delivery',
+        Type: 'Notification',
+        Message: {
+          mail: { messageId: 'ses-123' },
+          eventType: 'Delivery',
+        },
       });
 
       expect(Logger.warn).toHaveBeenCalledWith('No email message found for SES messageId: ses-123');

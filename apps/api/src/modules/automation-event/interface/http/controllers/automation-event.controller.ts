@@ -4,6 +4,7 @@ import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
 import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
 import { ZodValidationPipe } from '../../../../../infrastructure/pipes/zod-validation.pipe';
 import { AutomationEventSchema, AutomationEventDto } from '@email-automation-engine/shared';
+import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
 
 @Controller('automation/events')
 @UseGuards(AuthGuard, TenantMembershipGuard)
@@ -14,8 +15,9 @@ export class AutomationEventController {
   @HttpCode(HttpStatus.ACCEPTED)
   async ingestEvent(
     @Body(new ZodValidationPipe(AutomationEventSchema)) dto: AutomationEventDto,
+    @CurrentTenant('id') tenantId: string,
   ): Promise<{ accepted: boolean }> {
-    await this.automationEventService.ingest(dto);
+    await this.automationEventService.ingest(tenantId, dto);
     return { accepted: true };
   }
 }

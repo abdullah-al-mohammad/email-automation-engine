@@ -6,7 +6,7 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Status
 
-This project has successfully completed its core development phases and is ready for public release. The repository contains the fully functioning architecture, API, worker, infrastructure, and front-end builder components.
+This project is approaching its initial release. The repository contains the functioning architecture, API, worker, infrastructure, and front-end builder components. Some production-readiness issues (like tenant isolation hardening, SNS validation, and integration tests) have been recently addressed, and we are working towards a stable v1.0.0.
 
 See [Project Status](docs/project-status.md) for the detailed phase breakdown.
 

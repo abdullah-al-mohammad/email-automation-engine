@@ -28,9 +28,9 @@ export class TypeOrmContactWorkflowRepository implements ContactWorkflowReposito
     });
   }
 
-  async findManyByWorkflowId(workflowId: string): Promise<ContactWorkflow[]> {
+  async findManyByWorkflowId(tenantId: string, workflowId: string): Promise<ContactWorkflow[]> {
     return this.repository.find({
-      where: { workflowId },
+      where: { tenantId, workflowId },
       order: { createdAt: 'DESC' },
     });
   }
