@@ -4,6 +4,8 @@ import { EmailMessageService } from '../../../../email/application/services/emai
 import { EmailTrackingEventMessage } from '@email-automation-engine/shared';
 import { ConfigService } from '@nestjs/config';
 
+import MessageValidator from 'sns-validator';
+
 const SES_EVENT_TYPE_MAP: Record<string, EmailTrackingEventMessage['eventType']> = {
   Delivery: 'delivered',
   Bounce: 'bounced',
@@ -13,10 +15,19 @@ const SES_EVENT_TYPE_MAP: Record<string, EmailTrackingEventMessage['eventType']>
 };
 
 interface SesWebhookPayload {
-  Message?: string;
   mail?: { messageId?: string };
   eventType?: string;
 }
+
+interface SnsPayload {
+  Type?: string;
+  MessageId?: string;
+  TopicArn?: string;
+  Message?: string | SesWebhookPayload;
+  SubscribeURL?: string;
+}
+
+const validator = new MessageValidator();
 
 @Controller('webhooks/ses')
 export class SesWebhookController {
@@ -29,14 +40,43 @@ export class SesWebhookController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async handleSesWebhook(@Body() payload: SesWebhookPayload): Promise<void> {
+  async handleSesWebhook(@Body() payload: SnsPayload): Promise<void> {
     try {
-      // In a real scenario, this would parse SNS message formatting and confirm subscriptions
-      // For this step, we just extract SES notification details
+      // Validate SNS Signature
+      await new Promise<void>((resolve, reject) => {
+        validator.validate(payload as Record<string, unknown>, (err: Error | null) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+      // Parse SNS wrapper
+      const snsMessage = payload;
+
+      // If it's a string, it might be an unparsed body from SNS, but NestJS @Body() usually parses JSON.
+      // If it's an SNS message, it has a Type field
+      if (snsMessage.Type === 'SubscriptionConfirmation') {
+        Logger.log(`Confirming SNS subscription for topic ${snsMessage.TopicArn}`);
+        const response = await fetch(snsMessage.SubscribeURL as string);
+        if (response.ok) {
+          Logger.log('Successfully confirmed SNS subscription');
+        } else {
+          Logger.error(`Failed to confirm SNS subscription: ${response.statusText}`);
+        }
+        return;
+      }
+
+      if (snsMessage.Type !== 'Notification') {
+        Logger.warn(`Ignoring non-notification SNS message type: ${snsMessage.Type}`);
+        return;
+      }
+
       const messageObj =
-        typeof payload.Message === 'string'
-          ? (JSON.parse(payload.Message) as SesWebhookPayload)
-          : payload;
+        typeof snsMessage.Message === 'string'
+          ? (JSON.parse(snsMessage.Message) as SesWebhookPayload)
+          : snsMessage.Message;
 
       const sesMessageId = messageObj?.mail?.messageId;
       const rawEventType = messageObj?.eventType;
