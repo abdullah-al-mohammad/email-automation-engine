@@ -6,9 +6,9 @@ data "archive_file" "worker_lambda" {
 
 locals {
   common_env_vars = {
-    NODE_ENV       = "production"
-    DATABASE_URL   = var.database_url
-    REDIS_URL      = var.redis_url
+    NODE_ENV           = "production"
+    DATABASE_URL       = var.database_url
+    REDIS_URL          = var.redis_url
     FROM_EMAIL_ADDRESS = var.ses_from_email
   }
 }
