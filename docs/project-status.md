@@ -10,9 +10,9 @@ Phase 5: Frontend Builder completed.
 
 Phase 6: Terraform completed.
 
-Phase 7: Public Release Readiness completed.
+Phase 7: Public Release Readiness in progress.
 
-The project is fully complete and ready for launch!
+The project is approaching a stable release, but is not yet fully ready for public launch. Recent reviews identified and fixed production blockers including tenant isolation, worker SQL bugs, webhook security, and missing migrations. Real Postgres-backed integration tests are being added to ensure worker stability.
 
 ## Completed
 
@@ -140,12 +140,12 @@ The project is fully complete and ready for launch!
   - Created a robust `sqs-queue` module that automatically provisions paired DLQs and configures strict redrive and long-polling policies.
   - Created a generic `lambda-worker` module encapsulating standard IAM roles, Node.js 22x runtimes, and VPC configurations.
   - Created an `eventbridge-schedule` module for invoking the cron-driven delayed step evaluation worker.
-  - Bootstrapped a fully wired `example` environment containing 8 SQS queues and sample Worker bindings, safely passing secret configuration from external sources.
+  - Bootstrapped a fully wired `example` environment containing 8 SQS queues and sample Worker bindings (including conditional split, webhook, and tracking workers), safely passing secret configuration from external sources.
   - Wrote comprehensive setup documentation (`README.md`) detailing AWS execution.
 
 ## Blockers
 
-- None.
+- Need to verify all newly added integration tests and complete any remaining SNS webhook verification edges.
 
 ## Last Test Commands
 
@@ -168,6 +168,13 @@ The project is fully complete and ready for launch!
 
 ## Next Exact Task
 
-The Email Automation Engine has successfully reached Version 1.0! All phases (Planning, Scaffolding, Workflow Management, Runtime Core, Core Actions, Frontend Builder, Terraform, and Public Release Readiness) have been completed. The project is fully documented, strictly typed, comprehensively tested, and cleanly integrated.
+The Email Automation Engine is resolving final production blockers before Version 1.0. Recent fixes include:
 
-Next steps for the maintainers include cutting a v1.0.0 release tag and publicizing the repository.
+- Corrected malformed SQL statements in worker handlers (`send-workflow-email` and `start-workflow-steps`).
+- Added TypeORM migration for `tenant_invitations`.
+- Enforced single-source tenant identity in `TenantMembershipGuard` and across controllers (`@Param('tenantId')` now validated or overridden by `CurrentTenant`).
+- Secured SES webhooks with `sns-validator` for signature verification.
+- Updated Terraform example to deploy all required worker Lambda modules and correctly map `FROM_EMAIL_ADDRESS`.
+- Added a real Postgres-backed integration test for worker handlers.
+
+Next steps for the maintainers include verifying the integration tests in CI, ensuring full coverage of worker edge cases, and cutting a release candidate once all systems are green.
