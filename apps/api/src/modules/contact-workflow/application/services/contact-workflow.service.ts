@@ -44,8 +44,11 @@ export class ContactWorkflowService {
     return this.contactWorkflowRepository.findActiveByContactAndWorkflow(contactId, workflowId);
   }
 
-  async findManyByWorkflowId(workflowId: string): Promise<ContactWorkflowResponse[]> {
-    const records = await this.contactWorkflowRepository.findManyByWorkflowId(workflowId);
+  async findManyByWorkflowId(
+    tenantId: string,
+    workflowId: string,
+  ): Promise<ContactWorkflowResponse[]> {
+    const records = await this.contactWorkflowRepository.findManyByWorkflowId(tenantId, workflowId);
     return records.map((r) => ({
       id: r.id,
       tenantId: r.tenantId,
@@ -119,10 +122,13 @@ export class ContactWorkflowService {
   }
 
   async findAllStepsByContactWorkflowId(
+    tenantId: string,
     contactWorkflowId: string,
   ): Promise<ContactWorkflowStepResponse[]> {
-    const steps =
-      await this.contactWorkflowStepRepository.findAllByContactWorkflowId(contactWorkflowId);
+    const steps = await this.contactWorkflowStepRepository.findAllByContactWorkflowId(
+      tenantId,
+      contactWorkflowId,
+    );
     return steps.map((s) => ({
       id: s.id,
       tenantId: s.tenantId,

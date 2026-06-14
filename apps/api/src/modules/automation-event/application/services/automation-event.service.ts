@@ -20,8 +20,8 @@ export class AutomationEventService {
     this.queueUrl = this.configService.get<string>(AUTOMATION_EVENTS_QUEUE_URL)!;
   }
 
-  async ingest(dto: AutomationEventDto): Promise<void> {
-    const triggers = await this.triggerCache.getMatchingTriggers(dto.tenantId, dto.event);
+  async ingest(tenantId: string, dto: AutomationEventDto): Promise<void> {
+    const triggers = await this.triggerCache.getMatchingTriggers(tenantId, dto.event);
 
     if (!triggers || triggers.length === 0) {
       return;
@@ -33,7 +33,7 @@ export class AutomationEventService {
     const message: AutomationEventMessage = {
       version: 1,
       messageId: uuidv7(),
-      tenantId: dto.tenantId,
+      tenantId: tenantId,
       createdAt: new Date().toISOString(),
       contactId: dto.contactId,
       event: dto.event,

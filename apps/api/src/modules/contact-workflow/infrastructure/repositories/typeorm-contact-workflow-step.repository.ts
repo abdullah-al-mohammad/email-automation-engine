@@ -41,9 +41,12 @@ export class TypeOrmContactWorkflowStepRepository implements ContactWorkflowStep
     });
   }
 
-  async findAllByContactWorkflowId(contactWorkflowId: string): Promise<ContactWorkflowStep[]> {
+  async findAllByContactWorkflowId(
+    tenantId: string,
+    contactWorkflowId: string,
+  ): Promise<ContactWorkflowStep[]> {
     return this.repository.find({
-      where: { contactWorkflowId },
+      where: { tenantId, contactWorkflowId },
       order: { createdAt: 'ASC' },
     });
   }

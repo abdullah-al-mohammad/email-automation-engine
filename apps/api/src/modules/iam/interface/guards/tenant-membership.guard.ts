@@ -33,6 +33,10 @@ export class TenantMembershipGuard implements CanActivate {
       throw new BadRequestException('Tenant ID is required in X-Tenant-Id header');
     }
 
+    if (request.params && request.params.tenantId && request.params.tenantId !== tenantId) {
+      throw new ForbiddenException('Tenant ID in path does not match X-Tenant-Id header');
+    }
+
     const tenant = await this.tenantRepo.findById(tenantId);
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
