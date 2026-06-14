@@ -72,6 +72,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: postgres://engine_user:engine_password@localhost:5432/engine_db
+        run: pnpm --filter @email-automation-engine/api run migration:run
+
       - name: Run Tests
         env:
           DATABASE_URL: postgres://engine_user:engine_password@localhost:5432/engine_db
@@ -91,7 +96,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.5.0"
+          terraform_version: '1.5.0'
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive infra/terraform
