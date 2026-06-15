@@ -16,41 +16,7 @@ The project is approaching a stable release, but is not yet fully ready for publ
 
 ## Completed
 
-- Created monorepo planning directory.
-- Added architecture plan.
-- Added open-source scope.
-- Added data model plan.
-- Added API spec.
-- Added worker flow.
-- Added frontend builder plan.
-- Added Terraform plan.
-- Added testing strategy.
-- Added queue and cache plan.
-- Added edge-case catalog.
-- Added development workflow.
-- Added engineering rules.
-- Added contributing guide.
-- Added roadmap.
-- Renamed project to Email Automation Engine.
-- Confirmed AWS-first deployment direction.
-- Confirmed no dependency on external private codebases or copied private implementation details.
-- Confirmed MIT license.
-- Confirmed PostgreSQL-only database target.
-- Confirmed Redis for cache/coordination support.
-- Confirmed AWS SES email step from day one.
-- Confirmed frontend stack: Vite, React, Tailwind CSS, shadcn/ui, React Flow, TanStack Query, React Hook Form, and Zod.
-- Confirmed raw HTML editor plus WYSIWYG editor for email content; no drag-and-drop email builder in the first version.
-- Confirmed tenant creation and management from UI.
-- Added simple user auth and modular tenant permission plan with dynamic tenant roles and role-permission mappings.
-- Confirmed the tenant creator is tracked on the tenant record for ownership and recovery, without adding a separate root membership flag.
-- Confirmed the app should create a full-permission tenant role as a starting point while keeping normal authorization permission-based, not role-name-based.
-- Confirmed SES event tracking is in scope for v1, including delivery, bounce, complaint, open, and click events without app-owned tracking pixels or click redirects.
-- Confirmed one private/internal workspace package: `packages/shared`; no package publishing scope needed.
-- Confirmed GitHub Actions with PostgreSQL service containers for CI.
-- Confirmed Terraform will not create PostgreSQL/Redis by default; it will accept externally managed connection values.
-- Confirmed Node.js 24 runtime, pnpm package manager, and bounded Turborepo task orchestration.
-- Completed final documentation consistency pass before scaffolding.
-- Cleaned public documentation tone so it reads like maintained project documentation, not draft planning notes.
+- Completed Phase 0: scope, architecture, data model, API spec, worker flow, frontend plan, Terraform plan, testing strategy, edge-case catalog, and all engineering documentation finalised.
 - Scaffolded pnpm workspace with Node.js 24 configuration.
 - Added Turborepo task orchestration for build, test, lint, format check, integration test, and typecheck.
 - Added root TypeScript, ESLint, Prettier, ignore, and package manager configuration.
@@ -159,12 +125,6 @@ The project is approaching a stable release, but is not yet fully ready for publ
 ## Known Failing Tests
 
 - None.
-
-## Files Touched In Current Planning Task
-
-- `SECURITY.md`
-- `docs/demo-deployment.md`
-- `docs/project-status.md`
 
 ## Next Exact Task
 
