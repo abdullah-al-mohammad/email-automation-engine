@@ -17,26 +17,32 @@ export class CreateWorkflowExitConditionsTable1717401584210 implements Migration
           {
             name: 'tenant_id',
             type: 'uuid',
+            isNullable: false,
           },
           {
             name: 'workflow_id',
             type: 'uuid',
+            isNullable: false,
           },
           {
             name: 'logical_operator',
             type: 'varchar(50)',
+            isNullable: false,
           },
           {
             name: 'type',
             type: 'varchar(50)',
+            isNullable: false,
           },
           {
             name: 'resource',
             type: 'varchar(255)',
+            isNullable: false,
           },
           {
             name: 'operator',
             type: 'varchar(50)',
+            isNullable: false,
           },
           {
             name: 'value',
