@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handler } from './send-workflow-email.handler';
 import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
 import type { Mocked } from 'vitest';
 import type { DataSource } from 'typeorm';
@@ -7,7 +6,10 @@ import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { CacheService } from '../infrastructure/cache/cache.interface';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
 
-const mockSend = vi.fn();
+const { mockSend } = vi.hoisted(() => {
+  return { mockSend: vi.fn() };
+});
+
 vi.mock('@aws-sdk/client-ses', () => {
   const SESClient = class {
     send = mockSend;
@@ -17,6 +19,8 @@ vi.mock('@aws-sdk/client-ses', () => {
     SendEmailCommand: vi.fn(),
   };
 });
+
+import { handler } from './send-workflow-email.handler';
 
 vi.mock('../infrastructure', () => ({
   workerConfig: {

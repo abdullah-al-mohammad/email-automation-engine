@@ -9,6 +9,8 @@ import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
 
 describe('Worker Integration Tests', () => {
   let dataSource: DataSource;
+  let tenantId: string;
+  let userId: string;
 
   beforeAll(async () => {
     dataSource = new DataSource({
@@ -20,20 +22,28 @@ describe('Worker Integration Tests', () => {
 
   afterAll(async () => {
     if (dataSource?.isInitialized) {
+      await dataSource.query(`DELETE FROM contact_workflow_steps WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM contact_workflows WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM workflow_steps WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM workflows WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM contacts WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM tags WHERE tenant_id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM tenants WHERE id = $1`, [tenantId]);
+      await dataSource.query(`DELETE FROM users WHERE id = $1`, [userId]);
       await dataSource.destroy();
     }
   });
 
   it('should process a start-workflow-steps event using real DB', async () => {
     // Insert test data
-    const tenantId = uuidv7();
+    tenantId = uuidv7();
     const workflowId = uuidv7();
     const contactId = uuidv7();
     const contactWorkflowId = uuidv7();
     const workflowStepId = uuidv7();
 
     // 1. Insert User (creator)
-    const userId = uuidv7();
+    userId = uuidv7();
     await dataSource.query(`INSERT INTO users (id, email, password_hash) VALUES ($1, $2, 'hash')`, [
       userId,
       `test-${userId}@example.com`,

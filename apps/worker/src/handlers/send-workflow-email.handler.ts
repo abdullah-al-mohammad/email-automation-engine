@@ -8,13 +8,13 @@ import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import { v7 as uuidv7 } from 'uuid';
 import { workerConfig } from '../infrastructure';
 
+const ses = new SESClient({ region: workerConfig.AWS_REGION });
+
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<EmailStepMessage>(
     event,
     isEmailStepMessage,
   );
-
-  const ses = new SESClient({ region: workerConfig.AWS_REGION });
 
   await Promise.all(
     validRecords.map(async (record) => {
