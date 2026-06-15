@@ -6,9 +6,9 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Status
 
-This project is approaching its initial release. The repository contains the functioning architecture, API, worker, infrastructure, and front-end builder components. Some production-readiness issues (like tenant isolation hardening, SNS validation, and integration tests) have been recently addressed, and we are working towards a stable v1.0.0.
+Phases 1–6 are complete. Phase 7 (Public Release Readiness) is in progress — integration tests are being finalised and a few production-readiness checks remain before v1.0.0.
 
-See [Project Status](docs/project-status.md) for the detailed phase breakdown.
+See [Project Status](docs/project-status.md) for the full phase breakdown.
 
 ## Features
 
@@ -63,25 +63,27 @@ email-automation-engine/
 - **Infrastructure:** Terraform.
 - **CI:** GitHub Actions with PostgreSQL service containers.
 
+## Getting Started
+
+To run a local or AWS demo instance, follow the [Demo Deployment Guide](docs/demo-deployment.md).
+
+It covers:
+- Provisioning SQS queues with Terraform
+- Running PostgreSQL locally with Docker
+- Starting the API, worker, and web dashboard
+
 ## Documentation
 
-- [Contributing](CONTRIBUTING.md)
-- [Open Source Scope](docs/open-source-scope.md)
-- [Architecture](docs/architecture.md)
-- [Data Model](docs/data-model.md)
-- [API Spec](docs/api-spec.md)
-- [Auth and Permissions](docs/auth-and-permissions.md)
-- [Worker Flow](docs/worker-flow.md)
-- [Frontend Builder](docs/frontend-builder.md)
-- [Queue and Cache](docs/queue-and-cache.md)
-- [Terraform](docs/terraform.md)
-- [Tooling](docs/tooling.md)
-- [Edge Cases](docs/edge-cases.md)
-- [Testing](docs/testing.md)
-- [Engineering Rules](docs/engineering-rules.md)
-- [Development Workflow](docs/development-workflow.md)
-- [Roadmap](docs/roadmap.md)
-- [Project Status](docs/project-status.md)
+**Start here:** [Architecture](docs/architecture.md) · [Data Model](docs/data-model.md) · [API Spec](docs/api-spec.md) · [Worker Flow](docs/worker-flow.md)
+
+**Frontend & Auth:** [Frontend Builder](docs/frontend-builder.md) · [Auth and Permissions](docs/auth-and-permissions.md)
+
+**Infrastructure:** [Terraform](docs/terraform.md) · [Queue and Cache](docs/queue-and-cache.md)
+
+**Development:** [Contributing](CONTRIBUTING.md) · [Engineering Rules](docs/engineering-rules.md) · [Development Workflow](docs/development-workflow.md) · [Tooling](docs/tooling.md)
+
+**Reference:** [Edge Cases](docs/edge-cases.md) · [Testing](docs/testing.md) · [Open Source Scope](docs/open-source-scope.md) · [Roadmap](docs/roadmap.md) · [Project Status](docs/project-status.md)
+
 
 ## Workspace Package
 

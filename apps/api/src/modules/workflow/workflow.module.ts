@@ -26,6 +26,7 @@ import { TypeOrmWorkflowStepRepository } from './infrastructure/repositories/typ
 import { TypeOrmWorkflowExitConditionRepository } from './infrastructure/repositories/typeorm-workflow-exit-condition.repository';
 import { TypeOrmWorkflowStepConditionRepository } from './infrastructure/repositories/typeorm-workflow-step-condition.repository';
 import { IamModule } from '../iam/iam.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { IamModule } from '../iam/iam.module';
       WorkflowStepCondition,
     ]),
     IamModule, // Import IamModule for the AuthGuard and EncryptionService
+    EmailModule,
   ],
   controllers: [HealthController, WorkflowController, WorkflowStepConditionController],
   providers: [

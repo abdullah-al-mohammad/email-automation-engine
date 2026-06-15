@@ -14,7 +14,8 @@ describe('WorkflowService', () => {
     delete: Mock;
     deleteByWorkflowId: Mock;
   };
-  let dataSource: { query: Mock; transaction: Mock };
+  let stepConditionRepo: { findByStepId: Mock };
+  let emailTemplateService: { findOne: Mock };
 
   beforeEach(() => {
     workflowRepo = {
@@ -39,11 +40,11 @@ describe('WorkflowService', () => {
       delete: vi.fn(),
       deleteByWorkflowId: vi.fn(),
     };
-    dataSource = {
-      query: vi.fn().mockResolvedValue([{ count: '0' }]),
-      transaction: vi.fn().mockImplementation(async (cb) => {
-        return cb({ save: vi.fn() });
-      }),
+    stepConditionRepo = {
+      findByStepId: vi.fn().mockResolvedValue([]),
+    };
+    emailTemplateService = {
+      findOne: vi.fn().mockResolvedValue({ id: 'template-1' }),
     };
 
     service = new WorkflowService(
@@ -51,7 +52,8 @@ describe('WorkflowService', () => {
       triggerRepo as unknown as (typeof service)['triggerRepo'],
       stepRepo as unknown as (typeof service)['stepRepo'],
       exitConditionRepo as unknown as (typeof service)['exitConditionRepo'],
-      dataSource as unknown as (typeof service)['dataSource'],
+      stepConditionRepo as unknown as (typeof service)['stepConditionRepo'],
+      emailTemplateService as unknown as (typeof service)['emailTemplateService'],
     );
   });
 
@@ -188,9 +190,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain(
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain(
           'Workflow must have at least one trigger to be activated',
         );
       }
@@ -204,11 +208,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain(
-          'Workflow must have at least one step to be activated',
-        );
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain('Workflow must have at least one step to be activated');
       }
     });
 
@@ -236,9 +240,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain('A delay cannot be the final step in a workflow');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain('A delay cannot be the final step in a workflow');
       }
     });
 
@@ -259,9 +265,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain('Delay step requires an amount and a unit.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain('Delay step requires an amount and a unit.');
       }
     });
 
@@ -275,9 +283,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain(
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain(
           'A conditional split step must have valid conditions configured',
         );
       }
@@ -293,9 +303,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain(
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain(
           'An email step requires either a template or a subject and html body',
         );
       }
@@ -311,9 +323,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain('A tag step requires a tag reference');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain('A tag step requires a tag reference');
       }
     });
 
@@ -327,9 +341,11 @@ describe('WorkflowService', () => {
       try {
         await service.activate('tenant-1', 'workflow-1');
         expect.fail('Should have thrown');
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(BadRequestException);
-        expect(e.getResponse().message).toContain('A webhook step requires a valid URL');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const e = error as BadRequestException;
+        const response = e.getResponse() as { message: string | string[] };
+        expect(response.message).toContain('A webhook step requires a valid URL');
       }
     });
   });

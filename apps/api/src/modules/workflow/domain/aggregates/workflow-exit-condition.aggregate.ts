@@ -19,22 +19,22 @@ export class WorkflowExitCondition {
     }
   }
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: false })
   tenantId!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: false })
   workflowId!: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   logicalOperator!: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   type!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   resource!: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   operator!: string;
 
   @Column({ type: 'text', nullable: true })

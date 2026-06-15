@@ -123,7 +123,15 @@ async function processFinishWorkflowStep(
 
       const evaluations = exitConditions.map((ec) => evaluateExitCondition(ec, contact, tagIds));
 
-      const logicalOp = exitConditions[0]?.logical_operator || LOGICAL_OPERATORS.ANY;
+      const logicalOp = exitConditions[0]!.logical_operator;
+
+      const allSameOperator = exitConditions.every((ec) => ec.logical_operator === logicalOp);
+      if (!allSameOperator) {
+        Logger.warn(
+          `Exit conditions for workflow ${message.workflowId} have mixed logical_operator values. Using value from first condition: "${logicalOp}".`,
+        );
+      }
+
       switch (logicalOp) {
         case LOGICAL_OPERATORS.ANY:
           shouldExit = evaluations.some((r) => r);

@@ -5,8 +5,10 @@ import {
   BadRequestException,
   Optional,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { lookup } from 'node:dns/promises';
+import { WORKFLOW_STEP_CONDITION_REPOSITORY } from '../../constants/tokens';
+import type { IWorkflowStepConditionRepository } from '../../domain/repositories/workflow-step-condition.repository';
+import { EmailTemplateService } from '../../../email/application/services/email-template.service';
 import {
   CACHE_SERVICE,
   type ICacheService,
@@ -47,7 +49,9 @@ export class WorkflowService {
     private readonly stepRepo: WorkflowStepRepository,
     @Inject(WORKFLOW_EXIT_CONDITION_REPOSITORY)
     private readonly exitConditionRepo: WorkflowExitConditionRepository,
-    private readonly dataSource: DataSource,
+    @Inject(WORKFLOW_STEP_CONDITION_REPOSITORY)
+    private readonly stepConditionRepo: IWorkflowStepConditionRepository,
+    private readonly emailTemplateService: EmailTemplateService,
     @Optional()
     @Inject(CACHE_SERVICE)
     private readonly cacheService?: ICacheService,
@@ -226,11 +230,12 @@ export class WorkflowService {
 
       if (step.action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
         if (!step.trueStepId || !step.falseStepId) {
-          const conditionsCount = await this.dataSource.query<{ count: string }[]>(
-            `SELECT COUNT(*) FROM workflow_step_conditions WHERE workflow_step_id = $1`,
-            [step.id],
+          const conditions = await this.stepConditionRepo.findByStepId(
+            step.tenantId,
+            step.workflowId,
+            step.id,
           );
-          if (!conditionsCount || parseInt(conditionsCount[0]?.count ?? '0') === 0) {
+          if (conditions.length === 0) {
             errors.push('A conditional split step must have valid conditions configured');
           }
         }
@@ -240,11 +245,11 @@ export class WorkflowService {
         if (!step.config?.templateId && (!step.config?.subject || !step.config?.html)) {
           errors.push('An email step requires either a template or a subject and html body');
         } else if (step.config?.templateId) {
-          const templateExists = await this.dataSource.query<{ id: string }[]>(
-            `SELECT id FROM email_templates WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL LIMIT 1`,
-            [step.config.templateId, step.tenantId],
-          );
-          if (!templateExists || templateExists.length === 0) {
+          try {
+            const templateId = step.config?.templateId;
+            const templateIdStr = typeof templateId === 'string' ? templateId : '';
+            await this.emailTemplateService.findOne(step.tenantId, templateIdStr);
+          } catch {
             errors.push('An email step references a deleted or non-existent template');
           }
         }
