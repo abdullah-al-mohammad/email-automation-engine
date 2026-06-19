@@ -97,7 +97,7 @@ export class WorkflowService {
       return this.mapWorkflowToResponse(workflow);
     }
 
-    await this.validateForActivation(workflowId);
+    await this.validateForActivation(tenantId, workflowId);
     workflow.activatedAt = new Date();
     workflow.status = 'active';
     workflow.isActive = true;
@@ -158,7 +158,7 @@ export class WorkflowService {
     return workflow;
   }
 
-  private async validateForActivation(workflowId: string): Promise<void> {
+  private async validateForActivation(tenantId: string, workflowId: string): Promise<void> {
     const errors: string[] = [];
     const triggers = await this.triggerRepo.findByWorkflowId(workflowId);
 
@@ -231,7 +231,7 @@ export class WorkflowService {
       if (step.action === STEP_ACTIONS.CONDITIONAL_SPLIT) {
         if (!step.trueStepId || !step.falseStepId) {
           const conditions = await this.stepConditionRepo.findByStepId(
-            step.tenantId,
+            tenantId,
             step.workflowId,
             step.id,
           );
@@ -246,9 +246,7 @@ export class WorkflowService {
           errors.push('An email step requires either a template or a subject and html body');
         } else if (step.config?.templateId) {
           try {
-            const templateId = step.config?.templateId;
-            const templateIdStr = typeof templateId === 'string' ? templateId : '';
-            await this.emailTemplateService.findOne(step.tenantId, templateIdStr);
+            await this.emailTemplateService.findOne(tenantId, step.config.templateId as string);
           } catch {
             errors.push('An email step references a deleted or non-existent template');
           }
