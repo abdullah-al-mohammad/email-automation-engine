@@ -51,7 +51,10 @@ async function processConditionalSplit(
       operator: string;
       value: string;
     }>
-  >(`SELECT * FROM workflow_step_conditions WHERE workflow_step_id = $1`, [message.workflowStepId]);
+  >(
+    `SELECT logical_operator, type, resource, operator, value FROM workflow_step_conditions WHERE workflow_step_id = $1`,
+    [message.workflowStepId],
+  );
 
   let result = true;
 
@@ -66,7 +69,14 @@ async function processConditionalSplit(
       conditions.map((condition) => evaluateCondition(condition, message, metadata, dataSource)),
     );
 
-    const logicalOp = conditions[0]?.logical_operator || LOGICAL_OPERATORS.ALL;
+    const logicalOp = conditions[0]?.logical_operator ?? LOGICAL_OPERATORS.ALL;
+
+    const allSameOperator = conditions.every((c) => c.logical_operator === logicalOp);
+    if (!allSameOperator) {
+      Logger.warn(
+        `Step conditions for workflow step ${message.workflowStepId} have mixed logical_operator values. Using value from first condition: "${logicalOp}".`,
+      );
+    }
     switch (logicalOp) {
       case LOGICAL_OPERATORS.ANY:
         result = evaluations.some((r) => r);

@@ -2,19 +2,12 @@ import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sq
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
 import { isFinishedStepMessage } from '@email-automation-engine/shared';
 import type { FinishedStepMessage } from '@email-automation-engine/shared';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
 import { LOGICAL_OPERATORS, CONDITION_TYPES, STEP_ACTIONS } from '@email-automation-engine/shared';
-import type { CacheService } from '../infrastructure/cache/cache.interface';
-import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { Logger } from '../infrastructure/logger/logger';
 import { workerConfig } from '../infrastructure';
 
-export interface WorkerDeps {
-  queueService: QueueService;
-  cacheService: CacheService;
-  dataSource: DataSource;
-}
+import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<FinishedStepMessage>(

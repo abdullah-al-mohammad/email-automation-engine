@@ -3,18 +3,11 @@ import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
 import { isWaitingStepMessage } from '@email-automation-engine/shared';
 import type { WaitingStepMessage } from '@email-automation-engine/shared';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
-import type { CacheService } from '../infrastructure/cache/cache.interface';
-import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { Logger } from '../infrastructure/logger/logger';
 import { workerConfig } from '../infrastructure';
 import { v7 as uuidv7 } from 'uuid';
-export interface WorkerDeps {
-  queueService: QueueService;
-  cacheService: CacheService;
-  dataSource: DataSource;
-}
+import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<WaitingStepMessage>(

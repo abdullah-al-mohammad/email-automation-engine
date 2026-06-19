@@ -72,7 +72,9 @@ describe('conditional-split.handler', () => {
 
     expect(result.batchItemFailures).toHaveLength(0);
     expect(dataSource.query).toHaveBeenCalledWith(
-      expect.stringContaining('SELECT * FROM workflow_step_conditions'),
+      expect.stringContaining(
+        'SELECT logical_operator, type, resource, operator, value FROM workflow_step_conditions',
+      ),
       expect.any(Array),
     );
     expect(queueService.sendMessage).toHaveBeenCalledWith(
