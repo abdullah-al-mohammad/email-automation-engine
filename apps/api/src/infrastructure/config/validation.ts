@@ -20,4 +20,5 @@ export const validationSchema = Joi.object({
   WAITING_STEPS_QUEUE_URL: Joi.string().default('waiting-contact-workflow-steps'),
   FINISHED_STEPS_QUEUE_URL: Joi.string().default('finished-contact-workflow-steps'),
   EMAIL_TRACKING_EVENTS_QUEUE_URL: Joi.string().default('email-tracking-events'),
+  ALLOWED_ORIGINS: Joi.string().default('*'),
 });

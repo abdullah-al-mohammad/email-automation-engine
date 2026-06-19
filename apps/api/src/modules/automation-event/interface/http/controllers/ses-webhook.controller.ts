@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 
 import MessageValidator from 'sns-validator';
 
+import { EMAIL_TRACKING_EVENTS_QUEUE_URL } from '../../../../../infrastructure/config/config-keys';
+
 const SES_EVENT_TYPE_MAP: Record<string, EmailTrackingEventMessage['eventType']> = {
   Delivery: 'delivered',
   Bounce: 'bounced',
@@ -99,9 +101,7 @@ export class SesWebhookController {
         return;
       }
 
-      const queueUrl =
-        this.configService.get<string>('EMAIL_TRACKING_EVENTS_QUEUE_URL') ||
-        'email-tracking-events';
+      const queueUrl = this.configService.getOrThrow<string>(EMAIL_TRACKING_EVENTS_QUEUE_URL);
 
       const trackingEvent: EmailTrackingEventMessage = {
         version: 1,
