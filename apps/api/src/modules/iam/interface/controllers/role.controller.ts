@@ -22,6 +22,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { RequirePermissions } from '../decorators/require-permissions.decorator';
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
 
 @Controller('tenants/:tenantId/roles')
@@ -31,7 +32,7 @@ export class RoleController {
 
   @Get()
   @RequirePermissions('settings.manage')
-  async findAll(@Param('tenantId') tenantId: string): Promise<RoleResponse[]> {
+  async findAll(@CurrentTenant('id') tenantId: string): Promise<RoleResponse[]> {
     return this.roleService.findAllByTenantId(tenantId);
   }
 
@@ -39,7 +40,7 @@ export class RoleController {
   @RequirePermissions('settings.manage')
   @UsePipes(new ZodValidationPipe(createRoleSchema))
   async create(
-    @Param('tenantId') tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Body() dto: CreateRoleDto,
   ): Promise<RoleResponse> {
     return this.roleService.create(tenantId, dto);
@@ -49,7 +50,7 @@ export class RoleController {
   @RequirePermissions('settings.manage')
   @UsePipes(new ZodValidationPipe(updateRoleSchema))
   async update(
-    @Param('tenantId') tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
     @Body() dto: UpdateRoleDto,
   ): Promise<RoleResponse> {
@@ -59,7 +60,7 @@ export class RoleController {
   @Delete(':id')
   @HttpCode(204)
   @RequirePermissions('settings.manage')
-  async delete(@Param('tenantId') tenantId: string, @Param('id') id: string): Promise<void> {
+  async delete(@CurrentTenant('id') tenantId: string, @Param('id') id: string): Promise<void> {
     return this.roleService.delete(tenantId, id);
   }
 }

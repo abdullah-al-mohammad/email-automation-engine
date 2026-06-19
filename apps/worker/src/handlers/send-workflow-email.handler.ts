@@ -92,21 +92,22 @@ async function processSendWorkflowEmail(
   let subject = typeof stepConfig.subject === 'string' ? stepConfig.subject : 'Workflow Email';
   let html = typeof stepConfig.html === 'string' ? stepConfig.html : '';
   let text = typeof stepConfig.text === 'string' ? stepConfig.text : '';
-  let templateId = typeof stepConfig.templateId === 'string' ? stepConfig.templateId : null;
+  let resolvedTemplateId: string | null =
+    typeof stepConfig.templateId === 'string' ? stepConfig.templateId : null;
 
-  if (templateId) {
+  if (resolvedTemplateId) {
     const templateQuery = await dataSource.query<
       { subject: string; html: string; text: string | null }[]
     >(`SELECT subject, html, text FROM email_templates WHERE id = $1 AND deleted_at IS NULL`, [
-      templateId,
+      resolvedTemplateId,
     ]);
     if (templateQuery[0]) {
       subject = templateQuery[0].subject;
       html = templateQuery[0].html;
       text = templateQuery[0].text || '';
     } else {
-      Logger.warn(`Template ${templateId} not found, using config fallback`);
-      templateId = null;
+      Logger.warn(`Template ${resolvedTemplateId} not found, using config fallback`);
+      resolvedTemplateId = null;
     }
   }
 
@@ -125,7 +126,7 @@ async function processSendWorkflowEmail(
         message.contactWorkflowStepId,
         message.workflowId,
         message.workflowStepId,
-        templateId,
+        resolvedTemplateId,
         subject,
         'sending',
       ],
@@ -133,7 +134,7 @@ async function processSendWorkflowEmail(
   } else {
     await dataSource.query(
       `UPDATE email_messages SET status = 'sending', subject = $1, template_id = $2 WHERE id = $3`,
-      [subject, templateId, emailMessageId],
+      [subject, resolvedTemplateId, emailMessageId],
     );
   }
 

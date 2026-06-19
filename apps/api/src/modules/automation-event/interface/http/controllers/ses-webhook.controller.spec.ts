@@ -33,6 +33,7 @@ describe('SesWebhookController', () => {
     emailMessageService = { findBySesMessageId: vi.fn() } as unknown as Mocked<EmailMessageService>;
     configService = {
       get: vi.fn().mockReturnValue('email-tracking-events'),
+      getOrThrow: vi.fn().mockReturnValue('email-tracking-events'),
     } as unknown as Mocked<ConfigService>;
 
     controller = new SesWebhookController(queueService, emailMessageService, configService);

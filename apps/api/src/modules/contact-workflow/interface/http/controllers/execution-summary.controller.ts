@@ -1,6 +1,7 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
 import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
+import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
 import {
   type ContactWorkflowResponse,
   type ContactWorkflowStepResponse,
@@ -17,7 +18,7 @@ export class ExecutionSummaryController {
   @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
   @RequirePermissions('workflows.read')
   async listExecutions(
-    @Param('tenantId') tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('workflowId') workflowId: string,
   ): Promise<ContactWorkflowResponse[]> {
     return this.contactWorkflowService.findManyByWorkflowId(tenantId, workflowId);
@@ -27,7 +28,7 @@ export class ExecutionSummaryController {
   @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)
   @RequirePermissions('workflows.read')
   async getExecutionTimeline(
-    @Param('tenantId') tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @Param('contactWorkflowId') contactWorkflowId: string,
   ): Promise<ContactWorkflowStepResponse[]> {
     return this.contactWorkflowService.findAllStepsByContactWorkflowId(tenantId, contactWorkflowId);
