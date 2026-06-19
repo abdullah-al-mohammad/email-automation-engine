@@ -20,6 +20,7 @@ import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { RequirePermissions } from '../decorators/require-permissions.decorator';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
 
 @Controller('tenants/:tenantId/invitations')
@@ -29,7 +30,7 @@ export class TenantInvitationController {
 
   @Get()
   @RequirePermissions('members.read')
-  async findAll(@Param('tenantId') tenantId: string): Promise<TenantInvitationResponse[]> {
+  async findAll(@CurrentTenant('id') tenantId: string): Promise<TenantInvitationResponse[]> {
     return this.invitationService.findAllByTenantId(tenantId);
   }
 
@@ -37,7 +38,7 @@ export class TenantInvitationController {
   @RequirePermissions('members.manage')
   @UsePipes(new ZodValidationPipe(createTenantInvitationSchema))
   async create(
-    @Param('tenantId') tenantId: string,
+    @CurrentTenant('id') tenantId: string,
     @CurrentUser() user: { id: string },
     @Body() dto: CreateTenantInvitationDto,
   ): Promise<TenantInvitationResponse> {
@@ -47,7 +48,7 @@ export class TenantInvitationController {
   @Delete(':id')
   @HttpCode(204)
   @RequirePermissions('members.manage')
-  async delete(@Param('tenantId') tenantId: string, @Param('id') id: string): Promise<void> {
+  async delete(@CurrentTenant('id') tenantId: string, @Param('id') id: string): Promise<void> {
     return this.invitationService.delete(tenantId, id);
   }
 }
