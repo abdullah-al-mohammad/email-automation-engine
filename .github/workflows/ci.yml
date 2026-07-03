@@ -12,6 +12,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
+      # Workaround to force third-party javascript actions to run using Node 24 runtime, ensuring compatibility with our Node 24 runtime constraint
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     services:
@@ -77,10 +78,20 @@ jobs:
           DATABASE_URL: postgres://engine_user:engine_password@localhost:5432/engine_db
         run: pnpm --filter @email-automation-engine/api run migration:run
 
-      - name: Run Tests
+      - name: Run Tests with Coverage
         env:
           DATABASE_URL: postgres://engine_user:engine_password@localhost:5432/engine_db
-        run: pnpm test
+        run: pnpm test -- --coverage
+
+      - name: Upload Test Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage
+          path: |
+            apps/api/coverage/
+            apps/web/coverage/
+            apps/worker/coverage/
+            packages/shared/coverage/
 
       - name: Run Integration Tests
         env:

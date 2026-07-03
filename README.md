@@ -1,14 +1,15 @@
 # Email Automation Engine
 
+[![CI Status](https://github.com/md-emran-hossain/email-automation-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/md-emran-hossain/email-automation-engine/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D24-blue.svg)](https://nodejs.org)
+[![Release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/md-emran-hossain/email-automation-engine/releases)
+
 Email Automation Engine is an open-source platform for building, managing, and running event-driven email automations.
 
+![Workflow Builder Dashboard](docs/assets/workflow-builder.jpg)
+
 It receives events, matches workflow triggers, moves contacts through automation steps, runs delayed actions, branches on conditions, calls webhooks, and sends workflow emails through AWS SES.
-
-## Status
-
-Phases 1–6 are complete. Phase 7 (Public Release Readiness) is in progress — integration tests are being finalised and a few production-readiness checks remain before v1.0.0.
-
-See [Project Status](docs/project-status.md) for the full phase breakdown.
 
 ## Features
 
@@ -40,7 +41,7 @@ email-automation-engine/
     web/        React workflow builder
     worker/     TypeScript workers and Lambda handlers
   packages/
-    shared/     private workspace package for shared contracts, schemas, and constants
+    shared/     shared contracts, schemas, and constants
   infra/
     terraform/  AWS infrastructure modules and examples
   docs/
@@ -65,12 +66,32 @@ email-automation-engine/
 
 ## Getting Started
 
-To run a local or AWS demo instance, follow the [Demo Deployment Guide](docs/demo-deployment.md).
+Get a local development environment up and running in a few simple steps:
 
-It covers:
-- Provisioning SQS queues with Terraform
-- Running PostgreSQL locally with Docker
-- Starting the API, worker, and web dashboard
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/md-emran-hossain/email-automation-engine.git
+   cd email-automation-engine
+   ```
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+3. **Set up environment variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   _(Update `.env` with your PostgreSQL database credentials and AWS configuration if running SQS)_
+4. **Run database migrations:**
+   ```bash
+   pnpm --filter @email-automation-engine/api migration:run
+   ```
+5. **Start the services in development mode:**
+   ```bash
+   pnpm dev
+   ```
+
+For a detailed walkthrough, SQS queues provisioning with Terraform, and configuring AWS SES, check out the full [Demo Deployment Guide](docs/demo-deployment.md).
 
 ## Documentation
 
@@ -83,11 +104,6 @@ It covers:
 **Development:** [Contributing](CONTRIBUTING.md) · [Engineering Rules](docs/engineering-rules.md) · [Development Workflow](docs/development-workflow.md) · [Tooling](docs/tooling.md)
 
 **Reference:** [Edge Cases](docs/edge-cases.md) · [Testing](docs/testing.md) · [Open Source Scope](docs/open-source-scope.md) · [Roadmap](docs/roadmap.md) · [Project Status](docs/project-status.md)
-
-
-## Workspace Package
-
-`packages/shared` is a private monorepo workspace package for internal code sharing between the API, web app, and workers. It is not planned for npm publishing.
 
 ## Development Principles
 

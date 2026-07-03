@@ -6,13 +6,19 @@ The following versions of the Email Automation Engine are currently being suppor
 
 | Version | Supported          |
 | ------- | ------------------ |
-| v0.1.x  | :white_check_mark: |
+| v1.0.x  | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-Please report any security vulnerabilities responsibly. You can contact the core maintainers privately. Do not open a public issue for a security vulnerability.
+Please report any security vulnerabilities responsibly. Do not open a public issue for a security vulnerability.
 
-We will try to acknowledge receipt of your vulnerability report within 48 hours and provide regular updates.
+You can report vulnerabilities using GitHub's built-in [Private Vulnerability Reporting](https://github.com/md-emran-hossain/email-automation-engine/security/advisories/new) feature or by emailing us privately at security@email-automation-engine.org.
+
+We aim to:
+
+- Acknowledge receipt of your vulnerability report within 48 hours.
+- Validate and release a patch or mitigation for any confirmed vulnerability within 30 days of confirmation.
+- Provide regular status updates throughout the process.
 
 ## AWS Credentials & Keys
 

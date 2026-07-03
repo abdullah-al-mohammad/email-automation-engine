@@ -27,50 +27,76 @@ This guide outlines how to deploy a demo instance of the Email Automation Engine
 
 This will provision the necessary SQS queues for the engine.
 
-## Database Setup
+## Database Setup & Environment Configuration
 
-For a demo, you can spin up PostgreSQL using Docker locally:
+1. **Spin up PostgreSQL locally** using Docker:
 
-```bash
-docker run --name eae-postgres -e POSTGRES_USER=engine_user -e POSTGRES_PASSWORD=engine_password -e POSTGRES_DB=engine_db -p 5432:5432 -d postgres:15-alpine
-```
+   ```bash
+   docker run --name eae-postgres -e POSTGRES_USER=engine_user -e POSTGRES_PASSWORD=engine_password -e POSTGRES_DB=engine_db -p 5432:5432 -d postgres:15-alpine
+   ```
 
-## Running the API
+2. **Set up the Environment File**:
+   From the root directory, copy `.env.example` to create `.env`:
 
-1. Start from the root directory. Install dependencies and build all packages:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Open the `.env` file and configure:
+   - `DATABASE_URL` (e.g., `postgres://engine_user:engine_password@localhost:5432/engine_db`)
+   - AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`)
+   - The SQS Queue URLs output by Terraform under `# AWS SQS Queue URLs`
+   - `FROM_EMAIL_ADDRESS` (verified email in AWS SES)
+
+3. **Install dependencies and build the monorepo packages**:
+   From the root directory, run:
    ```bash
    pnpm install
    pnpm build
    ```
-2. Navigate to the `apps/api` directory:
+
+## Database Migrations
+
+Before launching the services, you must initialize the database schema:
+
+```bash
+pnpm --filter @email-automation-engine/api migration:run
+```
+
+## Running the Services
+
+You can start the API, worker, and web dashboard together in development mode from the root directory:
+
+```bash
+pnpm dev
+```
+
+_Note: If you prefer to run them in separate terminal tabs, you can navigate to `apps/api`, `apps/worker`, and `apps/web` respectively and run `pnpm dev` in each._
+
+## Verifying the Services
+
+To confirm everything is up and running correctly:
+
+1. **Check the API health endpoint**:
+
    ```bash
-   cd apps/api
-   ```
-3. Copy `.env.example` to `.env` and adjust the variables, including your AWS credentials (or ensure you have an active AWS SSO session) and the SQS Queue URLs outputted by Terraform.
-4. Start the API in dev mode:
-   ```bash
-   pnpm dev
+   curl http://localhost:3000/health
    ```
 
-## Running the Worker
+   **Expected Response**:
 
-The worker executes workflow steps.
-
-1. Navigate to the `apps/worker` directory.
-2. Provide the `.env` file with database and AWS SQS queue URL configurations.
-3. Start the worker:
-   ```bash
-   pnpm dev
+   ```json
+   {
+     "status": "ok",
+     "service": "api"
+   }
    ```
 
-## Running the Web Dashboard
+2. **Access the Web Interface**:
+   Open your browser and navigate to `http://localhost:5173`. You should see the workflow builder dashboard.
 
-1. Navigate to `apps/web`.
-2. Start the Vite development server:
-   ```bash
-   pnpm dev
-   ```
-3. Visit `http://localhost:5173` to access the Workflow Builder UI.
+3. **Check logs**:
+   Ensure no database connection errors or AWS credentials validation failures appear in your API/worker logs.
 
 ## Teardown
 
