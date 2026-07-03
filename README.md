@@ -13,24 +13,13 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Features
 
-- Workflow creation and management.
-- Tenant creation and management.
-- User authentication and tenant permissions.
-- React workflow builder.
-- Event ingestion.
-- Trigger matching.
-- Workflow activation validation.
-- Queue-driven workflow execution.
-- Delay steps and scheduled continuation.
-- Conditional split steps.
-- Webhook steps and delivery retries.
-- AWS SES workflow email step.
-- SES delivery/bounce/complaint tracking.
-- SES open and click tracking.
-- PostgreSQL persistence with TypeORM.
-- Optional Redis cache and coordination layer.
-- AWS SQS/Lambda deployment with Terraform.
-- Required test coverage for API, worker, queue contract, frontend, and infrastructure behavior.
+* **Drag-and-Drop Builder:** Build and organize your email journeys visually using a simple, interactive canvas.
+* **Event-Driven Triggers:** Start automations automatically when users take actions (like sign-up or checkout) in your own connected websites or applications.
+* **Delays & Scheduling:** Add wait steps (hours, days, or weeks) before executing subsequent automation actions.
+* **Conditional Branching:** Split user paths dynamically based on rules and properties.
+* **Smart Email Delivery:** Send via AWS SES with built-in open, click, bounce, and spam tracking.
+* **Resilient Webhooks:** Connect external APIs securely with automatic retry logic on failures.
+* **Production-Ready Scale:** Built with queue-based workers to handle heavy background traffic.
 
 ## Repository Layout
 
