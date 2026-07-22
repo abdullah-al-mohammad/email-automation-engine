@@ -1,108 +1,173 @@
-# Demo Deployment Guide
+# Production Cloud Deployment Guide
 
-This guide outlines how to deploy a demo instance of the Email Automation Engine using AWS and Terraform.
+This guide outlines the architecture and deployment process for running the Email Automation Engine in a production-ready cloud environment (AWS).
 
-## Prerequisites
+---
 
-1. AWS Account with Administrator access.
-2. Terraform CLI installed (v1.5+).
-3. Node.js 24 and pnpm installed.
-4. Docker (optional, for local PostgreSQL/Redis testing).
+## Architecture Overview
 
-## Infrastructure Provisioning
+For a reliable, scalable production setup, the services are distributed as follows:
 
-1. Navigate to the Terraform example environment:
-   ```bash
-   cd infra/terraform/environments/example
-   ```
-2. Initialize Terraform:
-   ```bash
-   terraform init
-   ```
-3. Plan and apply the infrastructure. Provide an AWS Region and resource prefix (e.g., `eae-demo`):
-   ```bash
-   terraform plan -var="aws_region=us-east-1" -var="environment=demo" -var="project_prefix=eae"
-   terraform apply
-   ```
-
-This will provision the necessary SQS queues for the engine.
-
-## Database Setup & Environment Configuration
-
-1. **Spin up PostgreSQL locally** using Docker:
-
-   ```bash
-   docker run --name eae-postgres -e POSTGRES_USER=engine_user -e POSTGRES_PASSWORD=engine_password -e POSTGRES_DB=engine_db -p 5432:5432 -d postgres:15-alpine
-   ```
-
-2. **Set up the Environment File**:
-   From the root directory, copy `.env.example` to create `.env`:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Open the `.env` file and configure:
-   - `DATABASE_URL` (e.g., `postgres://engine_user:engine_password@localhost:5432/engine_db`)
-   - AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`)
-   - The SQS Queue URLs output by Terraform under `# AWS SQS Queue URLs`
-   - `FROM_EMAIL_ADDRESS` (verified email in AWS SES)
-
-3. **Install dependencies and build the monorepo packages**:
-   From the root directory, run:
-   ```bash
-   pnpm install
-   pnpm build
-   ```
-
-## Database Migrations
-
-Before launching the services, you must initialize the database schema:
-
-```bash
-pnpm --filter @email-automation-engine/api migration:run
+```mermaid
+graph TD
+    User([User / Browser]) -->|Web UI| CloudFront[AWS CloudFront / S3]
+    User -->|API Requests| ALB[Application Load Balancer]
+    ALB -->|Route traffic| ECS[AWS ECS / Fargate - API Service]
+    ECS -->|Ingest Events / Jobs| SQS[AWS SQS Queues]
+    SQS -->|Triggers| Lambda[AWS Lambda - Workers]
+    Lambda -->|Send Emails| SES[AWS SES]
+    
+    ECS -->|Read/Write| RDS[(AWS RDS PostgreSQL)]
+    Lambda -->|Read/Write| RDS
+    
+    ECS -->|Cache/Idempotency| ElastiCache[(AWS ElastiCache Redis)]
+    Lambda -->|Cache/Idempotency| ElastiCache
 ```
 
-## Running the Services
+1. **Frontend (apps/web)**: Static React build hosted on **AWS S3** and distributed globally via **AWS CloudFront**.
+2. **API Backend (apps/api)**: Containerized NestJS application running on **AWS ECS (Fargate)** behind an **Application Load Balancer (ALB)**.
+3. **Workers (apps/worker)**: Serverless TypeScript event handlers running on **AWS Lambda**, triggered by **AWS SQS** and scheduled by **AWS EventBridge**.
+4. **Database & Cache**: **AWS RDS PostgreSQL** and **AWS ElastiCache Redis**.
 
-You can start the API, worker, and web dashboard together in development mode from the root directory:
+---
 
+## 1. Prerequisites & Setup
+
+Ensure you have the following installed and configured:
+* An **AWS Account** with administrator permissions.
+* **AWS CLI** configured with appropriate credentials.
+* **Terraform CLI** (v1.5+).
+* **Docker** installed locally (for containerizing the API backend).
+* **Node.js 24** and **pnpm** installed.
+
+---
+
+## 2. Infrastructure Provisioning (Terraform)
+
+The core queue and worker resources are defined under `infra/terraform`. 
+
+### Step A: Configure Environment Variables
+Navigate to the Terraform example environment:
 ```bash
-pnpm dev
+cd infra/terraform/environments/example
 ```
 
-_Note: If you prefer to run them in separate terminal tabs, you can navigate to `apps/api`, `apps/worker`, and `apps/web` respectively and run `pnpm dev` in each._
+Copy the example variables file:
+```bash
+cp terraform.example.tfvars terraform.tfvars
+```
 
-## Verifying the Services
+Edit `terraform.tfvars` and provide your production connections:
+```hcl
+aws_region      = "us-east-1"
+project_prefix  = "eae-prod"
+database_url    = "postgresql://db_user:db_password@your-rds-endpoint:5432/db_name"
+redis_url       = "redis://your-elasticache-endpoint:6379"
+ses_from_email  = "noreply@yourdomain.com"
+```
 
-To confirm everything is up and running correctly:
+### Step B: Build Worker Packages
+Before deploying the Lambdas, you must build the TypeScript worker packages so Terraform can archive and upload the build directory:
+```bash
+# From root directory
+pnpm install
+pnpm build
+```
 
-1. **Check the API health endpoint**:
+### Step C: Deploy
+Initialize and apply the Terraform configuration:
+```bash
+terraform init
+terraform apply
+```
+*Take note of the output variables, specifically the **SQS Queue URLs** and **Lambda IAM Roles**.*
 
-   ```bash
-   curl http://localhost:3000/health
-   ```
+---
 
-   **Expected Response**:
+## 3. Database Migration
+To run migrations against your production AWS RDS instance, run the following command from the root directory (ensure your network/security groups allow database access from your local machine, or run this step from a bastion host / CI pipeline):
 
-   ```json
-   {
-     "status": "ok",
-     "service": "api"
-   }
-   ```
+```bash
+DATABASE_URL="postgresql://db_user:db_password@your-rds-endpoint:5432/db_name" pnpm --filter @email-automation-engine/api migration:run
+```
 
-2. **Access the Web Interface**:
-   Open your browser and navigate to `http://localhost:5173`. You should see the workflow builder dashboard.
+---
 
-3. **Check logs**:
-   Ensure no database connection errors or AWS credentials validation failures appear in your API/worker logs.
+## 4. Deploying the API Backend (AWS ECS / Fargate)
 
-## Teardown
+Since the NestJS API is a persistent process handling incoming REST traffic, we recommend containerizing it.
 
-To remove all demo AWS infrastructure:
+### Step A: Dockerize the NestJS API
+Create a production `Dockerfile` in `apps/api/Dockerfile`:
 
+```dockerfile
+FROM node:24-alpine AS builder
+RUN npm install -g pnpm
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @email-automation-engine/shared build
+RUN pnpm --filter @email-automation-engine/api build
+
+FROM node:24-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/package.json ./package.json
+EXPOSE 3000
+CMD ["node", "dist/main.js"]
+```
+
+### Step B: Build and Push to AWS ECR
+Create an AWS ECR repository and push the image:
+```bash
+aws ecr create-repository --repository-name email-automation-engine-api
+
+# Authenticate Docker to your ECR registry
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com
+
+# Build and tag
+docker build -t email-automation-engine-api -f apps/api/Dockerfile .
+docker tag email-automation-engine-api:latest <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/email-automation-engine-api:latest
+
+# Push
+docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/email-automation-engine-api:latest
+```
+
+### Step C: Launch ECS Task
+Deploy a Fargate Service with the ECR image, passing the required environment variables (`DATABASE_URL`, `REDIS_URL`, and the SQS Queue URLs obtained from the Terraform outputs).
+
+---
+
+## 5. Deploying the Frontend (AWS S3 + CloudFront)
+
+The frontend React dashboard is built as a static site and can be served through a CDN.
+
+### Step A: Build Static Files
+From the project root, build the web application:
+```bash
+# Configure the API URL that the frontend should target
+VITE_API_BASE_URL="https://api.yourdomain.com" pnpm --filter @email-automation-engine/web build
+```
+This generates the static assets in `apps/web/dist`.
+
+### Step B: Deploy to S3 & Invalidate CloudFront
+Create an S3 bucket configured for static website hosting, then upload the build folder:
+```bash
+# Sync files to S3
+aws s3 sync apps/web/dist/ s3://your-frontend-bucket-name/ --delete
+
+# Invalidate CloudFront cache to serve the new files immediately
+aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
+```
+
+---
+
+## 6. Teardown & Maintenance
+
+To completely destroy the AWS resource stack managed by Terraform:
 ```bash
 cd infra/terraform/environments/example
 terraform destroy
 ```
+*Note: This will not delete resources created outside of Terraform, such as ECS clusters, RDS instances, S3 frontend buckets, or ECR images.*

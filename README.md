@@ -5,7 +5,7 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D24-blue.svg)](https://nodejs.org)
 [![Release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/md-emran-hossain/email-automation-engine/releases)
 
-Email Automation Engine is an open-source platform for building, managing, and running event-driven email automations.
+Email Automation Engine is an open-source platform for building, managing, and running event-driven email automations, built with NestJS, React, PostgreSQL, AWS SES/SQS, and Terraform.
 
 ![Workflow Builder Dashboard](docs/assets/workflow-builder.jpg)
 
@@ -20,38 +20,6 @@ It receives events, matches workflow triggers, moves contacts through automation
 * **Smart Email Delivery:** Send via AWS SES with built-in open, click, bounce, and spam tracking.
 * **Resilient Webhooks:** Connect external APIs securely with automatic retry logic on failures.
 * **Production-Ready Scale:** Built with queue-based workers to handle heavy background traffic.
-
-## Repository Layout
-
-```text
-email-automation-engine/
-  apps/
-    api/        NestJS backend
-    web/        React workflow builder
-    worker/     TypeScript workers and Lambda handlers
-  packages/
-    shared/     shared contracts, schemas, and constants
-  infra/
-    terraform/  AWS infrastructure modules and examples
-  docs/
-```
-
-## Technology
-
-- **Language:** TypeScript.
-- **Runtime:** Node.js 24.
-- **Package manager:** pnpm.
-- **Monorepo tasks:** Turborepo.
-- **Backend:** NestJS with Clean Architecture / DDD module boundaries.
-- **Database:** PostgreSQL with TypeORM migrations.
-- **Validation:** Zod for DTOs, Joi for environment validation.
-- **Frontend:** React.
-- **Frontend UI:** Tailwind CSS, shadcn/ui, React Flow, TanStack Query, React Hook Form, and Zod.
-- **Workers:** TypeScript workers deployable as AWS Lambda handlers.
-- **Queues:** AWS SQS.
-- **Cache:** Optional Redis for trigger cache, idempotency assistance, and lightweight coordination.
-- **Infrastructure:** Terraform.
-- **CI:** GitHub Actions with PostgreSQL service containers.
 
 ## Getting Started
 
@@ -80,7 +48,22 @@ Get a local development environment up and running in a few simple steps:
    pnpm dev
    ```
 
-For a detailed walkthrough, SQS queues provisioning with Terraform, and configuring AWS SES, check out the full [Demo Deployment Guide](docs/demo-deployment.md).
+For deploying to a production AWS environment using Terraform, ECS, and CloudFront, check out the full [Production Cloud Deployment Guide](docs/demo-deployment.md).
+
+## Repository Layout
+
+```text
+email-automation-engine/
+  apps/
+    api/        NestJS backend
+    web/        React workflow builder
+    worker/     TypeScript workers and Lambda handlers
+  packages/
+    shared/     shared contracts, schemas, and constants
+  infra/
+    terraform/  AWS infrastructure modules and examples
+  docs/
+```
 
 ## Documentation
 
