@@ -22,4 +22,8 @@ export class TypeOrmContactTagRepository implements ContactTagRepository {
   async delete(contactId: string, tagId: string): Promise<void> {
     await this.repository.delete({ contactId, tagId });
   }
+
+  async deleteByContactId(contactId: string): Promise<void> {
+    await this.repository.delete({ contactId });
+  }
 }
