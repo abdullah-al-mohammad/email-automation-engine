@@ -6,11 +6,14 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
   JoinColumn,
   BeforeInsert,
   PrimaryColumn,
 } from 'typeorm';
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
+import { Tag } from './tag.aggregate';
 
 @Entity('contacts')
 export class Contact {
@@ -47,4 +50,12 @@ export class Contact {
   @ManyToOne(() => Tenant)
   @JoinColumn()
   tenant?: Tenant;
+
+  @ManyToMany(() => Tag)
+  @JoinTable({
+    name: 'contact_tags',
+    joinColumn: { name: 'contact_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+  })
+  tags?: Tag[];
 }

@@ -5,4 +5,5 @@ export interface TagRepository {
   findAllByTenantId(tenantId: string): Promise<Tag[]>;
   findByTenantIdAndName(tenantId: string, name: string): Promise<Tag | null>;
   save(tag: Tag): Promise<Tag>;
+  deleteById(id: string): Promise<void>;
 }

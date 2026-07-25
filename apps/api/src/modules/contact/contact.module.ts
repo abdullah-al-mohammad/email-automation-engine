@@ -8,6 +8,7 @@ import { TypeOrmTagRepository } from './infrastructure/repositories/typeorm-tag.
 import { TypeOrmContactTagRepository } from './infrastructure/repositories/typeorm-contact-tag.repository';
 import { CONTACT_REPOSITORY, TAG_REPOSITORY, CONTACT_TAG_REPOSITORY } from './constants/tokens';
 import { ContactService } from './application/services/contact.service';
+import { ContactImportService } from './application/services/contact-import.service';
 import { TagService } from './application/services/tag.service';
 import { ContactController } from './interface/http/controllers/contact.controller';
 import { TagController } from './interface/http/controllers/tag.controller';
@@ -29,9 +30,17 @@ import { IamModule } from '../iam/iam.module';
       useClass: TypeOrmContactTagRepository,
     },
     ContactService,
+    ContactImportService,
     TagService,
   ],
   controllers: [ContactController, TagController],
-  exports: [CONTACT_REPOSITORY, TAG_REPOSITORY, CONTACT_TAG_REPOSITORY, ContactService, TagService],
+  exports: [
+    CONTACT_REPOSITORY,
+    TAG_REPOSITORY,
+    CONTACT_TAG_REPOSITORY,
+    ContactService,
+    ContactImportService,
+    TagService,
+  ],
 })
 export class ContactModule {}

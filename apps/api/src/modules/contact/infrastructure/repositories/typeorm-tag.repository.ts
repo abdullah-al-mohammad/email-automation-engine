@@ -29,4 +29,8 @@ export class TypeOrmTagRepository implements TagRepository {
   async save(tag: Tag): Promise<Tag> {
     return this.repository.save(tag);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.repository.delete(id);
+  }
 }
