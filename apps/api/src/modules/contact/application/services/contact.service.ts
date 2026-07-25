@@ -1,6 +1,9 @@
 import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
 import { CONTACT_REPOSITORY, TAG_REPOSITORY, CONTACT_TAG_REPOSITORY } from '../../constants/tokens';
-import { ContactRepository, FindContactsOptions } from '../../domain/repositories/contact.repository';
+import {
+  ContactRepository,
+  FindContactsOptions,
+} from '../../domain/repositories/contact.repository';
 import { TagRepository } from '../../domain/repositories/tag.repository';
 import { ContactTagRepository } from '../../domain/repositories/contact-tag.repository';
 import { Contact } from '../../domain/aggregates/contact.aggregate';
@@ -143,7 +146,13 @@ export class ContactService {
       email: contact.email,
       subscribed: contact.subscribed,
       metadata: contact.metadata ?? {},
-      tags: contact.tags?.map((t) => ({ id: t.id, name: t.name, tenantId: t.tenantId, createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt.toISOString() })),
+      tags: contact.tags?.map((t) => ({
+        id: t.id,
+        name: t.name,
+        tenantId: t.tenantId,
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      })),
       createdAt: contact.createdAt.toISOString(),
       updatedAt: contact.updatedAt.toISOString(),
     };

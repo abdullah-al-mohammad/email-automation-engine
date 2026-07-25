@@ -67,9 +67,7 @@ export class ContactController {
   @Post('import/preview')
   @RequirePermissions('contacts.read')
   @UseInterceptors(FileInterceptor('file'))
-  previewCsv(
-    @UploadedFile() file: Express.Multer.File,
-  ): CsvPreview {
+  previewCsv(@UploadedFile() file: Express.Multer.File): CsvPreview {
     return this.contactImportService.previewCsv(file.buffer);
   }
 

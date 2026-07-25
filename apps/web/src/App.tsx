@@ -22,6 +22,9 @@ import WorkflowContacts from './pages/workflow/WorkflowContacts';
 import ExecutionSummary from './pages/workflow/ExecutionSummary';
 import Settings from './pages/settings/Settings';
 import EmailTemplates from './pages/email-templates/EmailTemplates';
+import Contacts from './pages/contacts/Contacts';
+import ContactDetailPage from './pages/contacts/ContactDetail';
+import NewContact from './pages/contacts/NewContact';
 
 import CreateEmailTemplate from './pages/email-templates/CreateEmailTemplate';
 
@@ -33,6 +36,9 @@ const appRoutes = [
   { path: '/workflows/:workflowId/edit', element: <EditWorkflow /> },
   { path: '/workflows/:workflowId/summary', element: <ExecutionSummary /> },
   { path: '/workflows/:workflowId/contacts', element: <WorkflowContacts /> },
+  { path: '/contacts', element: <Contacts /> },
+  { path: '/contacts/new', element: <NewContact /> },
+  { path: '/contacts/:contactId', element: <ContactDetailPage /> },
   { path: '/email-templates', element: <EmailTemplates /> },
   { path: '/email-templates/create', element: <CreateEmailTemplate /> },
   { path: '/settings', element: <Settings /> },
@@ -108,6 +114,9 @@ function MainLayout() {
           <nav className="flex items-center gap-4">
             <Link to="/workflows" className={getNavClass('/workflows')}>
               Workflows
+            </Link>
+            <Link to="/contacts" className={getNavClass('/contacts')}>
+              Contacts
             </Link>
             <Link to="/email-templates" className={getNavClass('/email-templates')}>
               Templates
