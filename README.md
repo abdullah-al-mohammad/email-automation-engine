@@ -68,6 +68,7 @@ email-automation-engine/
 To run a local or AWS demo instance, follow the [Demo Deployment Guide](docs/demo-deployment.md).
 
 It covers:
+
 - Provisioning SQS queues with Terraform
 - Running PostgreSQL locally with Docker
 - Starting the API, worker, and web dashboard
@@ -83,7 +84,6 @@ It covers:
 **Development:** [Contributing](CONTRIBUTING.md) · [Engineering Rules](docs/engineering-rules.md) · [Development Workflow](docs/development-workflow.md) · [Tooling](docs/tooling.md)
 
 **Reference:** [Edge Cases](docs/edge-cases.md) · [Testing](docs/testing.md) · [Open Source Scope](docs/open-source-scope.md) · [Roadmap](docs/roadmap.md) · [Project Status](docs/project-status.md)
-
 
 ## Workspace Package
 
