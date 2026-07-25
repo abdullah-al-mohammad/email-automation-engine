@@ -9,3 +9,9 @@ export const tagResponseSchema = z.object({
 });
 
 export type TagResponse = z.infer<typeof tagResponseSchema>;
+
+export const createTagSchema = z.object({
+  name: z.string().min(1).max(255),
+});
+
+export type CreateTagDto = z.infer<typeof createTagSchema>;
