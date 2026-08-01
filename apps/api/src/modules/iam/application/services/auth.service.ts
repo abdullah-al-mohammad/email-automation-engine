@@ -13,8 +13,7 @@ import {
   type SigninDto,
   type AuthResponse,
   type UserResponse,
-  USER_NEW,
-  USER_BLOCKED,
+  USER_STATUS,
 } from '@email-automation-engine/shared';
 import { USER_REPOSITORY, ENCRYPTION_SERVICE } from '../../constants/tokens';
 import { type UserRepository } from '../../domain/repositories/user.repository';
@@ -46,7 +45,7 @@ export class AuthService {
     const user = new User();
     user.email = emailNormalized;
     user.passwordHash = passwordHash;
-    user.status = USER_NEW;
+    user.status = USER_STATUS.NEW;
 
     const savedUser = await this.userRepo.save(user);
     return this.issueToken(savedUser);
@@ -65,7 +64,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (user.status === USER_BLOCKED) {
+    if (user.status === USER_STATUS.BLOCKED) {
       throw new ForbiddenException('Your account has been blocked');
     }
 

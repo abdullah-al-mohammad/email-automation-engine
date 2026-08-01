@@ -1,5 +1,9 @@
-export const USER_NEW = 'new' as const;
-export const USER_APPROVED = 'approved' as const;
-export const USER_BLOCKED = 'blocked' as const;
+export const USER_STATUS = {
+  NEW: 'new',
+  APPROVED: 'approved',
+  BLOCKED: 'blocked',
+} as const;
 
-export type UserStatus = typeof USER_NEW | typeof USER_APPROVED | typeof USER_BLOCKED;
+export const USER_STATUSES = Object.values(USER_STATUS);
+
+export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
