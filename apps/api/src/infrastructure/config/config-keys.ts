@@ -3,6 +3,7 @@ export const PORT = 'PORT';
 export const DATABASE_URL = 'DATABASE_URL';
 export const JWT_SECRET = 'JWT_SECRET';
 export const JWT_ENCRYPTION_KEY = 'JWT_ENCRYPTION_KEY';
+export const JWT_EXPIRES_IN = '1h' as const;
 export const BCRYPT_SALT_ROUNDS = 'BCRYPT_SALT_ROUNDS';
 export const QUEUE_TYPE = 'QUEUE_TYPE';
 export const CACHE_TYPE = 'CACHE_TYPE';
