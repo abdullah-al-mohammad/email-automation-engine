@@ -26,12 +26,14 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Authentication token is missing or invalid');
     }
 
+    request.user = await this.authenticate(token);
+    return true;
+  }
+
+  private async authenticate(token: string): Promise<{ id: string; email: string }> {
     try {
       const payload = await this.tokenService.verify(token);
-      request.user = {
-        id: payload.sub,
-        email: payload.email,
-      };
+      return { id: payload.sub, email: payload.email };
     } catch (error) {
       this.logger.warn(
         `Token verification failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -40,11 +42,9 @@ export class AuthGuard implements CanActivate {
         cause: error,
       });
     }
-
-    return true;
   }
 
-  private parseBearerHeader(request: AuthenticatedRequest): string | undefined {
+  private parseBearerHeader(request: Pick<AuthenticatedRequest, 'headers'>): string | undefined {
     const authHeader = request.headers.authorization;
     if (!authHeader || Array.isArray(authHeader)) return undefined;
     const [type, token, ...extra] = authHeader.split(' ');
