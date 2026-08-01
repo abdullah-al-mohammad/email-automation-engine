@@ -1,19 +1,12 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest';
-import type { ConfigService } from '@nestjs/config';
+import { describe, expect, it, beforeEach } from 'vitest';
 import { EncryptionService } from './encryption.service';
-import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
 import * as crypto from 'crypto';
 
 describe('EncryptionService', () => {
-  const testKey = crypto.randomBytes(32).toString('hex');
   let service: EncryptionService;
 
   beforeEach(() => {
-    const configMock = {
-      getOrThrow: vi.fn().mockReturnValue(testKey),
-    } as unknown as ConfigService;
-
-    service = new EncryptionService(configMock);
+    service = new EncryptionService(crypto.randomBytes(32));
   });
 
   describe('encrypt', () => {
@@ -106,11 +99,7 @@ describe('EncryptionService', () => {
     });
 
     it('rejects data encrypted with a different key', () => {
-      const otherKey = crypto.randomBytes(32).toString('hex');
-      const otherConfigMock = {
-        getOrThrow: vi.fn().mockReturnValue(otherKey),
-      } as unknown as ConfigService;
-      const otherService = new EncryptionService(otherConfigMock);
+      const otherService = new EncryptionService(crypto.randomBytes(32));
 
       const encrypted = otherService.encrypt('secret');
 
@@ -118,15 +107,9 @@ describe('EncryptionService', () => {
     });
   });
 
-  describe('key loading', () => {
-    it('reads the encryption key when constructed', () => {
-      const getOrThrow = vi.fn().mockReturnValue(testKey);
-      const configMock = { getOrThrow } as unknown as ConfigService;
-
-      const svc = new EncryptionService(configMock);
-
-      expect(svc).toBeDefined();
-      expect(getOrThrow).toHaveBeenCalledWith(JWT_ENCRYPTION_KEY);
+  describe('key validation', () => {
+    it('fails fast when the key is not exactly 32 bytes', () => {
+      expect(() => new EncryptionService(crypto.randomBytes(16))).toThrow(/expected 32 bytes/);
     });
   });
 });

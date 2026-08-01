@@ -1,10 +1,8 @@
 import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { JwtService } from '@nestjs/jwt';
-import type { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { TokenService } from './token.service';
 import { EncryptionService } from './encryption.service';
-import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -83,10 +81,7 @@ describe('TokenService', () => {
 
   describe('roundtrip with real JwtService and EncryptionService', () => {
     it('round-trips a token with the real services', async () => {
-      const configMock = {
-        getOrThrow: vi.fn().mockReturnValue(crypto.randomBytes(32).toString('hex')),
-      } as unknown as ConfigService;
-      const encryptionService = new EncryptionService(configMock);
+      const encryptionService = new EncryptionService(crypto.randomBytes(32));
       const jwtService = new JwtService({
         secret: 'test-secret',
         signOptions: { expiresIn: '1h' },
@@ -98,7 +93,6 @@ describe('TokenService', () => {
       const payload = await service.verify(issued.accessToken);
 
       expect(payload).toEqual({ sub: 'user-id', email: 'user@example.com' });
-      expect(configMock.getOrThrow).toHaveBeenCalledWith(JWT_ENCRYPTION_KEY);
     });
   });
 });

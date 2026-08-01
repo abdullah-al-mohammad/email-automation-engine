@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { JWT_EXPIRES_IN, JWT_SECRET } from '../../infrastructure/config/config-keys';
+import { JWT_ENCRYPTION_KEY, JWT_EXPIRES_IN, JWT_SECRET } from '../../infrastructure/config/config-keys';
 
 import { Role } from './domain/aggregates/role.aggregate';
 import { RolePermission } from './domain/aggregates/role-permission.aggregate';
@@ -14,6 +14,7 @@ import { User } from './domain/aggregates/user.aggregate';
 
 import {
   ENCRYPTION_SERVICE,
+  JWT_ENCRYPTION_KEY_VALUE,
   PASSWORD_HASHER,
   ROLE_REPOSITORY,
   TENANT_INVITATION_REPOSITORY,
@@ -96,6 +97,12 @@ const useClassProviders: Provider<unknown>[] = (
     AuthGuard,
     TenantMembershipGuard,
     PermissionsGuard,
+    {
+      provide: JWT_ENCRYPTION_KEY_VALUE,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        Buffer.from(config.getOrThrow<string>(JWT_ENCRYPTION_KEY), 'hex'),
+    },
     ...useClassProviders,
   ],
   exports: [
