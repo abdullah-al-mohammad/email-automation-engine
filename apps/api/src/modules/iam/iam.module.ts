@@ -45,6 +45,10 @@ import { TenantController } from './interface/controllers/tenant.controller';
 import { TenantInvitationController } from './interface/controllers/tenant-invitation.controller';
 import { TenantMemberController } from './interface/controllers/tenant-member.controller';
 
+import { AuthGuard } from './interface/guards/auth.guard';
+import { PermissionsGuard } from './interface/guards/permissions.guard';
+import { TenantMembershipGuard } from './interface/guards/tenant-membership.guard';
+
 const useClassProviders: Provider<unknown>[] = (
   [
     [USER_REPOSITORY, TypeOrmUserRepository],
@@ -89,6 +93,9 @@ const useClassProviders: Provider<unknown>[] = (
     RoleService,
     TenantMemberService,
     TenantInvitationService,
+    AuthGuard,
+    TenantMembershipGuard,
+    PermissionsGuard,
     ...useClassProviders,
   ],
   exports: [
@@ -96,6 +103,9 @@ const useClassProviders: Provider<unknown>[] = (
     TENANT_REPOSITORY,
     ROLE_REPOSITORY,
     TENANT_MEMBERSHIP_REPOSITORY,
+    AuthGuard,
+    TenantMembershipGuard,
+    PermissionsGuard,
   ],
 })
 export class IamModule {}
