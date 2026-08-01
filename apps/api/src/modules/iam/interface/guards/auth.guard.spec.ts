@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { UnauthorizedException, type ExecutionContext } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard, AUTH_MESSAGES } from './auth.guard';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
@@ -44,14 +44,14 @@ describe('AuthGuard', () => {
   it('should throw UnauthorizedException if authorization header is missing', async () => {
     const context = createMockContext(undefined);
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Authentication token is missing'),
+      new UnauthorizedException(AUTH_MESSAGES.tokenMissing),
     );
   });
 
   it('should throw UnauthorizedException if header structure is not Bearer', async () => {
     const context = createMockContext('Basic token123');
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Authentication token is missing'),
+      new UnauthorizedException(AUTH_MESSAGES.tokenMissing),
     );
   });
 
@@ -60,7 +60,9 @@ describe('AuthGuard', () => {
     tokenService.verify.mockRejectedValue(new Error('JWT expired'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
+      new UnauthorizedException(AUTH_MESSAGES.tokenInvalid, {
+        cause: new Error('JWT expired'),
+      }),
     );
   });
 
@@ -69,7 +71,9 @@ describe('AuthGuard', () => {
     tokenService.verify.mockRejectedValue(new Error('Invalid token payload structure'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
+      new UnauthorizedException(AUTH_MESSAGES.tokenInvalid, {
+        cause: new Error('Invalid token payload structure'),
+      }),
     );
   });
 });
