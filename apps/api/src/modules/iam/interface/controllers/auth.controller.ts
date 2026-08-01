@@ -11,6 +11,7 @@ import { AuthService } from '../../application/services/auth.service';
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { type AuthenticatedUser } from '../types';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +31,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async getMe(@CurrentUser() user: { id: string }): Promise<UserResponse> {
+  async getMe(@CurrentUser() user: AuthenticatedUser): Promise<UserResponse> {
     return this.authService.getMe(user.id);
   }
 }

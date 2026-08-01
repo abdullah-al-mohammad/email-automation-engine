@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { TOKEN_SERVICE } from '../../constants/tokens';
 import { TokenService } from '../../infrastructure/security/token.service';
-import { type AuthenticatedRequest } from '../types/authenticated-request';
+import { type AuthenticatedRequest } from '../types';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
