@@ -1,0 +1,104 @@
+import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
+import { JwtService } from '@nestjs/jwt';
+import type { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
+import { TokenService } from './token.service';
+import { EncryptionService } from './encryption.service';
+import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
+
+describe('TokenService', () => {
+  let service: TokenService;
+  let jwt: { signAsync: Mock; verifyAsync: Mock };
+  let encryption: { encrypt: Mock; decrypt: Mock };
+
+  beforeEach(() => {
+    jwt = {
+      signAsync: vi.fn().mockResolvedValue('signed-jwt-token'),
+      verifyAsync: vi.fn(),
+    };
+    encryption = {
+      encrypt: vi.fn().mockReturnValue('encrypted-token'),
+      decrypt: vi.fn().mockReturnValue('decrypted-jwt'),
+    };
+    service = new TokenService(
+      jwt as unknown as JwtService,
+      encryption as unknown as EncryptionService,
+    );
+  });
+
+  describe('issue', () => {
+    it('signs the user id and email into a token and encrypts it before returning it', async () => {
+      const result = await service.issue('user-id', 'user@example.com');
+
+      expect(jwt.signAsync).toHaveBeenCalledWith({
+        sub: 'user-id',
+        email: 'user@example.com',
+      });
+      expect(encryption.encrypt).toHaveBeenCalledWith('signed-jwt-token');
+      expect(result).toEqual({ accessToken: 'encrypted-token' });
+    });
+  });
+
+  describe('verify', () => {
+    it('accepts a valid token and returns the user id and email', async () => {
+      jwt.verifyAsync.mockResolvedValue({ sub: 'user-id', email: 'user@example.com' });
+
+      const result = await service.verify('encrypted-token');
+
+      expect(encryption.decrypt).toHaveBeenCalledWith('encrypted-token');
+      expect(jwt.verifyAsync).toHaveBeenCalledWith('decrypted-jwt');
+      expect(result).toEqual({ sub: 'user-id', email: 'user@example.com' });
+    });
+
+    it('rejects a token that does not carry a user id', async () => {
+      jwt.verifyAsync.mockResolvedValue({ email: 'user@example.com' });
+
+      await expect(service.verify('encrypted-token')).rejects.toThrow(
+        'Invalid token payload structure',
+      );
+    });
+
+    it('rejects a token that does not carry an email', async () => {
+      jwt.verifyAsync.mockResolvedValue({ sub: 'user-id' });
+
+      await expect(service.verify('encrypted-token')).rejects.toThrow(
+        'Invalid token payload structure',
+      );
+    });
+
+    it('rejects a token that fails signature verification, such as an expired one', async () => {
+      jwt.verifyAsync.mockRejectedValue(new Error('JWT expired'));
+
+      await expect(service.verify('encrypted-token')).rejects.toThrow('JWT expired');
+    });
+
+    it('rejects a token that cannot be decrypted', async () => {
+      encryption.decrypt.mockImplementation(() => {
+        throw new Error('Decryption error');
+      });
+
+      await expect(service.verify('encrypted-token')).rejects.toThrow('Decryption error');
+    });
+  });
+
+  describe('roundtrip with real JwtService and EncryptionService', () => {
+    it('accepts a token produced by issue() using the real JWT + encryption stack', async () => {
+      const configMock = {
+        getOrThrow: vi.fn().mockReturnValue(crypto.randomBytes(32).toString('hex')),
+      } as unknown as ConfigService;
+      const encryptionService = new EncryptionService(configMock);
+      const jwtService = new JwtService({
+        secret: 'test-secret',
+        signOptions: { expiresIn: '1h' },
+      });
+
+      const service = new TokenService(jwtService, encryptionService);
+
+      const issued = await service.issue('user-id', 'user@example.com');
+      const payload = await service.verify(issued.accessToken);
+
+      expect(payload).toEqual({ sub: 'user-id', email: 'user@example.com' });
+      expect(configMock.getOrThrow).toHaveBeenCalledWith(JWT_ENCRYPTION_KEY);
+    });
+  });
+});

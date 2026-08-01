@@ -5,9 +5,6 @@ import {
   ForbiddenException,
   Inject,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import {
   type SignupDto,
   type SigninDto,
@@ -15,50 +12,49 @@ import {
   type UserResponse,
   USER_STATUS,
 } from '@email-automation-engine/shared';
-import { USER_REPOSITORY, ENCRYPTION_SERVICE } from '../../constants/tokens';
+import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE } from '../../constants/tokens';
 import { type UserRepository } from '../../domain/repositories/user.repository';
 import { User } from '../../domain/aggregates/user.aggregate';
-import { EncryptionService } from '../../infrastructure/security/encryption.service';
-import { BCRYPT_SALT_ROUNDS } from '../../../../infrastructure/config/config-keys';
+import { PasswordHasher } from '../../infrastructure/security/password-hasher.service';
+import { TokenService } from '../../infrastructure/security/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepo: UserRepository,
-    @Inject(ENCRYPTION_SERVICE)
-    private readonly encryptionService: EncryptionService,
-    private readonly jwt: JwtService,
-    private readonly config: ConfigService,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
+    @Inject(TOKEN_SERVICE)
+    private readonly tokenService: TokenService,
   ) {}
 
   async signup(dto: SignupDto): Promise<AuthResponse> {
-    const emailNormalized = dto.email.toLowerCase().trim();
-    const existingUser = await this.userRepo.findByEmail(emailNormalized);
+    const email = this.normalizeEmail(dto.email);
+    const existingUser = await this.userRepo.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('Unable to create account. Please try again or sign in.');
     }
 
-    const saltRounds = this.config.getOrThrow<number>(BCRYPT_SALT_ROUNDS);
-    const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+    const passwordHash = await this.passwordHasher.hash(dto.password);
 
     const user = new User();
-    user.email = emailNormalized;
+    user.email = email;
     user.passwordHash = passwordHash;
     user.status = USER_STATUS.NEW;
 
     const savedUser = await this.userRepo.save(user);
-    return this.issueToken(savedUser);
+    return this.tokenService.issue(savedUser.id, savedUser.email);
   }
 
   async signin(dto: SigninDto): Promise<AuthResponse> {
-    const emailNormalized = dto.email.toLowerCase().trim();
-    const user = await this.userRepo.findByEmail(emailNormalized);
+    const email = this.normalizeEmail(dto.email);
+    const user = await this.userRepo.findByEmail(email);
 
-    // Timing attack mitigation: run bcrypt comparison using a dummy hash if user doesn't exist
-    const dummyHash = '$2b$10$ckuRMbA53QkLioHjmr8cKuLFSwFgrfQHNybywg.uzuAfWysfMmiRm';
-    const passwordHash = user?.passwordHash ?? dummyHash;
-    const passwordMatched = await bcrypt.compare(dto.password, passwordHash);
+    // Timing attack mitigation: compare against a dummy hash if user doesn't exist
+    const passwordMatched = user
+      ? await this.passwordHasher.compare(dto.password, user.passwordHash)
+      : await this.passwordHasher.compareDummy(dto.password);
 
     if (!user || !passwordMatched) {
       throw new UnauthorizedException('Invalid credentials');
@@ -68,17 +64,7 @@ export class AuthService {
       throw new ForbiddenException('Your account has been blocked');
     }
 
-    return this.issueToken(user);
-  }
-
-  private async issueToken(user: User): Promise<AuthResponse> {
-    const signedToken = await this.jwt.signAsync({
-      sub: user.id,
-      email: user.email,
-    });
-
-    const accessToken = this.encryptionService.encrypt(signedToken);
-    return { accessToken };
+    return this.tokenService.issue(user.id, user.email);
   }
 
   async getMe(userId: string): Promise<UserResponse> {
@@ -86,10 +72,18 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    return this.toResponse(user);
+  }
+
+  private normalizeEmail(email: string): string {
+    return email.toLowerCase().trim();
+  }
+
+  private toResponse(user: User): UserResponse {
     return {
       id: user.id,
       email: user.email,
-      status: user.status as UserResponse['status'],
+      status: user.status,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

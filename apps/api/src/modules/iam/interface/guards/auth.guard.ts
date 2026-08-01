@@ -5,17 +5,15 @@ import {
   UnauthorizedException,
   Inject,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ENCRYPTION_SERVICE } from '../../constants/tokens';
-import { EncryptionService } from '../../infrastructure/security/encryption.service';
+import { TOKEN_SERVICE } from '../../constants/tokens';
+import { TokenService } from '../../infrastructure/security/token.service';
 import { type AuthenticatedRequest } from '../types/authenticated-request';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
-    @Inject(ENCRYPTION_SERVICE)
-    private readonly encryptionService: EncryptionService,
+    @Inject(TOKEN_SERVICE)
+    private readonly tokenService: TokenService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,16 +24,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const decrypted = this.encryptionService.decrypt(token);
-      const payload = (await this.jwtService.verifyAsync(decrypted)) as Record<
-        string,
-        unknown
-      > | null;
-
-      if (!payload || typeof payload.sub !== 'string' || typeof payload.email !== 'string') {
-        throw new Error('Invalid token payload structure');
-      }
-
+      const payload = await this.tokenService.verify(token);
       request.user = {
         id: payload.sub,
         email: payload.email,

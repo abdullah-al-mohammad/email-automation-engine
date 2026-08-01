@@ -1,21 +1,13 @@
 import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { UnauthorizedException, ConflictException, ForbiddenException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { User } from '../../domain/aggregates/user.aggregate';
-import { BCRYPT_SALT_ROUNDS } from '../../../../infrastructure/config/config-keys';
-
-vi.mock('bcrypt', () => ({
-  hash: vi.fn(),
-  compare: vi.fn(),
-}));
 
 describe('AuthService', () => {
   let service: AuthService;
   let userRepo: { findByEmail: Mock; findById: Mock; save: Mock };
-  let jwtService: { signAsync: Mock };
-  let configService: { getOrThrow: Mock };
-  let encryptionService: { encrypt: Mock; decrypt: Mock };
+  let passwordHasher: { hash: Mock; compare: Mock; compareDummy: Mock };
+  let tokenService: { issue: Mock };
 
   const existingUser = new User();
   existingUser.id = 'user-uuid';
@@ -31,34 +23,26 @@ describe('AuthService', () => {
       save: vi.fn(),
     };
 
-    jwtService = {
-      signAsync: vi.fn().mockResolvedValue('signed-jwt-token'),
+    passwordHasher = {
+      hash: vi.fn().mockResolvedValue('$2b$10$hashednewpass'),
+      compare: vi.fn().mockResolvedValue(true),
+      compareDummy: vi.fn().mockResolvedValue(false),
     };
 
-    configService = {
-      getOrThrow: vi.fn().mockImplementation((key) => {
-        if (key === BCRYPT_SALT_ROUNDS) return 10;
-        throw new Error(`Missing key ${key}`);
-      }),
-    };
-
-    encryptionService = {
-      encrypt: vi.fn().mockReturnValue('opaque-encrypted-token'),
-      decrypt: vi.fn(),
+    tokenService = {
+      issue: vi.fn().mockResolvedValue({ accessToken: 'opaque-token' }),
     };
 
     service = new AuthService(
       userRepo as unknown as (typeof service)['userRepo'],
-      encryptionService as unknown as (typeof service)['encryptionService'],
-      jwtService as unknown as (typeof service)['jwt'],
-      configService as unknown as (typeof service)['config'],
+      passwordHasher as unknown as (typeof service)['passwordHasher'],
+      tokenService as unknown as (typeof service)['tokenService'],
     );
   });
 
   describe('signup', () => {
     it('should hash password and save new user', async () => {
       userRepo.findByEmail.mockResolvedValue(null);
-      vi.mocked(bcrypt.hash).mockImplementation(() => Promise.resolve('$2b$10$hashednewpass'));
       userRepo.save.mockImplementation((u: User) => Promise.resolve({ ...u, id: 'new-id' }));
 
       const result = await service.signup({
@@ -67,13 +51,10 @@ describe('AuthService', () => {
       });
 
       expect(userRepo.findByEmail).toHaveBeenCalledWith('alice@example.com');
-      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
+      expect(passwordHasher.hash).toHaveBeenCalledWith('password123');
       expect(userRepo.save).toHaveBeenCalled();
-      expect(jwtService.signAsync).toHaveBeenCalledWith({
-        sub: 'new-id',
-        email: 'alice@example.com',
-      });
-      expect(result).toEqual({ accessToken: 'opaque-encrypted-token' });
+      expect(tokenService.issue).toHaveBeenCalledWith('new-id', 'alice@example.com');
+      expect(result).toEqual({ accessToken: 'opaque-token' });
     });
 
     it('should throw ConflictException if email exists', async () => {
@@ -89,7 +70,6 @@ describe('AuthService', () => {
 
     it('should normalize email before checking uniqueness during signup', async () => {
       userRepo.findByEmail.mockResolvedValue(null);
-      vi.mocked(bcrypt.hash).mockImplementation(() => Promise.resolve('$2b$10$hashednewpass'));
       userRepo.save.mockImplementation((u: User) => Promise.resolve({ ...u, id: 'new-id' }));
 
       await service.signup({
@@ -104,7 +84,6 @@ describe('AuthService', () => {
   describe('signin', () => {
     it('should return token if credentials are valid', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
-      vi.mocked(bcrypt.compare).mockImplementation(() => Promise.resolve(true));
 
       const result = await service.signin({
         email: 'john@example.com',
@@ -112,13 +91,12 @@ describe('AuthService', () => {
       });
 
       expect(userRepo.findByEmail).toHaveBeenCalledWith('john@example.com');
-      expect(bcrypt.compare).toHaveBeenCalledWith('password123', '$2b$10$hashedvalue');
-      expect(result).toEqual({ accessToken: 'opaque-encrypted-token' });
+      expect(passwordHasher.compare).toHaveBeenCalledWith('password123', '$2b$10$hashedvalue');
+      expect(result).toEqual({ accessToken: 'opaque-token' });
     });
 
     it('should normalize email during signin', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
-      vi.mocked(bcrypt.compare).mockImplementation(() => Promise.resolve(true));
 
       await service.signin({
         email: '  JOHN@example.com  ',
@@ -137,11 +115,14 @@ describe('AuthService', () => {
           password: 'password123',
         }),
       ).rejects.toThrow(UnauthorizedException);
+
+      expect(passwordHasher.compareDummy).toHaveBeenCalledWith('password123');
+      expect(passwordHasher.compare).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException if password incorrect', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
-      vi.mocked(bcrypt.compare).mockImplementation(() => Promise.resolve(false));
+      passwordHasher.compare.mockResolvedValue(false);
 
       await expect(
         service.signin({
@@ -159,7 +140,6 @@ describe('AuthService', () => {
       blockedUser.status = 'blocked';
 
       userRepo.findByEmail.mockResolvedValue(blockedUser);
-      vi.mocked(bcrypt.compare).mockImplementation(() => Promise.resolve(true));
 
       await expect(
         service.signin({
@@ -175,7 +155,7 @@ describe('AuthService', () => {
       const u = new User();
       u.id = 'u1';
       u.email = 'alice@example.com';
-      u.status = 'active';
+      u.status = 'approved';
       u.createdAt = new Date('2026-01-01T00:00:00Z');
       u.updatedAt = new Date('2026-01-01T00:00:00Z');
 
@@ -187,7 +167,7 @@ describe('AuthService', () => {
       expect(result).toEqual({
         id: 'u1',
         email: 'alice@example.com',
-        status: 'active',
+        status: 'approved',
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
       });

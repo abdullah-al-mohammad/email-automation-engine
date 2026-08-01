@@ -16,6 +16,8 @@ import {
   TENANT_MEMBERSHIP_REPOSITORY,
   TENANT_INVITATION_REPOSITORY,
   ENCRYPTION_SERVICE,
+  PASSWORD_HASHER,
+  TOKEN_SERVICE,
 } from './constants/tokens';
 import { TypeOrmUserRepository } from './infrastructure/repositories/typeorm-user.repository';
 import { TypeOrmTenantRepository } from './infrastructure/repositories/typeorm-tenant.repository';
@@ -23,6 +25,8 @@ import { TypeOrmRoleRepository } from './infrastructure/repositories/typeorm-rol
 import { TypeOrmTenantMembershipRepository } from './infrastructure/repositories/typeorm-tenant-membership.repository';
 
 import { EncryptionService } from './infrastructure/security/encryption.service';
+import { PasswordHasher } from './infrastructure/security/password-hasher.service';
+import { TokenService } from './infrastructure/security/token.service';
 import { AuthService } from './application/services/auth.service';
 import { TenantService } from './application/services/tenant.service';
 import { RoleService } from './application/services/role.service';
@@ -87,6 +91,14 @@ import { TypeOrmTenantInvitationRepository } from './infrastructure/repositories
       provide: ENCRYPTION_SERVICE,
       useClass: EncryptionService,
     },
+    {
+      provide: PASSWORD_HASHER,
+      useClass: PasswordHasher,
+    },
+    {
+      provide: TOKEN_SERVICE,
+      useClass: TokenService,
+    },
   ],
   exports: [
     AuthService,
@@ -97,8 +109,7 @@ import { TypeOrmTenantInvitationRepository } from './infrastructure/repositories
     ROLE_REPOSITORY,
     TENANT_MEMBERSHIP_REPOSITORY,
     TENANT_INVITATION_REPOSITORY,
-    ENCRYPTION_SERVICE,
-    JwtModule,
+    TOKEN_SERVICE,
   ],
 })
 export class IamModule {}

@@ -4,19 +4,14 @@ import { AuthGuard } from './auth.guard';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
-  let jwtService: { verifyAsync: Mock };
-  let encryptionService: { decrypt: Mock };
+  let tokenService: { verify: Mock };
 
   beforeEach(() => {
-    jwtService = {
-      verifyAsync: vi.fn(),
-    };
-    encryptionService = {
-      decrypt: vi.fn(),
+    tokenService = {
+      verify: vi.fn(),
     };
     guard = new AuthGuard(
-      jwtService as unknown as (typeof guard)['jwtService'],
-      encryptionService as unknown as (typeof guard)['encryptionService'],
+      tokenService as unknown as (typeof guard)['tokenService'],
     );
   });
 
@@ -36,14 +31,12 @@ describe('AuthGuard', () => {
 
   it('should activate if header is valid and token is verified', async () => {
     const context = createMockContext('Bearer encrypted-token-xyz');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    jwtService.verifyAsync.mockResolvedValue({ sub: 'user-id-123', email: 'user@example.com' });
+    tokenService.verify.mockResolvedValue({ sub: 'user-id-123', email: 'user@example.com' });
 
     const result = await guard.canActivate(context);
 
     expect(result).toBe(true);
-    expect(encryptionService.decrypt).toHaveBeenCalledWith('encrypted-token-xyz');
-    expect(jwtService.verifyAsync).toHaveBeenCalledWith('decrypted-jwt');
+    expect(tokenService.verify).toHaveBeenCalledWith('encrypted-token-xyz');
     const request = context.switchToHttp().getRequest();
     expect(request.user).toEqual({ id: 'user-id-123', email: 'user@example.com' });
   });
@@ -62,21 +55,9 @@ describe('AuthGuard', () => {
     );
   });
 
-  it('should throw UnauthorizedException if decryption fails', async () => {
+  it('should throw UnauthorizedException if token verification fails', async () => {
     const context = createMockContext('Bearer badtoken');
-    encryptionService.decrypt.mockImplementation(() => {
-      throw new Error('Decryption error');
-    });
-
-    await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
-    );
-  });
-
-  it('should throw UnauthorizedException if verification fails', async () => {
-    const context = createMockContext('Bearer badtoken');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    jwtService.verifyAsync.mockRejectedValue(new Error('JWT expired'));
+    tokenService.verify.mockRejectedValue(new Error('JWT expired'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Invalid or expired authentication token'),
@@ -85,9 +66,7 @@ describe('AuthGuard', () => {
 
   it('should throw UnauthorizedException if payload structure is invalid', async () => {
     const context = createMockContext('Bearer token');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    // Payload missing 'email' property
-    jwtService.verifyAsync.mockResolvedValue({ sub: 'user-id-123' });
+    tokenService.verify.mockRejectedValue(new Error('Invalid token payload structure'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Invalid or expired authentication token'),
