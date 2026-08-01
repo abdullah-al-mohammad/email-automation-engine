@@ -3,7 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { JWT_ENCRYPTION_KEY, JWT_EXPIRES_IN, JWT_SECRET } from '../../infrastructure/config/config-keys';
+import {
+  JWT_ENCRYPTION_KEY,
+  JWT_EXPIRES_IN,
+  JWT_SECRET,
+} from '../../infrastructure/config/config-keys';
 
 import { Role } from './domain/aggregates/role.aggregate';
 import { RolePermission } from './domain/aggregates/role-permission.aggregate';

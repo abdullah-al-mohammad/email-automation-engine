@@ -6,8 +6,7 @@ import { BCRYPT_SALT_ROUNDS } from '../../../../infrastructure/config/config-key
 @Injectable()
 export class PasswordHasher {
   private readonly saltRounds: number;
-  private readonly dummyHash =
-    '$2b$10$ckuRMbA53QkLioHjmr8cKuLFSwFgrfQHNybywg.uzuAfWysfMmiRm';
+  private readonly dummyHash = '$2b$10$ckuRMbA53QkLioHjmr8cKuLFSwFgrfQHNybywg.uzuAfWysfMmiRm';
 
   constructor(private readonly config: ConfigService) {
     this.saltRounds = this.config.getOrThrow<number>(BCRYPT_SALT_ROUNDS);

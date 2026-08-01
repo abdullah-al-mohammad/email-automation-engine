@@ -32,7 +32,11 @@ export default function Signup() {
   };
 
   return (
-    <AuthLayout title="Create an account" subtitle="Start automating your emails today" error={error}>
+    <AuthLayout
+      title="Create an account"
+      subtitle="Start automating your emails today"
+      error={error}
+    >
       <CredentialsForm
         onSubmit={(e) => {
           void handleSubmit(onSubmit)(e);

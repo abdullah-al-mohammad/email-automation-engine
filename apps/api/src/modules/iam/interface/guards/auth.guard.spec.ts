@@ -10,9 +10,7 @@ describe('AuthGuard', () => {
     tokenService = {
       verify: vi.fn(),
     };
-    guard = new AuthGuard(
-      tokenService as unknown as (typeof guard)['tokenService'],
-    );
+    guard = new AuthGuard(tokenService as unknown as (typeof guard)['tokenService']);
   });
 
   const createMockContext = (authHeader?: string): ExecutionContext => {
