@@ -33,7 +33,7 @@ export class AuthService {
     const email = this.normalizeEmail(dto.email);
     const existingUser = await this.userRepo.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException('Unable to create account. Please try again or sign in.');
+      throw new ConflictException('Account already exists.');
     }
 
     const passwordHash = await this.passwordHasher.hash(dto.password);
