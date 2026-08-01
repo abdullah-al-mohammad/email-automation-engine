@@ -13,13 +13,13 @@ It receives events, matches workflow triggers, moves contacts through automation
 
 ## Features
 
-* **Drag-and-Drop Builder:** Build and organize your email journeys visually using a simple, interactive canvas.
-* **Event-Driven Triggers:** Start automatically when users take actions (like sign-up or checkout) in your connected websites or applications.
-* **Delays & Scheduling:** Add wait steps (hours, days, or weeks) before executing subsequent actions.
-* **Conditional Branching:** Split user paths dynamically based on rules and properties.
-* **Smart Email Delivery:** Send via AWS SES with built-in open, click, bounce, and spam tracking.
-* **Resilient Webhooks:** Connect external APIs securely with automatic retry logic on failures.
-* **Production-Ready Scale:** Built with queue-based workers to handle heavy background traffic.
+- **Drag-and-Drop Builder:** Build and organize your email journeys visually using a simple, interactive canvas.
+- **Event-Driven Triggers:** Start automatically when users take actions (like sign-up or checkout) in your connected websites or applications.
+- **Delays & Scheduling:** Add wait steps (hours, days, or weeks) before executing subsequent actions.
+- **Conditional Branching:** Split user paths dynamically based on rules and properties.
+- **Smart Email Delivery:** Send via AWS SES with built-in open, click, bounce, and spam tracking.
+- **Resilient Webhooks:** Connect external APIs securely with automatic retry logic on failures.
+- **Production-Ready Scale:** Built with queue-based workers to handle heavy background traffic.
 
 ## Getting Started
 
