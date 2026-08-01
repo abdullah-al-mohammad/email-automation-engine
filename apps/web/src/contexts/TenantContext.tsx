@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { type TenantResponse } from '@email-automation-engine/shared';
 import { useAuth } from './AuthContext';
 import api from '../lib/api';
+import { STORAGE_KEYS } from '../lib/auth-storage';
 
 interface TenantContextType {
   currentTenant: TenantResponse | null;
@@ -29,28 +30,16 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       const response = await api.get<TenantResponse[]>('/tenants');
       setTenants(response.data);
 
-      // Auto-select first tenant if none is selected
-      const savedTenantId = localStorage.getItem('current_tenant_id');
-      if (savedTenantId) {
-        const found = response.data.find((t) => t.id === savedTenantId);
-        if (found) {
-          setCurrentTenantState(found);
-        } else if (response.data.length > 0) {
-          const first = response.data[0];
-          if (first) {
-            setCurrentTenantState(first);
-            localStorage.setItem('current_tenant_id', first.id);
-          }
-        }
-      } else if (response.data.length > 0) {
-        const first = response.data[0];
-        if (first) {
-          setCurrentTenantState(first);
-          localStorage.setItem('current_tenant_id', first.id);
-        }
+      // Auto-select saved tenant, or first tenant if none is selected
+      const savedTenantId = localStorage.getItem(STORAGE_KEYS.currentTenantId);
+      const found = savedTenantId ? response.data.find((t) => t.id === savedTenantId) : undefined;
+      const selected = found ?? response.data[0] ?? null;
+      if (selected) {
+        setCurrentTenantState(selected);
+        localStorage.setItem(STORAGE_KEYS.currentTenantId, selected.id);
       }
-    } catch (error) {
-      console.error('Failed to load tenants', error);
+    } catch {
+      // leave tenants empty; the 401 interceptor handles auth failures
     } finally {
       setIsLoadingTenants(false);
     }
@@ -63,9 +52,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const setCurrentTenant = (tenant: TenantResponse | null) => {
     setCurrentTenantState(tenant);
     if (tenant) {
-      localStorage.setItem('current_tenant_id', tenant.id);
+      localStorage.setItem(STORAGE_KEYS.currentTenantId, tenant.id);
     } else {
-      localStorage.removeItem('current_tenant_id');
+      localStorage.removeItem(STORAGE_KEYS.currentTenantId);
     }
   };
 

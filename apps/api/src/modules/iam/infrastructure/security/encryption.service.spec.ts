@@ -1,23 +1,16 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest';
-import type { ConfigService } from '@nestjs/config';
+import { describe, expect, it, beforeEach } from 'vitest';
 import { EncryptionService } from './encryption.service';
-import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
 import * as crypto from 'crypto';
 
 describe('EncryptionService', () => {
-  const testKey = crypto.randomBytes(32).toString('hex');
   let service: EncryptionService;
 
   beforeEach(() => {
-    const configMock = {
-      getOrThrow: vi.fn().mockReturnValue(testKey),
-    } as unknown as ConfigService;
-
-    service = new EncryptionService(configMock);
+    service = new EncryptionService(crypto.randomBytes(32));
   });
 
   describe('encrypt', () => {
-    it('should return a string in iv:authTag:ciphertext format', () => {
+    it('returns the encrypted value in three parts', () => {
       const result = service.encrypt('hello world');
       const parts = result.split(':');
 
@@ -29,14 +22,14 @@ describe('EncryptionService', () => {
       expect(ciphertext.length).toBeGreaterThan(0);
     });
 
-    it('should produce different ciphertexts for the same input due to random IV', () => {
+    it('produces a different result each time for the same input', () => {
       const first = service.encrypt('same input');
       const second = service.encrypt('same input');
 
       expect(first).not.toEqual(second);
     });
 
-    it('should handle empty string input', () => {
+    it('round-trips an empty string', () => {
       const encrypted = service.encrypt('');
       const parts = encrypted.split(':');
 
@@ -44,7 +37,7 @@ describe('EncryptionService', () => {
       expect(service.decrypt(encrypted)).toBe('');
     });
 
-    it('should handle long input', () => {
+    it('round-trips long input', () => {
       const longInput = 'a'.repeat(10_000);
       const encrypted = service.encrypt(longInput);
 
@@ -53,7 +46,7 @@ describe('EncryptionService', () => {
   });
 
   describe('decrypt', () => {
-    it('should recover the original plaintext after encryption', () => {
+    it('recovers the original plaintext after encryption', () => {
       const plaintext = 'jwt-token-payload-here';
       const encrypted = service.encrypt(plaintext);
       const decrypted = service.decrypt(encrypted);
@@ -61,7 +54,7 @@ describe('EncryptionService', () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it('should handle unicode content correctly', () => {
+    it('round-trips unicode content', () => {
       const plaintext = 'user@example.com — 日本語テスト';
       const encrypted = service.encrypt(plaintext);
 
@@ -70,7 +63,7 @@ describe('EncryptionService', () => {
   });
 
   describe('tamper detection', () => {
-    it('should reject a tampered IV', () => {
+    it('rejects a tampered IV', () => {
       const encrypted = service.encrypt('secret');
       const [iv, authTag, ciphertext] = encrypted.split(':');
 
@@ -80,7 +73,7 @@ describe('EncryptionService', () => {
       expect(() => service.decrypt(tampered)).toThrow();
     });
 
-    it('should reject a tampered auth tag', () => {
+    it('rejects a tampered auth tag', () => {
       const encrypted = service.encrypt('secret');
       const [iv, authTag, ciphertext] = encrypted.split(':');
 
@@ -90,7 +83,7 @@ describe('EncryptionService', () => {
       expect(() => service.decrypt(tampered)).toThrow();
     });
 
-    it('should reject tampered ciphertext', () => {
+    it('rejects tampered ciphertext', () => {
       const encrypted = service.encrypt('secret');
       const [iv, authTag, ciphertext] = encrypted.split(':');
 
@@ -100,17 +93,13 @@ describe('EncryptionService', () => {
       expect(() => service.decrypt(tampered)).toThrow();
     });
 
-    it('should reject malformed input with missing segments', () => {
+    it('rejects malformed input', () => {
       expect(() => service.decrypt('onlyone')).toThrow();
       expect(() => service.decrypt('two:parts')).toThrow();
     });
 
-    it('should reject ciphertext encrypted with a different key', () => {
-      const otherKey = crypto.randomBytes(32).toString('hex');
-      const otherConfigMock = {
-        getOrThrow: vi.fn().mockReturnValue(otherKey),
-      } as unknown as ConfigService;
-      const otherService = new EncryptionService(otherConfigMock);
+    it('rejects data encrypted with a different key', () => {
+      const otherService = new EncryptionService(crypto.randomBytes(32));
 
       const encrypted = otherService.encrypt('secret');
 
@@ -118,15 +107,9 @@ describe('EncryptionService', () => {
     });
   });
 
-  describe('key loading', () => {
-    it('should read the encryption key from ConfigService on construction', () => {
-      const getOrThrow = vi.fn().mockReturnValue(testKey);
-      const configMock = { getOrThrow } as unknown as ConfigService;
-
-      const svc = new EncryptionService(configMock);
-
-      expect(svc).toBeDefined();
-      expect(getOrThrow).toHaveBeenCalledWith(JWT_ENCRYPTION_KEY);
+  describe('key validation', () => {
+    it('fails fast when the key is not exactly 32 bytes', () => {
+      expect(() => new EncryptionService(crypto.randomBytes(16))).toThrow(/expected 32 bytes/);
     });
   });
 });

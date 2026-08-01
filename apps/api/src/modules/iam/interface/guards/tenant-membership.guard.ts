@@ -10,7 +10,7 @@ import {
 import { TENANT_REPOSITORY, TENANT_MEMBERSHIP_REPOSITORY } from '../../constants/tokens';
 import { type TenantRepository } from '../../domain/repositories/tenant.repository';
 import { type TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
-import { type AuthenticatedRequest } from '../types/authenticated-request';
+import { type AuthenticatedRequest } from '../types';
 
 @Injectable()
 export class TenantMembershipGuard implements CanActivate {

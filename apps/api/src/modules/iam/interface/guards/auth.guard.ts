@@ -4,53 +4,51 @@ import {
   Injectable,
   UnauthorizedException,
   Inject,
+  Logger,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ENCRYPTION_SERVICE } from '../../constants/tokens';
-import { EncryptionService } from '../../infrastructure/security/encryption.service';
-import { type AuthenticatedRequest } from '../types/authenticated-request';
+import { TOKEN_SERVICE } from '../../constants/tokens';
+import { TokenService } from '../../infrastructure/security/token.service';
+import { type AuthenticatedRequest } from '../types';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
   constructor(
-    private readonly jwtService: JwtService,
-    @Inject(ENCRYPTION_SERVICE)
-    private readonly encryptionService: EncryptionService,
+    @Inject(TOKEN_SERVICE)
+    private readonly tokenService: TokenService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const token = this.extractTokenFromHeader(request);
+    const token = this.parseBearerHeader(request);
     if (!token) {
-      throw new UnauthorizedException('Authentication token is missing');
+      throw new UnauthorizedException('Authentication token is missing or invalid');
     }
 
-    try {
-      const decrypted = this.encryptionService.decrypt(token);
-      const payload = (await this.jwtService.verifyAsync(decrypted)) as Record<
-        string,
-        unknown
-      > | null;
-
-      if (!payload || typeof payload.sub !== 'string' || typeof payload.email !== 'string') {
-        throw new Error('Invalid token payload structure');
-      }
-
-      request.user = {
-        id: payload.sub,
-        email: payload.email,
-      };
-    } catch {
-      throw new UnauthorizedException('Invalid or expired authentication token');
-    }
-
+    request.user = await this.authenticate(token);
     return true;
   }
 
-  private extractTokenFromHeader(request: AuthenticatedRequest): string | undefined {
+  private async authenticate(token: string): Promise<{ id: string; email: string }> {
+    try {
+      const payload = await this.tokenService.verify(token);
+      return { id: payload.sub, email: payload.email };
+    } catch (error) {
+      this.logger.warn(
+        `Token verification failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw new UnauthorizedException('Invalid or expired authentication token', {
+        cause: error,
+      });
+    }
+  }
+
+  private parseBearerHeader(request: Pick<AuthenticatedRequest, 'headers'>): string | undefined {
     const authHeader = request.headers.authorization;
     if (!authHeader || Array.isArray(authHeader)) return undefined;
-    const [type, token] = authHeader.split(' ');
-    return type === 'Bearer' ? token : undefined;
+    const [type, token, ...extra] = authHeader.split(' ');
+    if (type !== 'Bearer' || !token || extra.length) return undefined;
+    return token;
   }
 }

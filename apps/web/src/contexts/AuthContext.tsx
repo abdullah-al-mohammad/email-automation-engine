@@ -6,6 +6,7 @@ import {
   type AuthResponse,
 } from '@email-automation-engine/shared';
 import api from '../lib/api';
+import { AUTH_UNAUTHORIZED_EVENT, STORAGE_KEYS, clearStoredAuth } from '../lib/auth-storage';
 
 interface AuthContextType {
   user: UserResponse | null;
@@ -23,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadUser = async () => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem(STORAGE_KEYS.authToken);
     if (!token) {
       setIsLoading(false);
       return;
@@ -33,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.get<UserResponse>('/auth/me');
       setUser(response.data);
     } catch {
-      localStorage.removeItem('auth_token');
+      clearStoredAuth();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -47,26 +48,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     };
 
-    window.addEventListener('auth_unauthorized', handleUnauthorized);
+    window.addEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
     return () => {
-      window.removeEventListener('auth_unauthorized', handleUnauthorized);
+      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
     };
   }, []);
 
-  const login = async (data: SigninDto) => {
-    const response = await api.post<AuthResponse>('/auth/signin', data);
-    localStorage.setItem('auth_token', response.data.accessToken);
+  const authenticate = async (
+    data: SigninDto | SignupDto,
+    path: '/auth/signin' | '/auth/signup',
+  ) => {
+    const response = await api.post<AuthResponse>(path, data);
+    localStorage.setItem(STORAGE_KEYS.authToken, response.data.accessToken);
     await loadUser();
   };
 
-  const register = async (data: SignupDto) => {
-    const response = await api.post<AuthResponse>('/auth/signup', data);
-    localStorage.setItem('auth_token', response.data.accessToken);
-    await loadUser();
-  };
+  const login = (data: SigninDto) => authenticate(data, '/auth/signin');
+
+  const register = (data: SignupDto) => authenticate(data, '/auth/signup');
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
+    clearStoredAuth();
     setUser(null);
   };
 

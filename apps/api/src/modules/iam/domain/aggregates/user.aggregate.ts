@@ -7,7 +7,7 @@ import {
   BeforeInsert,
   PrimaryColumn,
 } from 'typeorm';
-import { type UserStatus, USER_NEW } from '@email-automation-engine/shared';
+import { type UserStatus, USER_STATUS } from '@email-automation-engine/shared';
 
 @Entity('users')
 export class User {
@@ -26,7 +26,7 @@ export class User {
   @Column({ type: 'varchar', length: 60 })
   passwordHash!: string;
 
-  @Column({ type: 'varchar', length: 20, default: USER_NEW })
+  @Column({ type: 'varchar', length: 20, default: USER_STATUS.NEW })
   status!: UserStatus;
 
   @CreateDateColumn()
