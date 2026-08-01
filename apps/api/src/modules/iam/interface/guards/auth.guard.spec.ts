@@ -29,7 +29,7 @@ describe('AuthGuard', () => {
     } as unknown as ExecutionContext;
   };
 
-  it('should activate if header is valid and token is verified', async () => {
+  it('allows a valid Bearer token that verifies', async () => {
     const context = createMockContext('Bearer encrypted-token-xyz');
     tokenService.verify.mockResolvedValue({ sub: 'user-id-123', email: 'user@example.com' });
 
@@ -41,28 +41,28 @@ describe('AuthGuard', () => {
     expect(request.user).toEqual({ id: 'user-id-123', email: 'user@example.com' });
   });
 
-  it('should throw UnauthorizedException if authorization header is missing', async () => {
+  it('rejects the request without an Authorization header', async () => {
     const context = createMockContext(undefined);
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Authentication token is missing or invalid'),
     );
   });
 
-  it('should throw UnauthorizedException if header scheme is not Bearer', async () => {
+  it('rejects a token without the Bearer scheme', async () => {
     const context = createMockContext('Basic token123');
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Authentication token is missing or invalid'),
     );
   });
 
-  it('should throw UnauthorizedException if header has extra segments', async () => {
+  it('rejects a token with extra parts', async () => {
     const context = createMockContext('Bearer token extra');
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Authentication token is missing or invalid'),
     );
   });
 
-  it('should throw UnauthorizedException if token verification fails', async () => {
+  it('rejects a token that fails verification', async () => {
     const context = createMockContext('Bearer badtoken');
     tokenService.verify.mockRejectedValue(new Error('JWT expired'));
 
@@ -73,7 +73,7 @@ describe('AuthGuard', () => {
     );
   });
 
-  it('should throw UnauthorizedException if payload structure is invalid', async () => {
+  it('rejects a token with an invalid payload', async () => {
     const context = createMockContext('Bearer token');
     tokenService.verify.mockRejectedValue(new Error('Invalid token payload structure'));
 

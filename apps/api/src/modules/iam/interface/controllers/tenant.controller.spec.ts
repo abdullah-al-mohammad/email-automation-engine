@@ -16,12 +16,12 @@ describe('TenantController', () => {
     );
   });
 
-  it('should be defined', () => {
+  it('is instantiable', () => {
     expect(controller).toBeDefined();
   });
 
   describe('create', () => {
-    it('should call tenantService.create and return the result', async () => {
+    it('forwards create to the tenant service', async () => {
       const user = { id: 'user-uuid' };
       const dto = { name: 'New Tenant' };
       const response = {
@@ -41,7 +41,7 @@ describe('TenantController', () => {
   });
 
   describe('findByUser', () => {
-    it('should call tenantService.findByUser and return the result', async () => {
+    it('forwards findByUser to the tenant service', async () => {
       const user = { id: 'user-uuid' };
       const response = [
         {
@@ -62,7 +62,7 @@ describe('TenantController', () => {
   });
 
   describe('findById', () => {
-    it('should call tenantService.findById and return the result', async () => {
+    it('forwards findById to the tenant service', async () => {
       const user = { id: 'user-uuid' };
       const tenantId = 'tenant-uuid';
       const response = {

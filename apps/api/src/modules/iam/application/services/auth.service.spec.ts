@@ -41,7 +41,7 @@ describe('AuthService', () => {
   });
 
   describe('signup', () => {
-    it('should hash password and save new user', async () => {
+    it('creates a user and returns an access token', async () => {
       userRepo.findByEmail.mockResolvedValue(null);
       userRepo.save.mockImplementation((u: User) => Promise.resolve({ ...u, id: 'new-id' }));
 
@@ -57,7 +57,7 @@ describe('AuthService', () => {
       expect(result).toEqual({ accessToken: 'opaque-token' });
     });
 
-    it('should throw ConflictException if email exists', async () => {
+    it('rejects signup when the email is already registered', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
 
       await expect(
@@ -68,7 +68,7 @@ describe('AuthService', () => {
       ).rejects.toThrow(ConflictException);
     });
 
-    it('should normalize email before checking uniqueness during signup', async () => {
+    it('accepts emails with spaces and different casing during signup', async () => {
       userRepo.findByEmail.mockResolvedValue(null);
       userRepo.save.mockImplementation((u: User) => Promise.resolve({ ...u, id: 'new-id' }));
 
@@ -82,7 +82,7 @@ describe('AuthService', () => {
   });
 
   describe('signin', () => {
-    it('should return token if credentials are valid', async () => {
+    it('returns an access token when the credentials are valid', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
 
       const result = await service.signin({
@@ -95,7 +95,7 @@ describe('AuthService', () => {
       expect(result).toEqual({ accessToken: 'opaque-token' });
     });
 
-    it('should normalize email during signin', async () => {
+    it('accepts emails with spaces and different casing during signin', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
 
       await service.signin({
@@ -106,7 +106,7 @@ describe('AuthService', () => {
       expect(userRepo.findByEmail).toHaveBeenCalledWith('john@example.com');
     });
 
-    it('should throw UnauthorizedException if user not found', async () => {
+    it('rejects signin when the user is not found', async () => {
       userRepo.findByEmail.mockResolvedValue(null);
 
       await expect(
@@ -120,7 +120,7 @@ describe('AuthService', () => {
       expect(passwordHasher.compare).not.toHaveBeenCalled();
     });
 
-    it('should throw UnauthorizedException if password incorrect', async () => {
+    it('rejects signin when the password is incorrect', async () => {
       userRepo.findByEmail.mockResolvedValue(existingUser);
       passwordHasher.compare.mockResolvedValue(false);
 
@@ -132,7 +132,7 @@ describe('AuthService', () => {
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw ForbiddenException if user status is blocked', async () => {
+    it('rejects signin when the account is blocked', async () => {
       const blockedUser = new User();
       blockedUser.id = 'user-uuid';
       blockedUser.email = 'john@example.com';
@@ -151,7 +151,7 @@ describe('AuthService', () => {
   });
 
   describe('getMe', () => {
-    it('should return user info if user is found', async () => {
+    it('returns the user profile', async () => {
       const u = new User();
       u.id = 'u1';
       u.email = 'alice@example.com';
@@ -173,7 +173,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw UnauthorizedException if user not found', async () => {
+    it('rejects getMe when the user is not found', async () => {
       userRepo.findById.mockResolvedValue(null);
 
       await expect(service.getMe('bad-uuid')).rejects.toThrow(UnauthorizedException);

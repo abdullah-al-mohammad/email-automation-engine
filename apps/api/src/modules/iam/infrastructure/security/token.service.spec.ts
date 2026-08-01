@@ -27,7 +27,7 @@ describe('TokenService', () => {
   });
 
   describe('issue', () => {
-    it('signs the user id and email into a token and encrypts it before returning it', async () => {
+    it('returns an encrypted token for the user', async () => {
       const result = await service.issue('user-id', 'user@example.com');
 
       expect(jwt.signAsync).toHaveBeenCalledWith({
@@ -40,7 +40,7 @@ describe('TokenService', () => {
   });
 
   describe('verify', () => {
-    it('accepts a valid token and returns the user id and email', async () => {
+    it('returns the user details for a valid token', async () => {
       jwt.verifyAsync.mockResolvedValue({ sub: 'user-id', email: 'user@example.com' });
 
       const result = await service.verify('encrypted-token');
@@ -50,7 +50,7 @@ describe('TokenService', () => {
       expect(result).toEqual({ sub: 'user-id', email: 'user@example.com' });
     });
 
-    it('rejects a token that does not carry a user id', async () => {
+    it('rejects a token without a user id', async () => {
       jwt.verifyAsync.mockResolvedValue({ email: 'user@example.com' });
 
       await expect(service.verify('encrypted-token')).rejects.toThrow(
@@ -58,7 +58,7 @@ describe('TokenService', () => {
       );
     });
 
-    it('rejects a token that does not carry an email', async () => {
+    it('rejects a token without an email', async () => {
       jwt.verifyAsync.mockResolvedValue({ sub: 'user-id' });
 
       await expect(service.verify('encrypted-token')).rejects.toThrow(
@@ -66,7 +66,7 @@ describe('TokenService', () => {
       );
     });
 
-    it('rejects a token that fails signature verification, such as an expired one', async () => {
+    it('rejects an invalid or expired token', async () => {
       jwt.verifyAsync.mockRejectedValue(new Error('JWT expired'));
 
       await expect(service.verify('encrypted-token')).rejects.toThrow('JWT expired');
@@ -82,7 +82,7 @@ describe('TokenService', () => {
   });
 
   describe('roundtrip with real JwtService and EncryptionService', () => {
-    it('accepts a token produced by issue() using the real JWT + encryption stack', async () => {
+    it('round-trips a token with the real services', async () => {
       const configMock = {
         getOrThrow: vi.fn().mockReturnValue(crypto.randomBytes(32).toString('hex')),
       } as unknown as ConfigService;
