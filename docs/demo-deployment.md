@@ -16,10 +16,10 @@ graph TD
     ECS -->|Ingest Events / Jobs| SQS[AWS SQS Queues]
     SQS -->|Triggers| Lambda[AWS Lambda - Workers]
     Lambda -->|Send Emails| SES[AWS SES]
-    
+
     ECS -->|Read/Write| RDS[(AWS RDS PostgreSQL)]
     Lambda -->|Read/Write| RDS
-    
+
     ECS -->|Cache/Idempotency| ElastiCache[(AWS ElastiCache Redis)]
     Lambda -->|Cache/Idempotency| ElastiCache
 ```
@@ -34,30 +34,35 @@ graph TD
 ## 1. Prerequisites & Setup
 
 Ensure you have the following installed and configured:
-* An **AWS Account** with administrator permissions.
-* **AWS CLI** configured with appropriate credentials.
-* **Terraform CLI** (v1.5+).
-* **Docker** installed locally (for containerizing the API backend).
-* **Node.js 24** and **pnpm** installed.
+
+- An **AWS Account** with administrator permissions.
+- **AWS CLI** configured with appropriate credentials.
+- **Terraform CLI** (v1.5+).
+- **Docker** installed locally (for containerizing the API backend).
+- **Node.js 24** and **pnpm** installed.
 
 ---
 
 ## 2. Infrastructure Provisioning (Terraform)
 
-The core queue and worker resources are defined under `infra/terraform`. 
+The core queue and worker resources are defined under `infra/terraform`.
 
 ### Step A: Configure Environment Variables
+
 Navigate to the Terraform example environment:
+
 ```bash
 cd infra/terraform/environments/example
 ```
 
 Copy the example variables file:
+
 ```bash
 cp terraform.example.tfvars terraform.tfvars
 ```
 
 Edit `terraform.tfvars` and provide your production connections:
+
 ```hcl
 aws_region      = "us-east-1"
 project_prefix  = "eae-prod"
@@ -67,7 +72,9 @@ ses_from_email  = "noreply@yourdomain.com"
 ```
 
 ### Step B: Build Worker Packages
+
 Before deploying the Lambdas, you must build the TypeScript worker packages so Terraform can archive and upload the build directory:
+
 ```bash
 # From root directory
 pnpm install
@@ -75,16 +82,20 @@ pnpm build
 ```
 
 ### Step C: Deploy
+
 Initialize and apply the Terraform configuration:
+
 ```bash
 terraform init
 terraform apply
 ```
-*Take note of the output variables, specifically the **SQS Queue URLs** and **Lambda IAM Roles**.*
+
+_Take note of the output variables, specifically the **SQS Queue URLs** and **Lambda IAM Roles**._
 
 ---
 
 ## 3. Database Migration
+
 To run migrations against your production AWS RDS instance, run the following command from the root directory (ensure your network/security groups allow database access from your local machine, or run this step from a bastion host / CI pipeline):
 
 ```bash
@@ -98,6 +109,7 @@ DATABASE_URL="postgresql://db_user:db_password@your-rds-endpoint:5432/db_name" p
 Since the NestJS API is a persistent process handling incoming REST traffic, we recommend containerizing it.
 
 ### Step A: Dockerize the NestJS API
+
 Create a production `Dockerfile` in `apps/api/Dockerfile`:
 
 ```dockerfile
@@ -119,7 +131,9 @@ CMD ["node", "dist/main.js"]
 ```
 
 ### Step B: Build and Push to AWS ECR
+
 Create an AWS ECR repository and push the image:
+
 ```bash
 aws ecr create-repository --repository-name email-automation-engine-api
 
@@ -135,6 +149,7 @@ docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/email-automation-en
 ```
 
 ### Step C: Launch ECS Task
+
 Deploy a Fargate Service with the ECR image, passing the required environment variables (`DATABASE_URL`, `REDIS_URL`, and the SQS Queue URLs obtained from the Terraform outputs).
 
 ---
@@ -144,15 +159,20 @@ Deploy a Fargate Service with the ECR image, passing the required environment va
 The frontend React dashboard is built as a static site and can be served through a CDN.
 
 ### Step A: Build Static Files
+
 From the project root, build the web application:
+
 ```bash
 # Configure the API URL that the frontend should target
 VITE_API_BASE_URL="https://api.yourdomain.com" pnpm --filter @email-automation-engine/web build
 ```
+
 This generates the static assets in `apps/web/dist`.
 
 ### Step B: Deploy to S3 & Invalidate CloudFront
+
 Create an S3 bucket configured for static website hosting, then upload the build folder:
+
 ```bash
 # Sync files to S3
 aws s3 sync apps/web/dist/ s3://your-frontend-bucket-name/ --delete
@@ -166,8 +186,10 @@ aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --path
 ## 6. Teardown & Maintenance
 
 To completely destroy the AWS resource stack managed by Terraform:
+
 ```bash
 cd infra/terraform/environments/example
 terraform destroy
 ```
-*Note: This will not delete resources created outside of Terraform, such as ECS clusters, RDS instances, S3 frontend buckets, or ECR images.*
+
+_Note: This will not delete resources created outside of Terraform, such as ECS clusters, RDS instances, S3 frontend buckets, or ECR images._

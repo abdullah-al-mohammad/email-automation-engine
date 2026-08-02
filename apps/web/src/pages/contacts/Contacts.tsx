@@ -85,7 +85,7 @@ export default function Contacts() {
   const total = contactsData?.total ?? 0;
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h1>
@@ -175,7 +175,7 @@ export default function Contacts() {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden">
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
             <tr>

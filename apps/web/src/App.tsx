@@ -1,16 +1,8 @@
 import React from 'react';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Link,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
+import Sidebar from './components/layout/Sidebar';
 import Signin from './pages/auth/Signin';
 import Signup from './pages/auth/Signup';
 import Tenants from './pages/tenant/Tenants';
@@ -63,77 +55,10 @@ function TenantRoute({ children }: { children: React.ReactNode }) {
 }
 
 function MainLayout() {
-  const { logout } = useAuth();
-  const { currentTenant, tenants, setCurrentTenant } = useTenant();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const getNavClass = (path: string) => {
-    const isActive = location.pathname.startsWith(path);
-    return `font-medium text-sm transition-colors ${
-      isActive
-        ? 'text-indigo-600 dark:text-indigo-400'
-        : 'text-gray-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-    }`;
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b h-14 flex items-center px-4 justify-between bg-card">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/"
-            className="hover:opacity-80 transition-opacity flex items-center gap-2 text-indigo-600 dark:text-indigo-400"
-          >
-            <Mail className="w-5 h-5" />
-            <h1 className="font-bold text-lg text-gray-900 dark:text-white">Engine</h1>
-          </Link>
-          {currentTenant && (
-            <select
-              className="border rounded p-1 text-sm bg-transparent"
-              value={currentTenant.id}
-              onChange={(e) => {
-                if (e.target.value === 'MANAGE_WORKSPACES') {
-                  void navigate('/');
-                } else {
-                  const t = tenants.find((t) => t.id === e.target.value);
-                  if (t) setCurrentTenant(t);
-                }
-              }}
-            >
-              {tenants.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-              <option value="MANAGE_WORKSPACES">Manage workspaces</option>
-            </select>
-          )}
-        </div>
-        <div className="flex items-center gap-6">
-          <nav className="flex items-center gap-4">
-            <Link to="/workflows" className={getNavClass('/workflows')}>
-              Workflows
-            </Link>
-            <Link to="/contacts" className={getNavClass('/contacts')}>
-              Contacts
-            </Link>
-            <Link to="/email-templates" className={getNavClass('/email-templates')}>
-              Templates
-            </Link>
-            <Link to="/settings" className={getNavClass('/settings')}>
-              Settings
-            </Link>
-          </nav>
-          <button
-            onClick={logout}
-            className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
-      <main className="flex-1 flex p-6">
+    <div className="min-h-screen pl-[220px] bg-background">
+      <Sidebar />
+      <main className="overflow-auto p-6">
         <div className="max-w-5xl w-full mx-auto">
           <Routes>
             {appRoutes.map((route) => (

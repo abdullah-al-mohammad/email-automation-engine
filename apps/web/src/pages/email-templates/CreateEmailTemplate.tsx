@@ -46,7 +46,7 @@ export default function CreateEmailTemplate() {
   };
 
   return (
-    <div className="py-12 max-w-2xl mx-auto">
+    <div className="pb-12 max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create email template</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">

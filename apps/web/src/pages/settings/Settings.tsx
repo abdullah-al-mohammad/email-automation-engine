@@ -108,7 +108,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
           {isEditingName ? (
