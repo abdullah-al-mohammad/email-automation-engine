@@ -33,7 +33,7 @@ export default function Workflows() {
   });
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="space-y-6">
       <WorkflowsHeader />
 
       {isLoading ? (

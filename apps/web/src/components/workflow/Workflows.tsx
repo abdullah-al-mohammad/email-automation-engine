@@ -140,7 +140,7 @@ export default function Workflows({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden">
       <ul className="divide-y divide-gray-100 dark:divide-zinc-800/50">
         {workflows.map((workflow) => (
           <WorkflowListItem key={workflow.id} workflow={workflow} onDelete={onDelete} />

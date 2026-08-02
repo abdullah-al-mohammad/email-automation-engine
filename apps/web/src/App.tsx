@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
 import Sidebar from './components/layout/Sidebar';
@@ -56,62 +55,18 @@ function TenantRoute({ children }: { children: React.ReactNode }) {
 }
 
 function MainLayout() {
-  const { logout } = useAuth();
-  const { currentTenant, tenants, setCurrentTenant } = useTenant();
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b h-14 flex items-center px-4 justify-between bg-card">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/"
-            className="hover:opacity-80 transition-opacity flex items-center gap-2 text-indigo-600 dark:text-indigo-400"
-          >
-            <Mail className="w-5 h-5" />
-            <h1 className="font-bold text-lg text-gray-900 dark:text-white">Engine</h1>
-          </Link>
-          {currentTenant && (
-            <select
-              className="border rounded p-1 text-sm bg-transparent"
-              value={currentTenant.id}
-              onChange={(e) => {
-                if (e.target.value === 'MANAGE_WORKSPACES') {
-                  void navigate('/');
-                } else {
-                  const t = tenants.find((t) => t.id === e.target.value);
-                  if (t) setCurrentTenant(t);
-                }
-              }}
-            >
-              {tenants.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-              <option value="MANAGE_WORKSPACES">Manage workspaces</option>
-            </select>
-          )}
+    <div className="min-h-screen pl-[220px] bg-background">
+      <Sidebar />
+      <main className="overflow-auto p-6">
+        <div className="max-w-5xl w-full mx-auto">
+          <Routes>
+            {appRoutes.map((route) => (
+              <Route key={route.path} path={route.path} element={route.element} />
+            ))}
+          </Routes>
         </div>
-        <button
-          onClick={logout}
-          className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-        >
-          Sign out
-        </button>
-      </header>
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-5xl w-full mx-auto">
-            <Routes>
-              {appRoutes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
-            </Routes>
-          </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
