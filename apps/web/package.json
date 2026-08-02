@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@email-automation-engine/shared": "workspace:*",
+    "@headlessui/react": "^2.2.10",
     "@hookform/resolvers": "^5.4.0",
     "@radix-ui/react-avatar": "^1.1.12",
     "@radix-ui/react-checkbox": "^1.3.4",
@@ -34,6 +35,7 @@
     "dagre": "^0.8.5",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.17.0",
+    "pluralize": "^8.0.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.77.0",
@@ -50,6 +52,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/dagre": "^0.7.54",
     "@types/node": "^24.12.4",
+    "@types/pluralize": "^0.0.33",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
