@@ -1,39 +1,54 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Combobox } from '@headlessui/react';
 import { type PaginatedContactResponse, type TagResponse } from '@email-automation-engine/shared';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
+import { useLocalStorageState } from '../../lib/use-local-storage-state';
 import Pagination from '../../components/shared/Pagination';
 import EmptyState from '../../components/shared/EmptyState';
-import TagManager from '../../components/contacts/TagManager';
-import { Search, X, Users, UserPlus } from 'lucide-react';
+import { Search, X, Users, UserPlus, Check, ChevronsUpDown } from 'lucide-react';
+
+const PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 
 export default function Contacts() {
   const { currentTenant } = useTenant();
   const navigate = useNavigate();
 
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-  const [subscribedFilter, setSubscribedFilter] = useState<boolean | undefined>(undefined);
-  const [showTagManager, setShowTagManager] = useState(false);
+  const key = (name: string) => `view:contacts:${currentTenant?.id}:${name}`;
 
-  const limit = 20;
+  const [page, setPage] = useLocalStorageState(key('page'), 1);
+  const [perPage, setPerPage] = useLocalStorageState(key('perPage'), 25);
+  const [query, setQuery] = useState('');
+  const [search, setSearch] = useLocalStorageState(key('search'), '');
+  const [searchInput, setSearchInput] = useLocalStorageState(key('searchInput'), '');
+  const [selectedTagIds, setSelectedTagIds] = useLocalStorageState<string[]>(key('tagIds'), []);
+  const [subscribedFilter, setSubscribedFilter] = useLocalStorageState<boolean | undefined>(
+    key('subscribed'),
+    undefined,
+  );
 
   const buildQueryParams = useCallback(() => {
     const params = new URLSearchParams();
     params.set('page', String(page));
-    params.set('limit', String(limit));
+    params.set('limit', String(perPage));
     if (search) params.set('search', search);
     if (selectedTagIds.length > 0) params.set('tagId', selectedTagIds.join(','));
     if (subscribedFilter !== undefined) params.set('subscribed', String(subscribedFilter));
     return params.toString();
-  }, [page, search, selectedTagIds, subscribedFilter]);
+  }, [page, perPage, search, selectedTagIds, subscribedFilter]);
 
   const { data: contactsData, isLoading } = useQuery({
-    queryKey: ['contacts', currentTenant?.id, page, search, selectedTagIds, subscribedFilter],
+    queryKey: [
+      'contacts',
+      currentTenant?.id,
+      page,
+      perPage,
+      search,
+      selectedTagIds,
+      subscribedFilter,
+    ],
     queryFn: async () => {
       const params = buildQueryParams();
       const res = await api.get<PaginatedContactResponse>(
@@ -80,32 +95,36 @@ export default function Contacts() {
     setPage(1);
   };
 
+  const handlePerPageSelect = (n: number | null) => {
+    if (n === null) return;
+    setPerPage(n);
+    setPage(1);
+    setQuery('');
+  };
+
   const contacts = contactsData?.data ?? [];
   const totalPages = contactsData?.totalPages ?? 0;
   const total = contactsData?.total ?? 0;
 
+  const normalizedQuery = query.trim();
+  const queryNumber = /^\d+$/.test(normalizedQuery) ? parseInt(normalizedQuery, 10) : null;
+  const filteredPresets = PER_PAGE_OPTIONS.filter((n) => String(n).includes(normalizedQuery));
+  const perPageOptions = [
+    ...(queryNumber !== null && !filteredPresets.includes(queryNumber) ? [queryNumber] : []),
+    ...filteredPresets,
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h1>
-          <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-            {total} contact{total !== 1 ? 's' : ''} total
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
           <button
             onClick={() => void navigate('/contacts/new')}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-3.5 h-3.5" />
             Add new
-          </button>
-          <button
-            onClick={() => setShowTagManager(true)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
-          >
-            Manage tags
           </button>
         </div>
       </div>
@@ -268,17 +287,69 @@ export default function Contacts() {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Page {page} of {totalPages}
-          </p>
-          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-zinc-400">
+          View
+          <div className="relative w-20">
+            <Combobox value={perPage} onChange={handlePerPageSelect} immediate>
+              <div className="relative">
+                <Combobox.Input
+                  onChange={(e) => setQuery(e.target.value)}
+                  onBlur={() => {
+                    if (/^\d+$/.test(normalizedQuery) && parseInt(normalizedQuery, 10) > 0) {
+                      handlePerPageSelect(parseInt(normalizedQuery, 10));
+                    } else {
+                      setQuery('');
+                    }
+                  }}
+                  displayValue={(n: number) => String(n)}
+                  className="w-full pr-7 px-2 py-1 text-sm border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
+                  <ChevronsUpDown className="w-4 h-4" />
+                </Combobox.Button>
+              </div>
+              <Combobox.Options
+                anchor={{ to: 'bottom start', gap: 4, padding: 8 }}
+                className="z-50 w-[var(--input-width)] overflow-auto rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg"
+              >
+                {perPageOptions.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-zinc-400">
+                    No matching options
+                  </div>
+                ) : (
+                  perPageOptions.map((n) => (
+                    <Combobox.Option
+                      key={n}
+                      value={n}
+                      className={({ active }) =>
+                        `flex items-center justify-between px-3 py-1.5 text-sm cursor-pointer ${
+                          active
+                            ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-900/30 dark:text-indigo-100'
+                            : 'text-gray-900 dark:text-zinc-200'
+                        }`
+                      }
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span>
+                            {queryNumber !== null && !PER_PAGE_OPTIONS.includes(n) ? `Use ${n}` : n}
+                          </span>
+                          {selected && (
+                            <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                          )}
+                        </>
+                      )}
+                    </Combobox.Option>
+                  ))
+                )}
+              </Combobox.Options>
+            </Combobox>
+          </div>
+          contacts
         </div>
-      )}
-
-      {/* Tag manager modal */}
-      {showTagManager && <TagManager isOpen={true} onClose={() => setShowTagManager(false)} />}
+        <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
+      </div>
     </div>
   );
 }

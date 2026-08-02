@@ -5,6 +5,7 @@ import { type ContactResponse, type ImportContactsResult } from '@email-automati
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 import { ArrowLeft, Upload, UserPlus, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import pluralize from 'pluralize';
 
 type Tab = 'import' | 'single';
 
@@ -262,7 +263,7 @@ export default function NewContact() {
                 <div>
                   <p className="text-xs font-medium text-red-600 dark:text-red-400 mb-2 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
-                    {results.errors.length} error{results.errors.length !== 1 ? 's' : ''}
+                    {pluralize('error', results.errors.length, true)}
                   </p>
                   <div className="max-h-60 overflow-y-auto space-y-1">
                     {results.errors.map((err) => (
