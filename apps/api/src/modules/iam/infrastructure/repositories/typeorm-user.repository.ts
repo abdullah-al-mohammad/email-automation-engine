@@ -16,7 +16,7 @@ export class TypeOrmUserRepository implements UserRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.repo.findOne({ where: { email: email.toLowerCase().trim() } });
+    return this.repo.findOne({ where: { email } });
   }
 
   async save(user: User): Promise<User> {

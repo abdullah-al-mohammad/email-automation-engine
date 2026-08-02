@@ -4,20 +4,13 @@ import { AuthGuard } from './auth.guard';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
-  let jwtService: { verifyAsync: Mock };
-  let encryptionService: { decrypt: Mock };
+  let tokenService: { verify: Mock };
 
   beforeEach(() => {
-    jwtService = {
-      verifyAsync: vi.fn(),
+    tokenService = {
+      verify: vi.fn(),
     };
-    encryptionService = {
-      decrypt: vi.fn(),
-    };
-    guard = new AuthGuard(
-      jwtService as unknown as (typeof guard)['jwtService'],
-      encryptionService as unknown as (typeof guard)['encryptionService'],
-    );
+    guard = new AuthGuard(tokenService as unknown as (typeof guard)['tokenService']);
   });
 
   const createMockContext = (authHeader?: string): ExecutionContext => {
@@ -34,63 +27,58 @@ describe('AuthGuard', () => {
     } as unknown as ExecutionContext;
   };
 
-  it('should activate if header is valid and token is verified', async () => {
+  it('allows a valid Bearer token that verifies', async () => {
     const context = createMockContext('Bearer encrypted-token-xyz');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    jwtService.verifyAsync.mockResolvedValue({ sub: 'user-id-123', email: 'user@example.com' });
+    tokenService.verify.mockResolvedValue({ sub: 'user-id-123', email: 'user@example.com' });
 
     const result = await guard.canActivate(context);
 
     expect(result).toBe(true);
-    expect(encryptionService.decrypt).toHaveBeenCalledWith('encrypted-token-xyz');
-    expect(jwtService.verifyAsync).toHaveBeenCalledWith('decrypted-jwt');
+    expect(tokenService.verify).toHaveBeenCalledWith('encrypted-token-xyz');
     const request = context.switchToHttp().getRequest();
     expect(request.user).toEqual({ id: 'user-id-123', email: 'user@example.com' });
   });
 
-  it('should throw UnauthorizedException if authorization header is missing', async () => {
+  it('rejects the request without an Authorization header', async () => {
     const context = createMockContext(undefined);
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Authentication token is missing'),
+      new UnauthorizedException('Authentication token is missing or invalid'),
     );
   });
 
-  it('should throw UnauthorizedException if header structure is not Bearer', async () => {
+  it('rejects a token without the Bearer scheme', async () => {
     const context = createMockContext('Basic token123');
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Authentication token is missing'),
+      new UnauthorizedException('Authentication token is missing or invalid'),
     );
   });
 
-  it('should throw UnauthorizedException if decryption fails', async () => {
+  it('rejects a token with extra parts', async () => {
+    const context = createMockContext('Bearer token extra');
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      new UnauthorizedException('Authentication token is missing or invalid'),
+    );
+  });
+
+  it('rejects a token that fails verification', async () => {
     const context = createMockContext('Bearer badtoken');
-    encryptionService.decrypt.mockImplementation(() => {
-      throw new Error('Decryption error');
-    });
+    tokenService.verify.mockRejectedValue(new Error('JWT expired'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
+      new UnauthorizedException('Invalid or expired authentication token', {
+        cause: new Error('JWT expired'),
+      }),
     );
   });
 
-  it('should throw UnauthorizedException if verification fails', async () => {
-    const context = createMockContext('Bearer badtoken');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    jwtService.verifyAsync.mockRejectedValue(new Error('JWT expired'));
-
-    await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
-    );
-  });
-
-  it('should throw UnauthorizedException if payload structure is invalid', async () => {
+  it('rejects a token with an invalid payload', async () => {
     const context = createMockContext('Bearer token');
-    encryptionService.decrypt.mockReturnValue('decrypted-jwt');
-    // Payload missing 'email' property
-    jwtService.verifyAsync.mockResolvedValue({ sub: 'user-id-123' });
+    tokenService.verify.mockRejectedValue(new Error('Invalid token payload structure'));
 
     await expect(guard.canActivate(context)).rejects.toThrow(
-      new UnauthorizedException('Invalid or expired authentication token'),
+      new UnauthorizedException('Invalid or expired authentication token', {
+        cause: new Error('Invalid token payload structure'),
+      }),
     );
   });
 });

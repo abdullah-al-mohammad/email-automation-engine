@@ -10,7 +10,7 @@ import { type Permission } from '@email-automation-engine/shared';
 import { ROLE_REPOSITORY } from '../../constants/tokens';
 import { type RoleRepository } from '../../domain/repositories/role.repository';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
-import { type AuthenticatedRequest } from '../types/authenticated-request';
+import { type AuthenticatedRequest } from '../types';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {

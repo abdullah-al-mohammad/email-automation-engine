@@ -1,46 +1,65 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
+import { JWT_ENCRYPTION_KEY_VALUE } from '../../constants/tokens';
+
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 12; // GCM standard: 96-bit IV
+const SEPARATOR = ':';
+const KEY_LENGTH = 32; // AES-256 requires a 256-bit key
+
+export class InvalidCiphertextError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidCiphertextError';
+  }
+}
+
+// Format: iv:authTag:ciphertext
+function serialize(iv: Buffer, authTag: Buffer, ciphertext: Buffer): string {
+  return [iv, authTag, ciphertext].map((b) => b.toString('hex')).join(SEPARATOR);
+}
+
+function parse(payload: string): { iv: Buffer; authTag: Buffer; ciphertext: Buffer } {
+  const parts = payload.split(SEPARATOR);
+  if (parts.length !== 3) {
+    throw new InvalidCiphertextError('expected iv:authTag:ciphertext');
+  }
+  const [ivHex, authTagHex, ciphertextHex] = parts;
+  return {
+    iv: Buffer.from(ivHex ?? '', 'hex'),
+    authTag: Buffer.from(authTagHex ?? '', 'hex'),
+    ciphertext: Buffer.from(ciphertextHex ?? '', 'hex'),
+  };
+}
 
 @Injectable()
 export class EncryptionService {
-  private readonly algorithm = 'aes-256-gcm';
-  private readonly key: Buffer;
-
-  constructor(private readonly config: ConfigService) {
-    const hexKey = this.config.getOrThrow<string>(JWT_ENCRYPTION_KEY);
-    this.key = Buffer.from(hexKey, 'hex');
+  constructor(@Inject(JWT_ENCRYPTION_KEY_VALUE) private readonly key: Buffer) {
+    if (this.key.length !== KEY_LENGTH) {
+      throw new Error(
+        `Invalid ${JWT_ENCRYPTION_KEY}: expected ${KEY_LENGTH} bytes (${KEY_LENGTH * 2} hex chars), got ${this.key.length}`,
+      );
+    }
   }
 
   encrypt(text: string): string {
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(ALGORITHM, this.key, iv);
+    const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
 
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-
-    const authTag = cipher.getAuthTag().toString('hex');
-
-    // Format: iv:authTag:encrypted
-    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
+    return serialize(iv, cipher.getAuthTag(), encrypted);
   }
 
-  decrypt(encryptedText: string): string {
-    const [ivHex, authTagHex, encrypted] = encryptedText.split(':');
-    if (ivHex === undefined || authTagHex === undefined || encrypted === undefined) {
-      throw new Error('Invalid token structure');
+  decrypt(payload: string): string {
+    try {
+      const parsed = parse(payload);
+      const decipher = crypto.createDecipheriv(ALGORITHM, this.key, parsed.iv);
+      decipher.setAuthTag(parsed.authTag);
+      return Buffer.concat([decipher.update(parsed.ciphertext), decipher.final()]).toString('utf8');
+    } catch (error) {
+      if (error instanceof InvalidCiphertextError) throw error;
+      throw new InvalidCiphertextError('failed to decrypt: data may be tampered or corrupted');
     }
-
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
-
-    decipher.setAuthTag(authTag);
-
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-
-    return decrypted;
   }
 }

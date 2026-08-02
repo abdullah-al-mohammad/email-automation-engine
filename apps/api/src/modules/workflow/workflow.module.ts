@@ -37,7 +37,7 @@ import { EmailModule } from '../email/email.module';
       WorkflowExitCondition,
       WorkflowStepCondition,
     ]),
-    IamModule, // Import IamModule for the AuthGuard and EncryptionService
+    IamModule, // Import IamModule for the AuthGuard and token services
     EmailModule,
   ],
   controllers: [HealthController, WorkflowController, WorkflowStepConditionController],

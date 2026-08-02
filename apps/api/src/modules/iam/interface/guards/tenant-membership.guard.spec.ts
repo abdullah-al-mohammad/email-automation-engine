@@ -48,21 +48,21 @@ describe('TenantMembershipGuard', () => {
     } as unknown as ExecutionContext;
   };
 
-  it('should throw ForbiddenException if user is not authenticated', async () => {
+  it('rejects the request when the user is not authenticated', async () => {
     const context = createMockContext({ user: undefined });
     await expect(guard.canActivate(context)).rejects.toThrow(
       new ForbiddenException('User is not authenticated'),
     );
   });
 
-  it('should throw BadRequestException if tenantId is missing', async () => {
+  it('rejects the request when the tenant ID is missing', async () => {
     const context = createMockContext({ user: { id: 'user-1' } });
     await expect(guard.canActivate(context)).rejects.toThrow(
       new BadRequestException('Tenant ID is required in X-Tenant-Id header'),
     );
   });
 
-  it('should throw NotFoundException if tenant does not exist', async () => {
+  it('rejects the request when the tenant does not exist', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
       headers: { 'x-tenant-id': 'tenant-1' },
@@ -74,7 +74,7 @@ describe('TenantMembershipGuard', () => {
     );
   });
 
-  it('should allow access if user has active membership', async () => {
+  it('allows the request when the user has an active membership', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
       headers: { 'x-tenant-id': 'tenant-1' },
@@ -93,7 +93,7 @@ describe('TenantMembershipGuard', () => {
     expect(request.tenantMembership).toBe(mockMembership);
   });
 
-  it('should allow access if user is tenant creator even without membership record', async () => {
+  it('allows the tenant creator even without a membership', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
       headers: { 'x-tenant-id': 'tenant-1' },
@@ -110,7 +110,7 @@ describe('TenantMembershipGuard', () => {
     expect(request.tenant).toBe(mockTenant);
   });
 
-  it('should throw ForbiddenException if user is not a member and not the creator', async () => {
+  it('rejects a user who is neither a member nor the creator', async () => {
     const context = createMockContext({
       user: { id: 'user-1' },
       headers: { 'x-tenant-id': 'tenant-1' },

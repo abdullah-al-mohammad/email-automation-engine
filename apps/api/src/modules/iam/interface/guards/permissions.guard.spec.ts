@@ -35,7 +35,7 @@ describe('PermissionsGuard', () => {
     } as unknown as ExecutionContext;
   };
 
-  it('should return true if route requires no permissions', async () => {
+  it('allows the request when the route requires no permissions', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(undefined);
     const context = createMockContext({});
 
@@ -43,7 +43,7 @@ describe('PermissionsGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('should throw ForbiddenException if user or tenant context is missing', async () => {
+  it('rejects the request when the user or tenant context is missing', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['tenant.read']);
     const context = createMockContext({ user: undefined, tenant: undefined });
 
@@ -52,7 +52,7 @@ describe('PermissionsGuard', () => {
     );
   });
 
-  it('should allow access if user is tenant creator', async () => {
+  it('allows the request when the user is the tenant creator', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['tenant.read']);
     const context = createMockContext({
       user: { id: 'user-1' },
@@ -63,7 +63,7 @@ describe('PermissionsGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('should throw ForbiddenException if user has no membership and is not creator', async () => {
+  it('rejects a user without a membership who is not the creator', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['tenant.read']);
     const context = createMockContext({
       user: { id: 'user-1' },
@@ -76,7 +76,7 @@ describe('PermissionsGuard', () => {
     );
   });
 
-  it('should allow access if membership role permissions satisfy required permissions', async () => {
+  it('allows a role that has all required permissions', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['tenant.read', 'workflows.read']);
     const context = createMockContext({
       user: { id: 'user-1' },
@@ -94,7 +94,7 @@ describe('PermissionsGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('should throw ForbiddenException if membership role permissions lack required permissions', async () => {
+  it('rejects a role missing a required permission', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['tenant.read', 'workflows.read']);
     const context = createMockContext({
       user: { id: 'user-1' },

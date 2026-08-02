@@ -14,12 +14,12 @@ describe('AuthController', () => {
     controller = new AuthController(authService as unknown as (typeof controller)['authService']);
   });
 
-  it('should be defined', () => {
+  it('is instantiable', () => {
     expect(controller).toBeDefined();
   });
 
   describe('signup', () => {
-    it('should call authService.signup and return the result', async () => {
+    it('forwards signup to the auth service', async () => {
       const dto = { email: 'test@example.com', password: 'password123' };
       const response = { accessToken: 'token123' };
       authService.signup.mockResolvedValue(response);
@@ -32,7 +32,7 @@ describe('AuthController', () => {
   });
 
   describe('signin', () => {
-    it('should call authService.signin and return the result', async () => {
+    it('forwards signin to the auth service', async () => {
       const dto = { email: 'test@example.com', password: 'password123' };
       const response = { accessToken: 'token123' };
       authService.signin.mockResolvedValue(response);
@@ -45,7 +45,7 @@ describe('AuthController', () => {
   });
 
   describe('getMe', () => {
-    it('should call authService.getMe and return the result', async () => {
+    it('forwards getMe to the auth service', async () => {
       const response = {
         id: 'u1',
         email: 'test@example.com',

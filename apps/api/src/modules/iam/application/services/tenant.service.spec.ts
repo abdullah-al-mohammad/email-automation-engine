@@ -44,7 +44,7 @@ describe('TenantService', () => {
   });
 
   describe('create', () => {
-    it('should create a tenant, full-access role with all permissions, and membership for the creator', async () => {
+    it('sets up the tenant, a role, and a membership for the creator', async () => {
       const userId = crypto.randomUUID();
 
       tenantRepo.save.mockImplementation((t: Tenant) => {
@@ -87,7 +87,7 @@ describe('TenantService', () => {
   });
 
   describe('findById', () => {
-    it('should return tenant if user is creator or active member', async () => {
+    it('returns the tenant when the user is the creator or an active member', async () => {
       const creatorId = crypto.randomUUID();
       const mockTenant = {
         id: 'tenant-1',
@@ -119,7 +119,7 @@ describe('TenantService', () => {
       await expect(service.findById('tenant-1', randomUserId)).rejects.toThrow(ForbiddenException);
     });
 
-    it('should throw NotFoundException if tenant does not exist', async () => {
+    it('errors when the tenant does not exist', async () => {
       tenantRepo.findById.mockResolvedValue(null);
       await expect(service.findById('random-id', crypto.randomUUID())).rejects.toThrow(
         NotFoundException,
@@ -128,7 +128,7 @@ describe('TenantService', () => {
   });
 
   describe('findByUser', () => {
-    it('should return all tenants the user belongs to', async () => {
+    it('returns all tenants the user belongs to', async () => {
       const userId = crypto.randomUUID();
       const mockMembership1 = { tenantId: 'tenant-1', userId };
       const mockMembership2 = { tenantId: 'tenant-2', userId };

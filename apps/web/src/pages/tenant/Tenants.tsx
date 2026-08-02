@@ -8,7 +8,7 @@ import {
   type TenantResponse,
 } from '@email-automation-engine/shared';
 import { isAxiosError } from 'axios';
-import { Plus, ChevronRight, Building } from 'lucide-react';
+import { Plus, ChevronRight, Building, LogOut, Mail } from 'lucide-react';
 
 import { useTenant } from '../../contexts/TenantContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,20 +33,31 @@ export default function Tenants() {
   const hasTenants = tenants.length > 0;
   const showList = hasTenants && !isCreating;
 
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4 relative">
-      <div className="absolute top-6 right-6">
+      <div className="absolute top-6 left-6 flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+        <Mail className="w-5 h-5" />
+        <span className="font-bold text-lg text-gray-900 dark:text-white">Engine</span>
+      </div>
+      <div className="absolute top-6 right-6 flex items-center gap-4">
+        {user?.email && (
+          <>
+            <span className="text-sm text-gray-500 dark:text-zinc-400">{user.email}</span>
+            <span className="h-4 w-px bg-gray-300 dark:bg-zinc-700" aria-hidden="true" />
+          </>
+        )}
         <button
           onClick={logout}
-          className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-zinc-200 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
+          <LogOut className="w-4 h-4" />
           Sign out
         </button>
       </div>
       <div className="max-w-xl w-full">
-        <Header />
+        {!isCreating && <Header />}
 
         {showList && <TenantList tenants={tenants} onSelect={handleSelectTenant} />}
 
@@ -149,7 +160,15 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Create new workspace</h2>
+      <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl mb-4 mx-auto">
+        <Building className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+      </div>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
+        Name your workspace
+      </h2>
+      <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-10">
+        Select a name for your new workspace.
+      </p>
 
       {globalError && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-xl text-sm flex items-start">
@@ -181,13 +200,13 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
           )}
         </div>
 
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex flex-col gap-3 pt-2">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-all shadow-sm"
+            className="py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-all shadow-sm w-full"
           >
-            {isSubmitting ? 'Creating...' : 'Create workspace'}
+            {isSubmitting ? 'Creating...' : 'Continue'}
           </button>
 
           {canCancel && (
@@ -195,9 +214,9 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-gray-700 dark:text-zinc-300 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all"
+              className="py-2.5 px-4 rounded-xl text-sm font-semibold text-gray-700 dark:text-zinc-300 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all w-full"
             >
-              Cancel
+              Back
             </button>
           )}
         </div>
