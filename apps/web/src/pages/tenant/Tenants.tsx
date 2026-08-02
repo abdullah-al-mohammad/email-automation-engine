@@ -163,7 +163,9 @@ function CreateTenantForm({ onSuccess, onCancel, canCancel }: CreateTenantFormPr
       <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl mb-4 mx-auto">
         <Building className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
       </div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">Name your workspace</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
+        Name your workspace
+      </h2>
       <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-10">
         Select a name for your new workspace.
       </p>
