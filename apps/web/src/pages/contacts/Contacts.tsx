@@ -86,26 +86,15 @@ export default function Contacts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h1>
-          <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-            {total} contact{total !== 1 ? 's' : ''} total
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
           <button
             onClick={() => void navigate('/contacts/new')}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-3.5 h-3.5" />
             Add new
-          </button>
-          <button
-            onClick={() => setShowTagManager(true)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
-          >
-            Manage tags
           </button>
         </div>
       </div>

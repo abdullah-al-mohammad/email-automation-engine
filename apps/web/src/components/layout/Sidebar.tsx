@@ -1,20 +1,37 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   GitBranch,
-  Users,
+  User,
   FileText,
   Settings,
   LogOut,
   Mail,
   ChevronDown,
+  ChevronRight,
   Check,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTenant } from '../../contexts/TenantContext';
 import HoverDropdown from '../shared/HoverDropdown';
 
-const navItems = [
-  { path: '/contacts', label: 'Contacts', icon: Users },
+interface NavItem {
+  path: string;
+  label: string;
+  icon: typeof User;
+  children?: { path: string; label: string }[];
+}
+
+const navItems: NavItem[] = [
+  {
+    path: '/contacts',
+    label: 'Contacts',
+    icon: User,
+    children: [
+      { path: '/contacts', label: 'View all' },
+      { path: '/contacts/tags', label: 'Tags' },
+    ],
+  },
   { path: '/workflows', label: 'Workflows', icon: GitBranch },
   { path: '/email-templates', label: 'Templates', icon: FileText },
   { path: '/settings', label: 'Settings', icon: Settings },
@@ -25,6 +42,11 @@ export default function Sidebar() {
   const { logout } = useAuth();
   const { currentTenant, tenants, setCurrentTenant } = useTenant();
   const navigate = useNavigate();
+  const [openGroup, setOpenGroup] = useState<string | null>(
+    () =>
+      navItems.find((item) => item.children && location.pathname.startsWith(item.path))?.path ??
+      null,
+  );
 
   return (
     <aside className="fixed inset-y-0 left-0 w-[220px] pt-6 px-3 flex flex-col">
@@ -83,21 +105,50 @@ export default function Sidebar() {
         </div>
       )}
       <nav className="flex flex-col gap-0.5">
-        {navItems.map(({ path, label, icon: Icon }) => {
-          const isActive = location.pathname.startsWith(path);
+        {navItems.map(({ path, label, icon: Icon, children }) => {
+          const hasChildren = !!children && children.length > 0;
+          const isGroupActive = hasChildren && location.pathname.startsWith(path);
+          const isOpen = openGroup === path;
           return (
-            <Link
-              key={path}
-              to={path}
-              className={`flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                isActive
-                  ? 'text-indigo-600 font-medium dark:text-indigo-400'
-                  : 'text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-zinc-300'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              {label}
-            </Link>
+            <div key={path}>
+              <Link
+                to={path}
+                onClick={hasChildren ? () => setOpenGroup(isOpen ? null : path) : undefined}
+                className={`flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  isGroupActive || location.pathname.startsWith(path)
+                    ? 'text-indigo-600 font-medium dark:text-indigo-400'
+                    : 'text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-zinc-300'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+                {hasChildren && (
+                  <ChevronRight
+                    className={`w-4 h-4 ml-auto transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                  />
+                )}
+              </Link>
+              {hasChildren && isOpen && (
+                <div className="mt-0.5 flex flex-col gap-0.5">
+                  {children.map((child) => {
+                    const isChildActive = location.pathname === child.path;
+                    return (
+                      <Link
+                        key={child.path}
+                        to={child.path}
+                        className={`flex items-center gap-2.5 pl-9 pr-3 py-1.5 rounded-md text-sm transition-colors ${
+                          isChildActive
+                            ? 'text-indigo-600 font-medium dark:text-indigo-400'
+                            : 'text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-zinc-300'
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>

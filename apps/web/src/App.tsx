@@ -17,6 +17,7 @@ import EmailTemplates from './pages/email-templates/EmailTemplates';
 import Contacts from './pages/contacts/Contacts';
 import ContactDetailPage from './pages/contacts/ContactDetail';
 import NewContact from './pages/contacts/NewContact';
+import Tags from './pages/contacts/Tags';
 
 import CreateEmailTemplate from './pages/email-templates/CreateEmailTemplate';
 
@@ -29,6 +30,7 @@ const appRoutes = [
   { path: '/workflows/:workflowId/summary', element: <ExecutionSummary /> },
   { path: '/workflows/:workflowId/contacts', element: <WorkflowContacts /> },
   { path: '/contacts', element: <Contacts /> },
+  { path: '/contacts/tags', element: <Tags /> },
   { path: '/contacts/new', element: <NewContact /> },
   { path: '/contacts/:contactId', element: <ContactDetailPage /> },
   { path: '/email-templates', element: <EmailTemplates /> },
@@ -58,7 +60,7 @@ function MainLayout() {
   return (
     <div className="min-h-screen pl-[220px] bg-background">
       <Sidebar />
-      <main className="overflow-auto p-6">
+      <main className="p-6">
         <div className="max-w-5xl w-full mx-auto">
           <Routes>
             {appRoutes.map((route) => (
