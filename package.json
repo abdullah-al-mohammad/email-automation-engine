@@ -16,7 +16,10 @@
     "format:check": "turbo run format:check",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "migration:run": "pnpm --filter @email-automation-engine/api migration:run",
+    "migration:revert": "pnpm --filter @email-automation-engine/api migration:revert",
+    "migration:generate": "pnpm --filter @email-automation-engine/api migration:generate"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
