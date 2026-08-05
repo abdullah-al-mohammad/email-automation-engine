@@ -2,17 +2,13 @@
 
 ## Supported Versions
 
-The following versions of the Email Automation Engine are currently being supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| v1.0.x  | :white_check_mark: |
+We provide security updates for the latest release. Older versions are not actively supported.
 
 ## Reporting a Vulnerability
 
 Please report any security vulnerabilities responsibly. Do not open a public issue for a security vulnerability.
 
-You can report vulnerabilities using GitHub's built-in [Private Vulnerability Reporting](https://github.com/md-emran-hossain/email-automation-engine/security/advisories/new) feature or by emailing us privately at security@email-automation-engine.org.
+You can report vulnerabilities using GitHub's built-in [Private Vulnerability Reporting](https://github.com/md-emran-hossain/email-automation-engine/security/advisories/new) feature.
 
 We aim to:
 

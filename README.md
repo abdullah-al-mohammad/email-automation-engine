@@ -67,15 +67,11 @@ email-automation-engine/
 
 ## Documentation
 
-**Start here:** [Architecture](docs/architecture.md) · [Data Model](docs/data-model.md) · [API Spec](docs/api-spec.md) · [Worker Flow](docs/worker-flow.md)
-
-**Frontend & Auth:** [Frontend Builder](docs/frontend-builder.md) · [Auth and Permissions](docs/auth-and-permissions.md)
+**Start here:** [API Spec](docs/api-spec.md)
 
 **Infrastructure:** [Terraform](docs/terraform.md) · [Queue and Cache](docs/queue-and-cache.md)
 
-**Development:** [Contributing](CONTRIBUTING.md) · [Engineering Rules](docs/engineering-rules.md) · [Development Workflow](docs/development-workflow.md) · [Tooling](docs/tooling.md)
-
-**Reference:** [Edge Cases](docs/edge-cases.md) · [Testing](docs/testing.md) · [Open Source Scope](docs/open-source-scope.md) · [Roadmap](docs/roadmap.md) · [Project Status](docs/project-status.md)
+**Development:** [Contributing](CONTRIBUTING.md)
 
 ## Development Principles
 
@@ -84,7 +80,6 @@ email-automation-engine/
 - Implement behavior in small, tested vertical slices.
 - Keep domain logic independent from queue, cache, and cloud-provider details.
 - Treat tests as required implementation artifacts, not follow-up work.
-- Maintain [Project Status](docs/project-status.md) so work can resume cleanly after handoff.
 
 ## License
 

@@ -2,134 +2,75 @@
 
 ## Decision
 
-The queue implementation should be AWS SQS because the automation runtime is AWS-first and designed around queue-triggered workers, dead-letter queues, visibility timeouts, partial batch failures, and Terraform-managed AWS infrastructure.
+Use **AWS SQS** for queuing. **Redis** is optional for cache and coordination; the first implementation runs without it using database reads and constraints.
 
-Redis is an optional but first-class cache and coordination dependency. The first implementation can run without Redis by using database reads and constraints, while still leaving room for Redis-backed trigger caching and lightweight locks.
+## Queue Contracts
 
-## Queue Abstraction
+Shared, typed SQS message contracts live in `packages/shared/src/queue/` (one file per message type plus `message-version.ts`). Senders and parsers live in `apps/api` and `apps/worker` infrastructure.
 
-Create shared typed SQS message contracts in `packages/shared`.
+Helpers:
+- Send one / batch / FIFO (group + dedupe keys)
+- Parse records into typed messages
+- Return partial batch failures
+- Expose queue names/URLs via config
 
-```text
-packages/shared/
-  src/
-    queue/
-      automation-event.message.ts
-      waiting-step.message.ts
-      finished-step.message.ts
-      email-tracking-event.message.ts
-      webhook-delivery.message.ts
-      message-version.ts
-```
+## Runtime Environment
 
-SQS senders and parsers live in `apps/api` and `apps/worker` infrastructure code. They use message contracts from `packages/shared`.
+| Variable | Purpose |
+| --- | --- |
+| `QUEUE_TYPE` | `in-memory` (local/test) or `sqs` |
+| `CACHE_TYPE` | `in-memory` (local/test) or `redis` |
+| `REDIS_URL` | Required when `CACHE_TYPE=redis` |
+| `AWS_REGION` | SQS region (default `us-east-1`) |
+| `AWS_SQS_ENDPOINT_URL` | Optional override for local emulators |
 
-SQS helpers support:
+## Queues
 
-- Send one message.
-- Send batch messages.
-- Send FIFO message with group and dedupe keys.
-- Parse records into typed messages.
-- Return partial batch failures.
-- Expose queue names/URLs through config.
-
-Runtime environment:
-
-- `QUEUE_TYPE`: `in-memory` for local/test defaults, `sqs` for SQS-backed queues.
-- `CACHE_TYPE`: `in-memory` for local/test defaults, `redis` for Redis-backed cache operations.
-- `REDIS_URL`: required when `CACHE_TYPE=redis`.
-- `AWS_REGION`: AWS region for SQS clients. Defaults to `us-east-1`.
-- `AWS_SQS_ENDPOINT_URL`: optional SQS endpoint override for local emulators.
-
-## Default Queues
-
-Core queues:
-
+**Core:**
 - `automation-events`
 - `waiting-contact-workflow-steps`
 - `finished-contact-workflow-steps`
 
-Special queues:
-
+**Special:**
 - `workflow-emails.fifo`
 - `email-tracking-events`
 - `conditional-split.fifo`
 - `webhook-steps.fifo`
 - `webhook-deliveries`
 
-Every production queue must have:
+Every production queue:
+- DLQ
+- Configurable retention
+- Long polling
+- Visibility timeout > worker timeout
+- Message schema version
+- Tests for malformed/unsupported versions
 
-- DLQ.
-- Configurable retention.
-- Long polling.
-- Visibility timeout greater than worker timeout.
-- Message schema version.
-- Tests for malformed and unsupported message versions.
+## Redis
 
-## Redis Usage
+Used for:
+- Active trigger cache (keyed by `tenantId` + event)
+- Short-lived idempotency keys for high-volume event ingestion
+- Distributed locks
+- Optional rate limiting
 
-Redis is used for:
-
-- Active trigger cache by `tenantId` and event.
-- Short-lived idempotency keys for high-volume event ingestion.
-- Lightweight distributed locks for scheduler/workers when needed.
-- Optional rate limiting or throttling state.
-
-Redis is not the source of truth. The database remains authoritative.
-
-## Trigger Cache
-
-Suggested cache key:
-
-```text
-automation:triggers:tenant:<tenantId>:event:<event>
-```
-
-Cache value:
-
-- Trigger ID.
-- Workflow ID.
-- Event name.
-- Filter config.
-- Version or updated timestamp.
-
-Invalidation:
-
-- Workflow activation.
-- Workflow deactivation.
-- Trigger create/update/delete.
-- Workflow delete.
-
-Fallback:
-
-- If Redis is unavailable, read active triggers from the database.
-- Cache failures must not break event ingestion.
-- Low-level cache adapters should treat Redis read/write failures as cache misses or no-ops. The application service that reads triggers remains responsible for querying the database after a cache miss.
+- Redis is **not** the source of truth; the database is authoritative.
+- Trigger cache key: `automation:triggers:tenant:<tenantId>:event:<event>`, storing trigger ID, workflow ID, event name, filter config, version/timestamp.
+- Invalidate on workflow activate/deactivate, trigger create/update/delete, workflow delete.
+- On Redis failure, read active triggers from the database. Cache failures must not break event ingestion.
 
 ## Idempotency
 
-Database constraints are the primary idempotency guard. Redis can reduce duplicate work, but correctness must not depend only on Redis.
+Database constraints are the primary guard; Redis only reduces duplicate work. Required:
+- Conflict-safe insert for workflow runs
+- Unique unfinished step record per contact workflow + step
+- Transactional state changes for workflow start and step finish
 
-Required database protections:
+Optional Redis keys (`automation:event:...`, `automation:step:...`) with short, configurable TTL.
 
-- Unique or conflict-safe insert for contact workflow runs where applicable.
-- Unique unfinished contact workflow step record per contact workflow and workflow step.
-- Transactional state changes for workflow start and step finish.
+## Testing
 
-Redis idempotency keys can be used for:
-
-```text
-automation:event:<tenantId>:<contactId>:<event>:<triggerIdsHash>
-automation:step:<contactWorkflowId>:<workflowStepId>
-```
-
-TTL must be short and configurable.
-
-## Testing Support
-
-Testing support:
-
-- Unit tests for message builders and parsers.
-- Integration tests for SQS message shape and partial failure behavior.
-- Optional Redis test instance for cache behavior.
-- Database-backed fallback when Redis is disabled.
+- Unit tests for message builders/parsers
+- Integration tests for SQS message shape and partial failures
+- Optional Redis test instance
+- Database fallback when Redis is disabled

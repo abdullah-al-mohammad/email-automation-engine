@@ -1,82 +1,147 @@
 # API Spec
 
-The API uses NestJS and TypeScript.
+The API is a NestJS application with TypeScript. All management endpoints are tenant-scoped and protected by an auth token plus tenant membership and permission checks. Route parameters use `:tenantId` for the tenant and `:id`/`:workflowId` etc. for resource ids.
 
-## Principles
-
-- All input DTOs use Zod schemas and inferred TypeScript types.
-- Controllers use a shared Zod validation pipe.
-- Environment variables are validated with Joi at boot.
-- All endpoints are tenant-scoped.
-- API response shapes are stable and documented.
-- Workflow activation runs full validation before changing `isActive`.
-- Active workflows are read-only for structural changes.
-- Event ingestion accepts generic events.
-- Authentication and authorization are required for tenant-scoped management APIs.
-
-## NestJS Module Pattern
-
-Use the same structure for every backend domain:
+## Auth
 
 ```text
-modules/<domain>/
-  application/
-    dto/
-    services/
-  domain/
-    aggregates/
-    repositories/
-  infrastructure/
-    repositories/
-  interface/
-    http/
-      controllers/
-      guards/
-      validators/
-  constants/
+POST   /auth/signup
+POST   /auth/signin
+GET    /auth/me
 ```
 
-Controllers stay thin. Business rules belong in application services and domain helpers. Persistence access goes through repository interfaces injected by tokens.
-
-## Workflow Endpoints
+## Tenants
 
 ```text
-POST   /workflows
-GET    /workflows
-GET    /workflows/:workflowId
-PATCH  /workflows/:workflowId
-DELETE /workflows/:workflowId
-
-PATCH  /workflows/:workflowId/activate
-PATCH  /workflows/:workflowId/deactivate
+POST   /tenants
+GET    /tenants
+GET    /tenants/:id
+PATCH  /tenants/:id
+DELETE /tenants/:id
 ```
 
-## Trigger Endpoints
+## Roles
+
+Requires `settings.manage`.
 
 ```text
-POST   /workflows/:workflowId/triggers
-PATCH  /workflows/:workflowId/triggers/:triggerId
-DELETE /workflows/:workflowId/triggers/:triggerId
+GET    /tenants/:tenantId/roles
+POST   /tenants/:tenantId/roles
+PATCH  /tenants/:tenantId/roles/:id
+DELETE /tenants/:tenantId/roles/:id
 ```
 
-## Step Endpoints
+## Members
+
+`members.read` for reads, `members.manage` for changes.
 
 ```text
-POST   /workflows/:workflowId/steps
-GET    /workflows/:workflowId/steps/:stepId
-PATCH  /workflows/:workflowId/steps/:stepId
-PATCH  /workflows/:workflowId/steps/:stepId/reorder
-DELETE /workflows/:workflowId/steps/:stepId
+GET    /tenants/:tenantId/members
+DELETE /tenants/:tenantId/members/:userId
 ```
 
-## Exit Condition Endpoints
+## Invitations
+
+`members.read` for reads, `members.manage` for changes.
 
 ```text
-GET    /workflows/:workflowId/exit-conditions
-PUT    /workflows/:workflowId/exit-conditions
+GET    /tenants/:tenantId/invitations
+POST   /tenants/:tenantId/invitations
+DELETE /tenants/:tenantId/invitations/:id
 ```
 
-## Email Template Endpoints
+## Contacts
+
+`contacts.read` for reads, `contacts.manage` for changes.
+
+```text
+GET    /tenants/:tenantId/contacts
+GET    /tenants/:tenantId/contacts/:contactId
+POST   /tenants/:tenantId/contacts
+PATCH  /tenants/:tenantId/contacts/:contactId
+DELETE /tenants/:tenantId/contacts/:contactId
+
+POST   /tenants/:tenantId/contacts/import/preview
+POST   /tenants/:tenantId/contacts/import
+
+POST   /tenants/:tenantId/contacts/:contactId/tags/:tagId
+DELETE /tenants/:tenantId/contacts/:contactId/tags/:tagId
+```
+
+## Tags
+
+`contacts.read` for reads, `tags.manage` for changes.
+
+```text
+GET    /tenants/:tenantId/tags
+POST   /tenants/:tenantId/tags
+DELETE /tenants/:tenantId/tags/:tagId
+```
+
+## Workflows
+
+`workflows.read` for reads, `workflows.manage` for create/update/delete, `workflows.activate` for activate/deactivate.
+
+```text
+POST   /tenants/:tenantId/workflows
+GET    /tenants/:tenantId/workflows
+GET    /tenants/:tenantId/workflows/:id
+PATCH  /tenants/:tenantId/workflows/:id
+DELETE /tenants/:tenantId/workflows/:id
+
+PATCH  /tenants/:tenantId/workflows/:id/activate
+PATCH  /tenants/:tenantId/workflows/:id/deactivate
+```
+
+## Triggers
+
+```text
+GET    /tenants/:tenantId/workflows/:id/triggers
+POST   /tenants/:tenantId/workflows/:id/triggers
+PATCH  /tenants/:tenantId/workflows/:id/triggers/:triggerId
+DELETE /tenants/:tenantId/workflows/:id/triggers/:triggerId
+```
+
+## Steps
+
+```text
+GET    /tenants/:tenantId/workflows/:id/steps
+POST   /tenants/:tenantId/workflows/:id/steps
+GET    /tenants/:tenantId/workflows/:id/steps/:stepId
+PATCH  /tenants/:tenantId/workflows/:id/steps/:stepId
+POST   /tenants/:tenantId/workflows/:id/steps/:stepId/reorder
+DELETE /tenants/:tenantId/workflows/:id/steps/:stepId
+```
+
+## Step Conditions
+
+```text
+GET /tenants/:tenantId/workflows/:workflowId/steps/:stepId/conditions
+PUT /tenants/:tenantId/workflows/:workflowId/steps/:stepId/conditions
+```
+
+## Exit Conditions
+
+```text
+GET    /tenants/:tenantId/workflows/:id/exit-conditions
+PUT    /tenants/:tenantId/workflows/:id/exit-conditions
+POST   /tenants/:tenantId/workflows/:id/exit-conditions
+PATCH  /tenants/:tenantId/workflows/:id/exit-conditions/:conditionId
+DELETE /tenants/:tenantId/workflows/:id/exit-conditions/:conditionId
+```
+
+## Execution Summary
+
+`workflows.read`.
+
+```text
+GET /tenants/:tenantId/workflows/:workflowId/execution
+GET /tenants/:tenantId/workflows/:workflowId/execution/:contactWorkflowId
+```
+
+## Email Templates
+
+`workflows.read` for reads, `workflows.manage` for create/update/delete. Templates are soft-deleted and tenant-scoped.
 
 ```text
 POST   /tenants/:tenantId/email-templates
@@ -86,35 +151,13 @@ PATCH  /tenants/:tenantId/email-templates/:id
 DELETE /tenants/:tenantId/email-templates/:id
 ```
 
-Requires `workflows.read` permission for read endpoints, `workflows.manage` for create/update/delete. Email templates are soft-deleted and tenant-scoped.
+## Event Ingestion
 
-## Event Ingestion Endpoint
+Accepts a generic event, finds matching active triggers, and enqueues it to the automation queue. Returns `202 Accepted`.
 
 ```text
 POST /automation/events
 ```
-
-Example request:
-
-```json
-{
-  "tenantId": "tenant_123",
-  "contactId": "contact_456",
-  "event": "contact.subscribed",
-  "metadata": {
-    "source": "form",
-    "formId": "form_1"
-  },
-  "occurredAt": "2026-01-01T00:00:00.000Z"
-}
-```
-
-The API:
-
-- Validate the event.
-- Find matching active triggers.
-- Enqueue a message to `automation-events`.
-- Return an accepted response.
 
 ## SES Tracking Webhook
 
@@ -134,48 +177,8 @@ SES webhook behavior:
 - Keep webhook processing idempotent because SES notifications can be retried.
 - Map SES PascalCase event types (`Delivery`, `Bounce`, `Open`) to lowercase schema values (`delivered`, `bounced`, `opened`).
 
-## Supported Trigger Events
+## Health
 
-Initial generic events:
-
-- `contact.subscribed`
-- `contact.unsubscribed`
-- `tag.attached`
-- `tag.detached`
-- `email.sent`
-- `email.delivered`
-- `email.bounced`
-- `email.complained`
-- `email.opened`
-- `email.link_clicked`
-- `form.submitted`
-- `custom.event`
-
-## Supported Step Actions
-
-Initial actions:
-
-- `delay`
-- `send_email`
-- `attach_tag`
-- `detach_tag`
-- `unsubscribe_contact`
-- `delete_contact`
-- `conditional_split`
-- `webhook`
-
-## Activation Validation
-
-Before activation:
-
-- Workflow must have at least one trigger.
-- Workflow must have at least one step.
-- Trigger filters must be valid for their event.
-- Delay steps must have amount and unit.
-- Delay cannot be the final step.
-- Email steps must have either a templateId or a subject/html pair.
-- Email steps with a templateId validate the template exists and is not soft-deleted.
-- Tag steps must have a tag reference.
-- Webhook steps must have a valid non-private URL (SSRF protection: blocks localhost, private IP ranges, and malformed URLs).
-- Conditional split steps must have valid true/false routing or conditions in the database.
-- All referenced resources must belong to the same tenant.
+```text
+GET /health
+```
