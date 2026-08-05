@@ -1,79 +1,62 @@
 # Contributing
 
-Email Automation Engine is open source and welcomes contributions. Contributions should preserve the project goals: product-neutral naming, strong tests, and clean TypeScript architecture.
+Thanks for taking the time to contribute! This guide covers how to report issues, suggest features, and submit code changes.
 
-## Before Contributing
+## Ways to Contribute
 
-Please read the following documents to get familiar with our setup and standards:
+- **Report a bug** — Open an [issue](https://github.com/md-emran-hossain/email-automation-engine/issues) with steps to reproduce, expected behavior, and your environment (Node/OS versions).
+- **Suggest a feature** — Describe the use case and the proposed solution in an issue.
+- **Ask a question** — Open an issue tagged `question` or `discussion`.
+- **Submit code** — See [Getting Started](#getting-started) below.
 
-- [README](README.md)
-- [Engineering Rules](docs/engineering-rules.md)
+## Getting Started
 
-_Other useful references: [Architecture](docs/architecture.md), [Development Workflow](docs/development-workflow.md), [Testing](docs/testing.md), and [Project Status](docs/project-status.md)._
+1. Find an issue labeled [good first issue](https://github.com/md-emran-hossain/email-automation-engine/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22), or open one first to discuss your change.
+2. Fork the repository and create a branch for your change.
+3. Make your change as a small, tested vertical slice.
+4. Run the checks below and open a Pull Request.
 
-## How to Report Issues & Suggest Features
+## Development Setup
 
-If you encounter a bug, have a feature request, or want to ask a question, please check the existing [GitHub Issues](https://github.com/md-emran-hossain/email-automation-engine/issues).
+Install dependencies with [pnpm](https://pnpm.io) (Node >= 24):
 
-- **Bug Reports**: Use the Bug Report template or detail the steps to reproduce, expected behavior, and environment (Node/OS version).
-- **Feature Requests**: Describe the use case and proposed solution clearly.
-- **Questions/Discussions**: Open a GitHub Issue with the `question` or `discussion` tag.
+```bash
+pnpm install
+```
 
-## Finding an Issue to Work On
+Run the app in development:
 
-If you are looking for a place to make your first contribution, check out issues labeled [good first issue](https://github.com/md-emran-hossain/email-automation-engine/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22). These tasks are self-contained and great for getting familiar with the codebase.
+```bash
+pnpm dev
+```
 
-Alternatively, improving test coverage or documentation is always a welcomed starting point!
+## Checks
 
-## Development Standards
+Before submitting a Pull Request, verify everything passes locally:
+
+- **Unit tests:** `pnpm test`
+- **Integration tests:** `pnpm test:integration`
+- **Type checks:** `pnpm typecheck`
+- **Lint:** `pnpm lint`
+- **Format:** `pnpm format`
+
+## Coding Standards
 
 - Use TypeScript strict mode.
 - Keep public names generic and product-neutral.
 - Do not include private domains, account IDs, ARNs, secrets, customer data, or proprietary product references.
 - Keep controllers thin and domain logic testable.
 - Add tests with every behavior change.
-- Update [Project Status](docs/project-status.md) when completing or pausing implementation work.
-
-## Change Size
-
-Prefer small vertical changes:
-
-- One API endpoint with tests.
-- One worker behavior with tests.
-- One queue contract with contract tests.
-- One frontend form or graph behavior with tests.
-- One Terraform module or validation improvement.
-
-Avoid broad, untested changes across many modules.
-
-## Running Tests & Checks Locally
-
-Before submitting a Pull Request, verify that all validation checks pass on your machine:
-
-- **Run all unit tests:**
-  ```bash
-  pnpm test
-  ```
-- **Run integration tests:**
-  ```bash
-  pnpm test:integration
-  ```
-- **Run TypeScript type checks:**
-  ```bash
-  pnpm typecheck
-  ```
-- **Lint and format the codebase:**
-  ```bash
-  pnpm lint
-  pnpm format
-  ```
+- Prefer small vertical changes: one endpoint, worker behavior, queue contract, or frontend behavior per PR.
 
 ## Pull Request Checklist
 
-- Typecheck passes (`pnpm typecheck`).
-- Lint and format checks pass (`pnpm lint` & `pnpm format`).
-- Relevant unit tests pass (`pnpm test`).
-- Relevant integration or contract tests pass (`pnpm test:integration`).
-- Terraform is formatted and validated when infrastructure changes.
-- Documentation is updated for behavior or architecture changes.
-- No private identifiers or secrets are included.
+- [ ] Typecheck, lint, and format pass.
+- [ ] Unit and integration tests pass.
+- [ ] Terraform is formatted and validated when infrastructure changes.
+- [ ] Documentation is updated for behavior or architecture changes.
+- [ ] No private identifiers or secrets are included.
+
+## Security
+
+Found a security issue? Do not open a public issue. Follow the instructions in [SECURITY.md](SECURITY.md).
