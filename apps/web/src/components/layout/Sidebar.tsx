@@ -1,16 +1,16 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  GitBranch,
-  User,
-  FileText,
-  Settings,
-  LogOut,
-  Mail,
+  Check,
   ChevronDown,
   ChevronRight,
-  Check,
+  FileText,
+  GitBranch,
+  LogOut,
+  Mail,
+  Settings,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTenant } from '../../contexts/TenantContext';
 import HoverDropdown from '../shared/HoverDropdown';
@@ -29,6 +29,7 @@ const navItems: NavItem[] = [
     icon: User,
     children: [
       { path: '/contacts', label: 'View all' },
+      { path: '/contacts/tags', label: 'Add tag' },
       { path: '/contacts/tags', label: 'Tags' },
     ],
   },
