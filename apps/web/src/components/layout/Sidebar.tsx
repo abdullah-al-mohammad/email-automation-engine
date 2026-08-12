@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
     icon: User,
     children: [
       { path: '/contacts', label: 'View all' },
-      { path: '/contacts/tags', label: 'Add tag' },
+      { path: '/contacts/new', label: 'Add new' },
       { path: '/contacts/tags', label: 'Tags' },
     ],
   },
