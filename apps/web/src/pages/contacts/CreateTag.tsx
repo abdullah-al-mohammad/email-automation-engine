@@ -58,7 +58,6 @@ export default function CreateTag() {
         </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="max-w-xl border rounded-xl p-6 space-y-5">
         <div>
           <label
