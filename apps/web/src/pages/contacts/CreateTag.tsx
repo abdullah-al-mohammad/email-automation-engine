@@ -40,7 +40,6 @@ export default function CreateTag() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <button
           type="button"
