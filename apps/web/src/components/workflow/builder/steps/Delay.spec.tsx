@@ -3,6 +3,7 @@ import { render, screen, cleanup } from '@testing-library/react';
 import DelayStepForm from './Delay';
 
 import { useForm } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
 export function TestFormWrapper({
@@ -50,7 +51,7 @@ describe('DelayStepForm', () => {
   it('renders validation errors', () => {
     const mockErrors = {
       config: { amount: { type: 'manual', message: 'Amount is required' } },
-    } as any;
+    } as FieldErrors<StepFormData>;
     render(
       <TestFormWrapper defaultValues={{ config: { amount: 1, unit: 'days' } }}>
         {({ register, watch }) => (

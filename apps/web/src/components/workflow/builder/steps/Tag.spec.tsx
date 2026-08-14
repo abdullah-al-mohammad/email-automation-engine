@@ -3,6 +3,7 @@ import { render, screen, cleanup } from '@testing-library/react';
 import TagStepForm from './Tag';
 
 import { useForm } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
 export function TestFormWrapper({
@@ -50,7 +51,9 @@ describe('TagStepForm', () => {
   });
 
   it('renders validation errors', () => {
-    const mockErrors = { config: { tagId: { type: 'manual', message: 'Tag is required' } } } as any;
+    const mockErrors = {
+      config: { tagId: { type: 'manual', message: 'Tag is required' } },
+    } as FieldErrors<StepFormData>;
     render(
       <TestFormWrapper defaultValues={{ config: { tagId: 'tag-1' } }}>
         {({ register }) => <TagStepForm register={register} errors={mockErrors} isActive={false} />}

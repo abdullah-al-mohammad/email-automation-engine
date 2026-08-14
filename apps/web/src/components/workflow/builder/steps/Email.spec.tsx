@@ -3,6 +3,7 @@ import { render, screen, cleanup } from '@testing-library/react';
 import EmailStepForm from './Email';
 
 import { useForm } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
 export function TestFormWrapper({
@@ -51,7 +52,7 @@ describe('EmailStepForm', () => {
   it('renders validation errors', () => {
     const mockErrors = {
       config: { templateId: { type: 'manual', message: 'Template is required' } },
-    } as any;
+    } as FieldErrors<StepFormData>;
     render(
       <TestFormWrapper defaultValues={{ config: { templateId: 'tmp-1' } }}>
         {({ register }) => (

@@ -3,6 +3,7 @@ import { render, screen, cleanup } from '@testing-library/react';
 import WebhookStepForm from './Webhook';
 
 import { useForm } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
 
 export function TestFormWrapper({
@@ -45,7 +46,9 @@ describe('WebhookStepForm', () => {
   });
 
   it('renders validation errors', () => {
-    const mockErrors = { configString: { type: 'manual', message: 'Invalid JSON' } } as any;
+    const mockErrors = {
+      configString: { type: 'manual', message: 'Invalid JSON' },
+    } as FieldErrors<StepFormData>;
     render(
       <TestFormWrapper defaultValues={{ configString: '{"url":"https://example.com"}' }}>
         {({ register }) => (
