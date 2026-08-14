@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { TRIGGER_EVENTS, STEP_ACTIONS } from '@email-automation-engine/shared';
+import { STEP_ACTIONS } from '@email-automation-engine/shared';
 import Sidebar from './Sidebar';
 
 vi.mock('./EditTrigger', () => ({
