@@ -24,7 +24,7 @@ export default function CreateTag() {
         queryKey: ['tags', currentTenant?.id],
       });
 
-      navigate('/contacts/tags');
+      void navigate('/contacts/tags');
     },
   });
 
@@ -43,7 +43,7 @@ export default function CreateTag() {
       <div>
         <button
           type="button"
-          onClick={() => navigate('/contacts/tags')}
+          onClick={() => void navigate('/contacts/tags')}
           className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-white mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -90,7 +90,7 @@ export default function CreateTag() {
 
           <button
             type="button"
-            onClick={() => navigate('/contacts/tags')}
+            onClick={() => void navigate('/contacts/tags')}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700"
           >
             Cancel

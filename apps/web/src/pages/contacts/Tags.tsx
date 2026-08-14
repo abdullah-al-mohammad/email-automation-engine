@@ -49,7 +49,7 @@ export default function Tags() {
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tags</h1>
           <button
-            onClick={() => navigate('/contacts/tags/create')}
+            onClick={() => void navigate('/contacts/tags/create')}
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
           >
             <Plus className="w-4 h-4" />
