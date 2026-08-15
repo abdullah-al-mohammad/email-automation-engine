@@ -37,12 +37,9 @@ export default function CreateWorkflow() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create workflow</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          Start a new automated email sequence to engage your audience.
-        </p>
       </div>
 
       <form onSubmit={void handleSubmit(onSubmit)} className="space-y-4 max-w-md">
@@ -53,7 +50,7 @@ export default function CreateWorkflow() {
           <input
             {...register('name')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-            placeholder="Onboarding sequence"
+            placeholder=""
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-500">{errors.name.message as string}</p>
@@ -67,7 +64,7 @@ export default function CreateWorkflow() {
             {...register('description')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             rows={3}
-            placeholder="What does this workflow do?"
+            placeholder=""
           />
           {errors.description && (
             <p className="mt-1 text-sm text-red-500">{errors.description.message as string}</p>
