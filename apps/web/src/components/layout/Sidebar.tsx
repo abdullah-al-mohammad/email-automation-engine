@@ -132,7 +132,10 @@ export default function Sidebar() {
               {hasChildren && isOpen && (
                 <div className="mt-0.5 flex flex-col gap-0.5">
                   {children.map((child) => {
-                    const isChildActive = location.pathname === child.path;
+                    const isChildActive =
+                      location.pathname === child.path ||
+                      (child.path !== '/contacts' &&
+                        location.pathname.startsWith(`${child.path}/`));
                     return (
                       <Link
                         key={child.path}
