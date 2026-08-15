@@ -326,10 +326,14 @@ export default function NewContact() {
           className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4 max-w-lg"
         >
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
+            <label
+              htmlFor="new-contact-email"
+              className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
+            >
               Email *
             </label>
             <input
+              id="new-contact-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -339,10 +343,14 @@ export default function NewContact() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
+            <label
+              htmlFor="new-contact-status"
+              className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
+            >
               Status
             </label>
             <select
+              id="new-contact-status"
               value={String(subscribed)}
               onChange={(e) => setSubscribed(e.target.value === 'true')}
               className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"

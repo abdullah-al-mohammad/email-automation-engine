@@ -39,33 +39,37 @@ export default function CreateWorkflow() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create workflow</h1>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Create workflow</h1>
 
       <form onSubmit={void handleSubmit(onSubmit)} className="space-y-4 max-w-md">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="create-workflow-name"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Name
           </label>
           <input
+            id="create-workflow-name"
             {...register('name')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-            placeholder=""
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-500">{errors.name.message as string}</p>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="create-workflow-description"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Description (optional)
           </label>
           <textarea
+            id="create-workflow-description"
             {...register('description')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             rows={3}
-            placeholder=""
           />
           {errors.description && (
             <p className="mt-1 text-sm text-red-500">{errors.description.message as string}</p>
