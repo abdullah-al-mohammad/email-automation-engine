@@ -1,7 +1,6 @@
 import { type TagResponse } from '@email-automation-engine/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Tag, Trash2 } from 'lucide-react';
-import pluralize from 'pluralize';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmptyState from '../../components/shared/EmptyState';
@@ -53,13 +52,9 @@ export default function Tags() {
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Create tag
+            Add new
           </button>
         </div>
-
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-          {pluralize('tag', tags.length, true)} total
-        </p>
       </div>
 
       <div>
