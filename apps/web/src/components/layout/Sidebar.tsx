@@ -57,7 +57,9 @@ function getGroupContentId(path: string) {
 }
 
 function findActiveGroupPath(pathname: string) {
-  return navItems.find((item) => item.children && isSectionActive(pathname, item.path))?.path ?? null;
+  return (
+    navItems.find((item) => item.children && isSectionActive(pathname, item.path))?.path ?? null
+  );
 }
 
 function SidebarNavEntry({
@@ -98,7 +100,9 @@ function SidebarNavEntry({
       >
         <Icon className="w-4 h-4" />
         {label}
-        <ChevronRight className={`w-4 h-4 ml-auto transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+        <ChevronRight
+          className={`w-4 h-4 ml-auto transition-transform ${isOpen ? 'rotate-90' : ''}`}
+        />
       </button>
       {isOpen && (
         <div id={groupContentId} className="mt-0.5 flex flex-col gap-0.5">
@@ -127,7 +131,9 @@ export default function Sidebar() {
   const { logout } = useAuth();
   const { currentTenant, tenants, setCurrentTenant } = useTenant();
   const navigate = useNavigate();
-  const [openGroup, setOpenGroup] = useState<string | null>(() => findActiveGroupPath(location.pathname));
+  const [openGroup, setOpenGroup] = useState<string | null>(() =>
+    findActiveGroupPath(location.pathname),
+  );
 
   useEffect(() => {
     setOpenGroup(findActiveGroupPath(location.pathname));
