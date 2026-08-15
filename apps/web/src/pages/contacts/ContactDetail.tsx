@@ -1,21 +1,30 @@
 import { type ContactResponse, type TagResponse } from '@email-automation-engine/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Calendar, Check, Mail, Pencil, Tag, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Calendar, Mail, Tag, Trash2, X } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import EditableRow from '../../components/shared/EditableRow';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
+import { useContactEditor } from './hooks/useContactEditor';
 
 export default function ContactDetailPage() {
   const { contactId } = useParams<{ contactId: string }>();
   const navigate = useNavigate();
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [editingField, setEditingField] = useState<'email' | 'subscribed' | null>(null);
-  const [editEmail, setEditEmail] = useState('');
-  const [editSubscribed, setEditSubscribed] = useState(true);
+  const {
+    editingField,
+    editEmail,
+    editSubscribed,
+    showDeleteConfirm,
+    startEditEmail,
+    startEditSubscribed,
+    setEditEmail,
+    setEditSubscribed,
+    finishEdit,
+    toggleDeleteConfirm,
+  } = useContactEditor();
 
   const { data: contact, isLoading } = useQuery({
     queryKey: ['contact', currentTenant?.id, contactId],
@@ -48,7 +57,7 @@ export default function ContactDetailPage() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['contact', currentTenant?.id, contactId] });
       void queryClient.invalidateQueries({ queryKey: ['contacts', currentTenant?.id] });
-      setEditingField(null);
+      finishEdit();
     },
   });
 
@@ -82,14 +91,12 @@ export default function ContactDetailPage() {
     },
   });
 
-  const startEditEmail = () => {
-    setEditEmail(contact?.email ?? '');
-    setEditingField('email');
+  const handleStartEditEmail = () => {
+    startEditEmail(contact?.email ?? '');
   };
 
-  const startEditSubscribed = () => {
-    setEditSubscribed(contact?.subscribed ?? true);
-    setEditingField('subscribed');
+  const handleStartEditSubscribed = () => {
+    startEditSubscribed(contact?.subscribed ?? true);
   };
 
   const saveEdit = () => {
@@ -101,7 +108,7 @@ export default function ContactDetailPage() {
   };
 
   const cancelEdit = () => {
-    setEditingField(null);
+    finishEdit();
   };
 
   const assignedTagIds = contact?.tags?.map((t) => t.id) ?? [];
@@ -128,98 +135,52 @@ export default function ContactDetailPage() {
       ) : (
         <div className="space-y-6 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
           {/* Email */}
-          <div className="flex items-start gap-3">
-            <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-xs text-gray-500 dark:text-zinc-400 mb-1">Email</p>
-              {editingField === 'email' ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="email"
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <button
-                    onClick={saveEdit}
-                    disabled={updateMutation.isPending}
-                    className="p-1.5 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={cancelEdit}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {contact.email}
-                  </p>
-                  <button
-                    onClick={startEditEmail}
-                    className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300"
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          <EditableRow
+            label="Email"
+            leading={<Mail className="w-5 h-5 text-gray-400" />}
+            isEditing={editingField === 'email'}
+            displayValue={contact.email}
+            isSaving={updateMutation.isPending}
+            onStartEdit={handleStartEditEmail}
+            onSave={saveEdit}
+            onCancel={cancelEdit}
+          >
+            <input
+              type="email"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </EditableRow>
 
           {/* Status */}
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 flex items-center justify-center mt-0.5">
-              <div
-                className={`w-2.5 h-2.5 rounded-full ${
-                  contact.subscribed ? 'bg-green-500' : 'bg-gray-400'
-                }`}
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs text-gray-500 dark:text-zinc-400 mb-1">Status</p>
-              {editingField === 'subscribed' ? (
-                <div className="flex items-center gap-2">
-                  <select
-                    value={String(editSubscribed)}
-                    onChange={(e) => setEditSubscribed(e.target.value === 'true')}
-                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="true">Subscribed</option>
-                    <option value="false">Unsubscribed</option>
-                  </select>
-                  <button
-                    onClick={saveEdit}
-                    disabled={updateMutation.isPending}
-                    className="p-1.5 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={cancelEdit}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {contact.subscribed ? 'Subscribed' : 'Unsubscribed'}
-                  </p>
-                  <button
-                    onClick={startEditSubscribed}
-                    className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300"
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          <EditableRow
+            label="Status"
+            leading={
+              <div className="w-5 h-5 flex items-center justify-center">
+                <div
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    contact.subscribed ? 'bg-green-500' : 'bg-gray-400'
+                  }`}
+                />
+              </div>
+            }
+            isEditing={editingField === 'subscribed'}
+            displayValue={contact.subscribed ? 'Subscribed' : 'Unsubscribed'}
+            isSaving={updateMutation.isPending}
+            onStartEdit={handleStartEditSubscribed}
+            onSave={saveEdit}
+            onCancel={cancelEdit}
+          >
+            <select
+              value={String(editSubscribed)}
+              onChange={(e) => setEditSubscribed(e.target.value === 'true')}
+              className="px-3 py-1.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="true">Subscribed</option>
+              <option value="false">Unsubscribed</option>
+            </select>
+          </EditableRow>
 
           {/* Dates */}
           <div className="flex items-start gap-3">
@@ -320,7 +281,7 @@ export default function ContactDetailPage() {
                 <p className="text-sm text-red-600 dark:text-red-400">Delete this contact?</p>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setShowDeleteConfirm(false)}
+                    onClick={toggleDeleteConfirm}
                     className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
                   >
                     Cancel
@@ -335,7 +296,7 @@ export default function ContactDetailPage() {
               </div>
             ) : (
               <button
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={toggleDeleteConfirm}
                 className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
