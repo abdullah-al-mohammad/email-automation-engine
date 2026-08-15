@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite",
-    "lint": "eslint src --ignore-pattern \"**/*.spec.ts\" --ignore-pattern \"**/*.spec.tsx\"",
+    "lint": "eslint src",
     "format:check": "prettier --check package.json tsconfig.json vite.config.ts vitest.config.ts index.html src",
     "test": "vitest run",
     "test:integration": "vitest run --passWithNoTests",
