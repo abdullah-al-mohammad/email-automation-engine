@@ -1,11 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type ContactResponse, type ImportContactsResult } from '@email-automation-engine/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, CheckCircle, FileText, Upload, UserPlus } from 'lucide-react';
+import pluralize from 'pluralize';
+import { useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { ArrowLeft, Upload, UserPlus, FileText, CheckCircle, AlertCircle } from 'lucide-react';
-import pluralize from 'pluralize';
 
 type Tab = 'import' | 'single';
 
@@ -121,18 +121,7 @@ export default function NewContact() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => void navigate('/contacts')}
-          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add contacts</h1>
-        </div>
-      </div>
-
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add contacts</h1>
       {/* Tabs */}
       <div className="flex gap-1 border-b border-gray-200 dark:border-zinc-800">
         <button
