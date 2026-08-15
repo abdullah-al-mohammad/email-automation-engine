@@ -261,15 +261,7 @@ class WorkflowGraphBuilder {
           ...edgeStyles,
         });
       } else {
-        const labelText =
-          typeof branchType === 'boolean' ? (branchType ? 'True' : 'False') : undefined;
-        this.addExitNode(
-          sourceId,
-          `${step.id}-${branchSuffix}`,
-          branchHandle,
-          labelText,
-          edgeStyles,
-        );
+        this.addExitNode(sourceId, `${step.id}-${branchSuffix}`, branchHandle, edgeStyles);
       }
     }
   }
@@ -278,7 +270,6 @@ class WorkflowGraphBuilder {
     parentId: string,
     idSuffix: string,
     sourceHandle?: string,
-    label?: string,
     extraStyles?: Partial<Edge>,
   ): void {
     const exitId = `exit-${idSuffix}`;
@@ -288,22 +279,14 @@ class WorkflowGraphBuilder {
       DIMENSIONS.NODE_HEIGHT,
     );
 
-    const edge: Edge = {
+    this.addGraphEdge({
       id: `edge-${parentId}-${exitId}`,
       source: parentId,
       target: exitId,
       type: 'smoothstep',
       ...(sourceHandle && { sourceHandle }),
       ...extraStyles,
-    };
-
-    if (label && !extraStyles?.label) {
-      if (label === 'True') Object.assign(edge, STYLES.trueBranch);
-      else if (label === 'False') Object.assign(edge, STYLES.falseBranch);
-      else edge.label = label;
-    }
-
-    this.addGraphEdge(edge);
+    });
   }
 
   private addGraphNode(node: Node, width: number, height: number): void {
@@ -330,64 +313,74 @@ class WorkflowGraphBuilder {
       };
     });
 
-    // Enforce "True" branch on the left, "False" branch on the right
     this.context.steps.forEach((step) => {
-      if (step.action === 'conditional_split') {
-        const splitNodeId = `step-${step.id}`;
-        const splitNode = layoutedNodes.find((n) => n.id === splitNodeId);
+      if (step.action !== 'conditional_split') return;
 
-        // Find the direct children IDs
-        let trueNodeId = step.trueStepId ? `step-${step.trueStepId}` : undefined;
-        let falseNodeId = step.falseStepId ? `step-${step.falseStepId}` : undefined;
+      const splitNodeId = `step-${step.id}`;
+      const splitNode = layoutedNodes.find((n) => n.id === splitNodeId);
+      if (!splitNode) return;
 
-        if (!trueNodeId) {
-          trueNodeId = this.edges.find(
-            (e) => e.source === splitNodeId && e.sourceHandle === 'true',
-          )?.target;
-        }
-        if (!falseNodeId) {
-          falseNodeId = this.edges.find(
-            (e) => e.source === splitNodeId && e.sourceHandle === 'false',
-          )?.target;
-        }
+      // Prefer the configured branch steps, fall back to the edge handles
+      let trueNodeId = step.trueStepId ? `step-${step.trueStepId}` : undefined;
+      let falseNodeId = step.falseStepId ? `step-${step.falseStepId}` : undefined;
 
-        const trueNode = layoutedNodes.find((n) => n.id === trueNodeId);
-        const falseNode = layoutedNodes.find((n) => n.id === falseNodeId);
+      if (!trueNodeId) {
+        trueNodeId = this.edges.find(
+          (e) => e.source === splitNodeId && e.sourceHandle === 'true',
+        )?.target;
+      }
+      if (!falseNodeId) {
+        falseNodeId = this.edges.find(
+          (e) => e.source === splitNodeId && e.sourceHandle === 'false',
+        )?.target;
+      }
 
-        if (splitNode && trueNode && falseNode && trueNode.position.x > falseNode.position.x) {
-          // They are swapped! True is on the right. We must mirror their subtrees.
-          const parentWidth = this.dagreGraph.node(splitNode.id).width;
-          const parentCenterX = splitNode.position.x + parentWidth / 2;
-
-          // Find all descendants of both trueNodeId and falseNodeId
-          const descendants = new Set<string>();
-          const queue = [trueNodeId, falseNodeId];
-
-          while (queue.length > 0) {
-            const currentId = queue.shift()!;
-            if (!descendants.has(currentId)) {
-              descendants.add(currentId);
-              const children = this.edges
-                .filter((e) => e.source === currentId)
-                .map((e) => e.target);
-              queue.push(...children);
-            }
-          }
-
-          // Mirror X coordinates across the parent's center
-          descendants.forEach((descendantId) => {
-            const nodeToMirror = layoutedNodes.find((n) => n.id === descendantId);
-            if (nodeToMirror) {
-              const nodeWidth = this.dagreGraph.node(nodeToMirror.id).width;
-              nodeToMirror.position.x = 2 * parentCenterX - nodeToMirror.position.x - nodeWidth;
-            }
-          });
-        }
+      if (trueNodeId && falseNodeId) {
+        this.enforceTrueOnLeft(layoutedNodes, splitNode, trueNodeId, falseNodeId);
       }
     });
 
     return { nodes: layoutedNodes, edges: this.edges };
   }
+
+  private enforceTrueOnLeft(
+    layoutedNodes: Node[],
+    splitNode: Node,
+    trueNodeId: string,
+    falseNodeId: string,
+  ): void {
+    const trueNode = layoutedNodes.find((n) => n.id === trueNodeId);
+    const falseNode = layoutedNodes.find((n) => n.id === falseNodeId);
+
+    if (!trueNode || !falseNode || trueNode.position.x <= falseNode.position.x) return;
+
+    const parentWidth = this.dagreGraph.node(splitNode.id).width;
+    const parentCenterX = splitNode.position.x + parentWidth / 2;
+
+    // Mirror X coordinates of both subtrees across the parent's center
+    collectDescendants([trueNodeId, falseNodeId], this.edges).forEach((descendantId) => {
+      const nodeToMirror = layoutedNodes.find((n) => n.id === descendantId);
+      if (nodeToMirror) {
+        const nodeWidth = this.dagreGraph.node(nodeToMirror.id).width;
+        nodeToMirror.position.x = 2 * parentCenterX - nodeToMirror.position.x - nodeWidth;
+      }
+    });
+  }
+}
+
+function collectDescendants(roots: string[], edges: Edge[]): string[] {
+  const descendants = new Set<string>();
+  const queue = [...roots];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    if (descendants.has(currentId)) continue;
+
+    descendants.add(currentId);
+    queue.push(...edges.filter((e) => e.source === currentId).map((e) => e.target));
+  }
+
+  return [...descendants];
 }
 
 export function generateWorkflowGraph(

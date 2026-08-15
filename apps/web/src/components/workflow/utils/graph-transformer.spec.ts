@@ -109,4 +109,70 @@ describe('graph-transformer', () => {
     expect(step1Node.position.x).toBeDefined();
     expect(step1Node.position.y).toBeDefined();
   });
+
+  it('should place the True branch of a conditional split on the left', () => {
+    const trigger: WorkflowTriggerResponse = {
+      id: 'trigger-1',
+      tenantId: 'tenant-1',
+      workflowId: 'wf-1',
+      event: 'contact_created',
+      filters: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const steps: WorkflowStepResponse[] = [
+      {
+        id: 'step-split',
+        tenantId: 'tenant-1',
+        workflowId: 'wf-1',
+        parentWorkflowStepId: null,
+        action: 'conditional_split',
+        position: 0,
+        trueStepId: 'step-true',
+        falseStepId: 'step-false',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: 'step-true',
+        tenantId: 'tenant-1',
+        workflowId: 'wf-1',
+        parentWorkflowStepId: 'step-split',
+        action: 'send_email',
+        position: 1,
+        config: { templateId: 'tpl-true' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: 'step-false',
+        tenantId: 'tenant-1',
+        workflowId: 'wf-1',
+        parentWorkflowStepId: 'step-split',
+        action: 'send_email',
+        position: 2,
+        config: { templateId: 'tpl-false' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    const result = generateWorkflowGraph(
+      [trigger],
+      steps,
+      true,
+      () => {},
+      () => {},
+    );
+
+    const trueNode = result.nodes.find((n) => n.id === 'step-step-true')!;
+    const falseNode = result.nodes.find((n) => n.id === 'step-step-false')!;
+    expect(trueNode.position.x).toBeLessThan(falseNode.position.x);
+
+    const trueEdge = result.edges.find(
+      (e) => e.source === 'step-step-split' && e.sourceHandle === 'true',
+    )!;
+    expect(trueEdge.label).toBe('True');
+  });
 });
