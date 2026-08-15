@@ -1,5 +1,6 @@
-import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { type StepFormData } from '@email-automation-engine/shared';
+import type { FieldErrors, UseFormRegister } from 'react-hook-form';
+
 import { useEmailTemplates } from '../../../../pages/workflow/hooks/useEmailTemplates';
 
 interface EmailProps {
@@ -13,10 +14,14 @@ export default function Email({ register, errors, isActive }: EmailProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+      <label
+        htmlFor="email-template"
+        className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+      >
         Email template
       </label>
       <select
+        id="email-template"
         {...register('config.templateId')}
         disabled={isActive}
         className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 ${

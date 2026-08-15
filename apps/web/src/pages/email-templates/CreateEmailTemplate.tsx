@@ -1,12 +1,13 @@
+import {
+  type CreateEmailTemplateDto,
+  CreateEmailTemplateSchema,
+  type EmailTemplateResponse,
+} from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import {
-  type EmailTemplateResponse,
-  CreateEmailTemplateSchema,
-  type CreateEmailTemplateDto,
-} from '@email-automation-engine/shared';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
@@ -56,10 +57,14 @@ export default function CreateEmailTemplate() {
 
       <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-4 max-w-xl">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="email-template-name"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Template name
           </label>
           <input
+            id="email-template-name"
             type="text"
             {...register('name')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -69,10 +74,14 @@ export default function CreateEmailTemplate() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="email-template-subject"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Subject line
           </label>
           <input
+            id="email-template-subject"
             type="text"
             {...register('subject')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -82,10 +91,14 @@ export default function CreateEmailTemplate() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="email-template-html"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             HTML Content
           </label>
           <textarea
+            id="email-template-html"
             {...register('html')}
             className="w-full font-mono text-sm px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             rows={8}
@@ -94,10 +107,14 @@ export default function CreateEmailTemplate() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="email-template-text"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Plain text fallback (optional)
           </label>
           <textarea
+            id="email-template-text"
             {...register('text')}
             className="w-full font-mono text-sm px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             rows={4}

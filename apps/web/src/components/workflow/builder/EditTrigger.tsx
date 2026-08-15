@@ -1,14 +1,15 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  type WorkflowTriggerResponse,
   TRIGGER_EVENTS,
-  TriggerFormSchema,
   type TriggerFormData,
+  TriggerFormSchema,
   type UpdateWorkflowTriggerDto,
+  type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import { useWorkflowTriggers } from '../../../pages/workflow/hooks/useWorkflowTriggers';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
 import { useTags } from '../../../pages/workflow/hooks/useTags';
+import { useWorkflowTriggers } from '../../../pages/workflow/hooks/useWorkflowTriggers';
 
 interface TriggerFormProps {
   trigger: WorkflowTriggerResponse;
@@ -82,10 +83,14 @@ export default function EditTrigger({
         {(selectedEvent === TRIGGER_EVENTS.TAG_ATTACHED ||
           selectedEvent === TRIGGER_EVENTS.TAG_DETACHED) && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+            <label
+              htmlFor="trigger-tag"
+              className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+            >
               Select tag
             </label>
             <select
+              id="trigger-tag"
               {...register('tagId')}
               disabled={isActive}
               className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"

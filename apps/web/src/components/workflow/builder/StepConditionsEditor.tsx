@@ -1,14 +1,15 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
-import { useWorkflowStepConditions } from '../../../pages/workflow/hooks/useWorkflowStepConditions';
-import { useTags } from '../../../pages/workflow/hooks/useTags';
 import {
-  LOGICAL_OPERATORS,
-  type CreateWorkflowStepConditionDto,
-  type LogicalOperator,
-  CONDITION_TYPES,
   CONDITION_OPERATORS,
+  CONDITION_TYPES,
+  type CreateWorkflowStepConditionDto,
+  LOGICAL_OPERATORS,
+  type LogicalOperator,
 } from '@email-automation-engine/shared';
+import { Plus, Trash2 } from 'lucide-react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+
+import { useTags } from '../../../pages/workflow/hooks/useTags';
+import { useWorkflowStepConditions } from '../../../pages/workflow/hooks/useWorkflowStepConditions';
 
 interface StepConditionsEditorProps {
   workflowId: string;
@@ -123,9 +124,9 @@ const StepConditionsEditor = forwardRef<StepConditionsEditorRef, StepConditionsE
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300">
+          <span className="block text-sm font-medium text-gray-700 dark:text-zinc-300">
             Split Conditions
-          </label>
+          </span>
           {!isActive && (
             <button
               type="button"
