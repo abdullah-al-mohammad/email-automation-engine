@@ -1,24 +1,25 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Sidebar from './components/layout/Sidebar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
-import Sidebar from './components/layout/Sidebar';
 import Signin from './pages/auth/Signin';
 import Signup from './pages/auth/Signup';
-import Tenants from './pages/tenant/Tenants';
-import Workflows from './pages/workflow/Workflows';
-import CreateWorkflow from './pages/workflow/CreateWorkflow';
-import EditWorkflow from './pages/workflow/EditWorkflow';
-import WorkflowBuilder from './pages/workflow/WorkflowBuilder';
-import WorkflowContacts from './pages/workflow/WorkflowContacts';
-import ExecutionSummary from './pages/workflow/ExecutionSummary';
-import Settings from './pages/settings/Settings';
-import EmailTemplates from './pages/email-templates/EmailTemplates';
-import Contacts from './pages/contacts/Contacts';
 import ContactDetailPage from './pages/contacts/ContactDetail';
+import Contacts from './pages/contacts/Contacts';
 import NewContact from './pages/contacts/NewContact';
 import Tags from './pages/contacts/Tags';
+import EmailTemplates from './pages/email-templates/EmailTemplates';
+import Settings from './pages/settings/Settings';
+import Tenants from './pages/tenant/Tenants';
+import CreateWorkflow from './pages/workflow/CreateWorkflow';
+import EditWorkflow from './pages/workflow/EditWorkflow';
+import ExecutionSummary from './pages/workflow/ExecutionSummary';
+import WorkflowBuilder from './pages/workflow/WorkflowBuilder';
+import WorkflowContacts from './pages/workflow/WorkflowContacts';
+import Workflows from './pages/workflow/Workflows';
 
+import CreateTag from './pages/contacts/CreateTag';
 import CreateEmailTemplate from './pages/email-templates/CreateEmailTemplate';
 
 const appRoutes = [
@@ -31,6 +32,7 @@ const appRoutes = [
   { path: '/workflows/:workflowId/contacts', element: <WorkflowContacts /> },
   { path: '/contacts', element: <Contacts /> },
   { path: '/contacts/tags', element: <Tags /> },
+  { path: '/contacts/tags/create', element: <CreateTag /> },
   { path: '/contacts/new', element: <NewContact /> },
   { path: '/contacts/:contactId', element: <ContactDetailPage /> },
   { path: '/email-templates', element: <EmailTemplates /> },

@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom';
 import { type WorkflowResponse } from '@email-automation-engine/shared';
-import { useState, useRef, useEffect } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 import {
-  MoreVertical,
+  Activity,
+  Clock,
   Edit2,
+  MoreVertical,
   Trash2,
   Workflow as WorkflowIcon,
-  Clock,
-  Activity,
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function WorkflowListItem({
   workflow,
