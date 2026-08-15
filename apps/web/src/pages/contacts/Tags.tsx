@@ -1,9 +1,8 @@
 import { type TagResponse } from '@email-automation-engine/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Tag, Trash2 } from 'lucide-react';
-import pluralize from 'pluralize';
 import { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import EmptyState from '../../components/shared/EmptyState';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
@@ -11,74 +10,54 @@ import api from '../../lib/api';
 export default function Tags() {
   const { currentTenant } = useTenant();
   const queryClient = useQueryClient();
-  const [newTagName, setNewTagName] = useState('');
+  const navigate = useNavigate();
+
   const [tagToDelete, setTagToDelete] = useState<string | null>(null);
 
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ['tags', currentTenant?.id],
     queryFn: async () => {
       const res = await api.get<TagResponse[]>(`/tenants/${currentTenant?.id}/tags`);
+
       return res.data;
     },
     enabled: !!currentTenant,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (name: string) => {
-      await api.post(`/tenants/${currentTenant?.id}/tags`, { name });
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['tags', currentTenant?.id] });
-      setNewTagName('');
-    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (tagId: string) => {
       await api.delete(`/tenants/${currentTenant?.id}/tags/${tagId}`);
     },
+
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['tags', currentTenant?.id] });
-      void queryClient.invalidateQueries({ queryKey: ['contacts', currentTenant?.id] });
+      void queryClient.invalidateQueries({
+        queryKey: ['tags', currentTenant?.id],
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: ['contacts', currentTenant?.id],
+      });
+
       setTagToDelete(null);
     },
   });
 
-  const handleCreate = () => {
-    const name = newTagName.trim();
-    if (!name) return;
-    createMutation.mutate(name);
-  };
-
   return (
     <div className="space-y-6">
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tags</h1>
+          <button
+            onClick={() => void navigate('/contacts/tags/create')}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add new
+          </button>
+        </div>
+      </div>
+
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tags</h1>
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-          {pluralize('tag', tags.length, true)} total
-        </p>
-      </div>
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="New tag name..."
-          value={newTagName}
-          onChange={(e) => setNewTagName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-          className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-        />
-        <button
-          onClick={handleCreate}
-          disabled={!newTagName.trim() || createMutation.isPending}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create tag
-        </button>
-      </div>
-
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="py-12 text-center text-gray-500 text-sm">Loading tags...</div>
         ) : tags.length === 0 ? (
@@ -98,15 +77,19 @@ export default function Tags() {
                   <Tag className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                   {tag.name}
                 </span>
+
                 {tagToDelete === tag.id ? (
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-red-600 dark:text-red-400">Delete?</span>
+
                     <button
                       onClick={() => deleteMutation.mutate(tag.id)}
-                      className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                      disabled={deleteMutation.isPending}
+                      className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
                     >
                       Yes
                     </button>
+
                     <button
                       onClick={() => setTagToDelete(null)}
                       className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 rounded hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"

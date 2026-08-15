@@ -1,10 +1,9 @@
 import { type ContactResponse, type ImportContactsResult } from '@email-automation-engine/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, ArrowLeft, CheckCircle, FileText, Upload, UserPlus } from 'lucide-react';
+import { AlertCircle, CheckCircle, FileText, Upload, UserPlus } from 'lucide-react';
 import pluralize from 'pluralize';
 import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
@@ -122,18 +121,7 @@ export default function NewContact() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => void navigate('/contacts')}
-          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add contacts</h1>
-        </div>
-      </div>
-
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add contacts</h1>
       {/* Tabs */}
       <div className="flex gap-1 border-b border-gray-200 dark:border-zinc-800">
         <button
@@ -337,14 +325,10 @@ export default function NewContact() {
           className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4 max-w-lg"
         >
           <div>
-            <label
-              htmlFor="new-contact-email"
-              className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
-            >
+            <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
               Email *
             </label>
             <input
-              id="new-contact-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -354,14 +338,10 @@ export default function NewContact() {
           </div>
 
           <div>
-            <label
-              htmlFor="new-contact-status"
-              className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
-            >
+            <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
               Status
             </label>
             <select
-              id="new-contact-status"
               value={String(subscribed)}
               onChange={(e) => setSubscribed(e.target.value === 'true')}
               className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
