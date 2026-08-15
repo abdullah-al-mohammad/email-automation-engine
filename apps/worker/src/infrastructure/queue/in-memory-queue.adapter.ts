@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+
 import { type QueueService, type SendMessageOptions } from './queue.interface';
 
 export interface InMemoryQueuedMessage<T = unknown> {

@@ -1,9 +1,10 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { parse } from 'csv-parse/sync';
-import { CONTACT_REPOSITORY } from '../../constants/tokens';
-import { ContactRepository } from '../../domain/repositories/contact.repository';
-import { Contact } from '../../domain/aggregates/contact.aggregate';
 import { type ImportContactsResult } from '@email-automation-engine/shared';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { parse } from 'csv-parse/sync';
+
+import { CONTACT_REPOSITORY } from '../../constants/tokens';
+import { Contact } from '../../domain/aggregates/contact.aggregate';
+import { ContactRepository } from '../../domain/repositories/contact.repository';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PREVIEW_MAX_ROWS = 10;

@@ -1,8 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { IEmailTemplateRepository } from '../../domain/repositories/email-template.repository';
+import { CreateEmailTemplateDto, UpdateEmailTemplateDto } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { EMAIL_TEMPLATE_REPOSITORY } from '../../constants/tokens';
 import { EmailTemplate } from '../../domain/aggregates/email-template.aggregate';
-import { CreateEmailTemplateDto, UpdateEmailTemplateDto } from '@email-automation-engine/shared';
+import { IEmailTemplateRepository } from '../../domain/repositories/email-template.repository';
 
 @Injectable()
 export class EmailTemplateService {

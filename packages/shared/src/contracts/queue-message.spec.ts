@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { queueMessageEnvelopeSchema } from './queue-message';
 
 describe('queueMessageEnvelopeSchema', () => {

@@ -1,10 +1,11 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import {
   BadRequestException,
+  type ExecutionContext,
   ForbiddenException,
   NotFoundException,
-  type ExecutionContext,
 } from '@nestjs/common';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import { TenantMembershipGuard } from './tenant-membership.guard';
 
 describe('TenantMembershipGuard', () => {

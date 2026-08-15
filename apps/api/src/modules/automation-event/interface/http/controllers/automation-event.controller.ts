@@ -1,10 +1,11 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { AutomationEventService } from '../../../application/services/automation-event.service';
+import { AutomationEventDto, AutomationEventSchema } from '@email-automation-engine/shared';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+
+import { ZodValidationPipe } from '../../../../../infrastructure/pipes/zod-validation.pipe';
+import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
 import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
 import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
-import { ZodValidationPipe } from '../../../../../infrastructure/pipes/zod-validation.pipe';
-import { AutomationEventSchema, AutomationEventDto } from '@email-automation-engine/shared';
-import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
+import { AutomationEventService } from '../../../application/services/automation-event.service';
 
 @Controller('automation/events')
 @UseGuards(AuthGuard, TenantMembershipGuard)

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { IQueueService, SendMessageOptions } from './queue.interface';
 import { randomUUID } from 'crypto';
+
+import type { IQueueService, SendMessageOptions } from './queue.interface';
 
 export interface InMemoryQueuedMessage<T = unknown> {
   message: T;

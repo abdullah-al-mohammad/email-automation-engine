@@ -1,23 +1,22 @@
-import { Handle, Position } from '@xyflow/react';
-import { useMemo } from 'react';
 import {
-  type WorkflowStepResponse,
-  SUPPORTED_STEP_ACTIONS,
   STEP_ACTIONS,
+  SUPPORTED_STEP_ACTIONS,
+  type WorkflowStepResponse,
 } from '@email-automation-engine/shared';
-
+import { Handle, Position } from '@xyflow/react';
 import {
-  Mail,
   Clock,
   GitBranch,
-  Tag,
-  Plus,
+  Mail,
   Minus,
-  UserX,
-  UserMinus,
-  Webhook,
+  Plus,
   Settings,
+  Tag,
+  UserMinus,
+  UserX,
+  Webhook,
 } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { useEmailTemplates } from '../../../pages/workflow/hooks/useEmailTemplates';
 import { useTags } from '../../../pages/workflow/hooks/useTags';

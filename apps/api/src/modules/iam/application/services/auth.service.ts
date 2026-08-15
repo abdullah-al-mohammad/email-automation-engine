@@ -1,20 +1,21 @@
 import {
-  Injectable,
-  UnauthorizedException,
+  type AuthResponse,
+  type SigninDto,
+  type SignupDto,
+  USER_STATUS,
+  type UserResponse,
+} from '@email-automation-engine/shared';
+import {
   ConflictException,
   ForbiddenException,
   Inject,
+  Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
-import {
-  type SignupDto,
-  type SigninDto,
-  type AuthResponse,
-  type UserResponse,
-  USER_STATUS,
-} from '@email-automation-engine/shared';
-import { USER_REPOSITORY, PASSWORD_HASHER, TOKEN_SERVICE } from '../../constants/tokens';
-import { type UserRepository } from '../../domain/repositories/user.repository';
+
+import { PASSWORD_HASHER, TOKEN_SERVICE, USER_REPOSITORY } from '../../constants/tokens';
 import { User } from '../../domain/aggregates/user.aggregate';
+import { type UserRepository } from '../../domain/repositories/user.repository';
 import { PasswordHasher } from '../../infrastructure/security/password-hasher.service';
 import { TokenService } from '../../infrastructure/security/token.service';
 

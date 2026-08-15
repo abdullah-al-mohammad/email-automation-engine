@@ -1,27 +1,28 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  UsePipes,
-  HttpCode,
-} from '@nestjs/common';
-import {
-  createTenantInvitationSchema,
   type CreateTenantInvitationDto,
+  createTenantInvitationSchema,
   type TenantInvitationResponse,
 } from '@email-automation-engine/shared';
-import { TenantInvitationService } from '../../application/services/tenant-invitation.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
-import { PermissionsGuard } from '../guards/permissions.guard';
-import { RequirePermissions } from '../decorators/require-permissions.decorator';
-import { CurrentUser } from '../decorators/current-user.decorator';
-import { CurrentTenant } from '../decorators/current-tenant.decorator';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
+import { TenantInvitationService } from '../../application/services/tenant-invitation.service';
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { RequirePermissions } from '../decorators/require-permissions.decorator';
+import { AuthGuard } from '../guards/auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 
 @Controller('tenants/:tenantId/invitations')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

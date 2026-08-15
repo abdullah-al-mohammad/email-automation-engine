@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+
 import { createCacheService } from './cache.factory';
 import { InMemoryCacheAdapter } from './in-memory-cache.adapter';
 import { RedisCacheAdapter } from './redis-cache.adapter';

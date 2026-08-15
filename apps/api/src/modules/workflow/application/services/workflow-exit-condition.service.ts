@@ -1,12 +1,13 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import {
   type CreateWorkflowExitConditionDto,
   type UpdateWorkflowExitConditionDto,
   type WorkflowExitConditionResponse,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { WORKFLOW_EXIT_CONDITION_REPOSITORY } from '../../constants/tokens';
-import { type WorkflowExitConditionRepository } from '../../domain/repositories/workflow-exit-condition.repository';
 import { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
+import { type WorkflowExitConditionRepository } from '../../domain/repositories/workflow-exit-condition.repository';
 import { WorkflowService } from './workflow.service';
 
 @Injectable()

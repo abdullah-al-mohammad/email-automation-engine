@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type TagResponse } from '@email-automation-engine/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Tag, Trash2 } from 'lucide-react';
+import pluralize from 'pluralize';
+import { useState } from 'react';
+
+import EmptyState from '../../components/shared/EmptyState';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { Plus, Trash2, Tag } from 'lucide-react';
-import pluralize from 'pluralize';
-import EmptyState from '../../components/shared/EmptyState';
 
 export default function Tags() {
   const { currentTenant } = useTenant();

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { EmailTemplate } from '../../domain/aggregates/email-template.aggregate';
 import { IEmailTemplateRepository } from '../../domain/repositories/email-template.repository';
 

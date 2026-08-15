@@ -1,5 +1,6 @@
 import { SendMessageBatchCommand, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { describe, expect, it, vi } from 'vitest';
+
 import { SqsQueueAdapter } from './sqs-queue.adapter';
 
 describe('worker SqsQueueAdapter', () => {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { queueMessageEnvelopeSchema } from '../contracts/queue-message';
 
 export const webhookStepMessageSchema = queueMessageEnvelopeSchema.extend({

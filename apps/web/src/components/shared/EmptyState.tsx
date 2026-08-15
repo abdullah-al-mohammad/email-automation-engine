@@ -1,5 +1,5 @@
-import React from 'react';
 import { Inbox } from 'lucide-react';
+import React from 'react';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;

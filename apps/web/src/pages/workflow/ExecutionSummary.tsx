@@ -1,19 +1,20 @@
-import { useParams, Link } from 'react-router-dom';
+import { type WorkflowResponse } from '@email-automation-engine/shared';
 import { useQuery } from '@tanstack/react-query';
+import {
+  Activity,
+  ArrowLeft,
+  BarChart3,
+  CheckCircle2,
+  Clock,
+  Mail,
+  PlayCircle,
+  Users,
+  XCircle,
+} from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { type WorkflowResponse } from '@email-automation-engine/shared';
-import {
-  ArrowLeft,
-  Activity,
-  Users,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  PlayCircle,
-  BarChart3,
-  Mail,
-} from 'lucide-react';
 
 export default function ExecutionSummary() {
   const { workflowId } = useParams<{ workflowId: string }>();

@@ -1,16 +1,17 @@
-import { Injectable, Inject } from '@nestjs/common';
-import {
-  CONTACT_WORKFLOW_REPOSITORY,
-  CONTACT_WORKFLOW_STEP_REPOSITORY,
-} from '../../constants/tokens';
-import { ContactWorkflowRepository } from '../../domain/repositories/contact-workflow.repository';
-import { ContactWorkflowStepRepository } from '../../domain/repositories/contact-workflow-step.repository';
-import { ContactWorkflow } from '../../domain/aggregates/contact-workflow.aggregate';
-import { ContactWorkflowStep } from '../../domain/aggregates/contact-workflow-step.aggregate';
 import {
   type ContactWorkflowResponse,
   type ContactWorkflowStepResponse,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable } from '@nestjs/common';
+
+import {
+  CONTACT_WORKFLOW_REPOSITORY,
+  CONTACT_WORKFLOW_STEP_REPOSITORY,
+} from '../../constants/tokens';
+import { ContactWorkflow } from '../../domain/aggregates/contact-workflow.aggregate';
+import { ContactWorkflowStep } from '../../domain/aggregates/contact-workflow-step.aggregate';
+import { ContactWorkflowRepository } from '../../domain/repositories/contact-workflow.repository';
+import { ContactWorkflowStepRepository } from '../../domain/repositories/contact-workflow-step.repository';
 
 @Injectable()
 export class ContactWorkflowService {

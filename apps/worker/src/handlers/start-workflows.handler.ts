@@ -1,14 +1,15 @@
+import type { AutomationEventMessage } from '@email-automation-engine/shared';
+import { isAutomationEventMessage } from '@email-automation-engine/shared';
+import { randomUUID } from 'crypto';
+import type { DataSource } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
+
+import { workerConfig } from '../infrastructure';
+import type { CacheService } from '../infrastructure/cache/cache.interface';
+import { Logger } from '../infrastructure/logger/logger';
+import type { QueueService } from '../infrastructure/queue/queue.interface';
 import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import { isAutomationEventMessage } from '@email-automation-engine/shared';
-import type { AutomationEventMessage } from '@email-automation-engine/shared';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
-import type { CacheService } from '../infrastructure/cache/cache.interface';
-import type { DataSource } from 'typeorm';
-import { randomUUID } from 'crypto';
-import { v7 as uuidv7 } from 'uuid';
-import { Logger } from '../infrastructure/logger/logger';
-import { workerConfig } from '../infrastructure';
 
 export interface WorkerDeps {
   queueService: QueueService;

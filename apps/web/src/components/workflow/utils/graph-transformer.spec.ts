@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { generateWorkflowGraph } from './graph-transformer';
 import {
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
+import { describe, expect, it } from 'vitest';
+
+import { generateWorkflowGraph } from './graph-transformer';
 
 describe('graph-transformer', () => {
   it('should transform a simple workflow with trigger and no steps', () => {

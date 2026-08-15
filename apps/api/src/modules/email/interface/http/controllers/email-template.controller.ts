@@ -1,26 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
+  CreateEmailTemplateDto,
+  EmailTemplateResponse,
+  UpdateEmailTemplateDto,
+} from '@email-automation-engine/shared';
+import {
   Body,
-  Param,
-  UseGuards,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { EmailTemplateService } from '../../../application/services/email-template.service';
+
 import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
-import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
-import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
-import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
 import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
-import {
-  CreateEmailTemplateDto,
-  UpdateEmailTemplateDto,
-  EmailTemplateResponse,
-} from '@email-automation-engine/shared';
+import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
+import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
+import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
+import { EmailTemplateService } from '../../../application/services/email-template.service';
 import type { EmailTemplate } from '../../../domain/aggregates/email-template.aggregate';
 
 @Controller('tenants/:tenantId/email-templates')

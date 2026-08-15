@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Role } from '../../domain/aggregates/role.aggregate';
 import { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
 import { type RoleRepository } from '../../domain/repositories/role.repository';

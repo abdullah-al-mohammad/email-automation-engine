@@ -1,8 +1,8 @@
 import {
-  type WorkflowTriggerResponse,
   type WorkflowStepResponse,
+  type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import { type Node, type Edge } from '@xyflow/react';
+import { type Edge, type Node } from '@xyflow/react';
 import dagre from 'dagre';
 
 const DIMENSIONS = {

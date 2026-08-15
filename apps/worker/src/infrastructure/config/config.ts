@@ -1,6 +1,6 @@
-import { z } from 'zod';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { z } from 'zod';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 

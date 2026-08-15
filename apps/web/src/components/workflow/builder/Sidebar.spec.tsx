@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
 import Sidebar from './Sidebar';
 
 vi.mock('./EditTrigger', () => ({

@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CACHE_SERVICE } from './cache.interface';
-import { RedisCacheAdapter } from './redis-cache.adapter';
-import { InMemoryCacheAdapter } from './in-memory-cache.adapter';
+
 import { CACHE_TYPE } from '../config/config-keys';
+import { CACHE_SERVICE } from './cache.interface';
+import { InMemoryCacheAdapter } from './in-memory-cache.adapter';
+import { RedisCacheAdapter } from './redis-cache.adapter';
 
 @Global()
 @Module({

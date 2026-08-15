@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { waitingStepMessageSchema, isWaitingStepMessage } from './waiting-step.message';
+import { describe, expect, it } from 'vitest';
+
+import { isWaitingStepMessage, waitingStepMessageSchema } from './waiting-step.message';
 
 describe('waitingStepMessageSchema', () => {
   const validMessage = {

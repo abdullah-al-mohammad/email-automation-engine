@@ -1,12 +1,13 @@
-import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
-import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import { isWaitingStepMessage } from '@email-automation-engine/shared';
 import type { WaitingStepMessage } from '@email-automation-engine/shared';
+import { isWaitingStepMessage } from '@email-automation-engine/shared';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
 import { randomUUID } from 'crypto';
-import { Logger } from '../infrastructure/logger/logger';
-import { workerConfig } from '../infrastructure';
 import { v7 as uuidv7 } from 'uuid';
+
+import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
+import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
+import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
 import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {

@@ -1,8 +1,10 @@
 import 'reflect-metadata';
+
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+
 import { AppModule } from './app.module';
-import { PORT, ALLOWED_ORIGINS } from './infrastructure/config/config-keys';
+import { ALLOWED_ORIGINS, PORT } from './infrastructure/config/config-keys';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);

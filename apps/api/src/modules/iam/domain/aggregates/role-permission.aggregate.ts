@@ -1,13 +1,13 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
-  BeforeInsert,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
 
 @Entity('role_permissions')
 @Index(['roleId', 'permission'], { unique: true })

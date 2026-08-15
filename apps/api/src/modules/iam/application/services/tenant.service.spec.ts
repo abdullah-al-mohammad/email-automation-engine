@@ -1,10 +1,11 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { TenantService } from './tenant.service';
-import type { Tenant } from '../../domain/aggregates/tenant.aggregate';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import type { Role } from '../../domain/aggregates/role.aggregate';
-import type { TenantMembership } from '../../domain/aggregates/tenant-membership.aggregate';
 import type { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
+import type { Tenant } from '../../domain/aggregates/tenant.aggregate';
+import type { TenantMembership } from '../../domain/aggregates/tenant-membership.aggregate';
+import { TenantService } from './tenant.service';
 
 describe('TenantService', () => {
   let service: TenantService;

@@ -1,6 +1,7 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
-import { ForbiddenException, type ExecutionContext } from '@nestjs/common';
+import { type ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import { PermissionsGuard } from './permissions.guard';
 
 describe('PermissionsGuard', () => {

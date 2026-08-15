@@ -1,6 +1,7 @@
+import { type AuthResponse } from '@email-automation-engine/shared';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { type AuthResponse } from '@email-automation-engine/shared';
+
 import { ENCRYPTION_SERVICE } from '../../constants/tokens';
 import { EncryptionService } from './encryption.service';
 

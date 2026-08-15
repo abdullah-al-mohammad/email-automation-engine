@@ -1,8 +1,9 @@
-import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
+import { type CreateTagDto, type TagResponse } from '@email-automation-engine/shared';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { TAG_REPOSITORY } from '../../constants/tokens';
-import { TagRepository } from '../../domain/repositories/tag.repository';
 import { Tag } from '../../domain/aggregates/tag.aggregate';
-import { type TagResponse, type CreateTagDto } from '@email-automation-engine/shared';
+import { TagRepository } from '../../domain/repositories/tag.repository';
 
 @Injectable()
 export class TagService {

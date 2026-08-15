@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handler } from './conditional-split.handler';
-import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
-import type { Mocked } from 'vitest';
 import { CONDITION_TYPES, STEP_ACTIONS } from '@email-automation-engine/shared';
 import type { DataSource } from 'typeorm';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { CacheService } from '../infrastructure/cache/cache.interface';
+import type { QueueService } from '../infrastructure/queue/queue.interface';
+import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
+import { handler } from './conditional-split.handler';
 
 vi.mock('../infrastructure', () => ({
   workerConfig: {

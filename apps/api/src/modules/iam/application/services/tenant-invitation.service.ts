@@ -1,12 +1,13 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { TENANT_INVITATION_REPOSITORY } from '../../constants/tokens';
-import { TenantInvitationRepository } from '../../domain/repositories/tenant-invitation.repository';
-import { TenantInvitation } from '../../domain/aggregates/tenant-invitation.aggregate';
 import {
-  type TenantInvitationResponse,
   type CreateTenantInvitationDto,
+  type TenantInvitationResponse,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import * as crypto from 'crypto';
+
+import { TENANT_INVITATION_REPOSITORY } from '../../constants/tokens';
+import { TenantInvitation } from '../../domain/aggregates/tenant-invitation.aggregate';
+import { TenantInvitationRepository } from '../../domain/repositories/tenant-invitation.repository';
 
 @Injectable()
 export class TenantInvitationService {

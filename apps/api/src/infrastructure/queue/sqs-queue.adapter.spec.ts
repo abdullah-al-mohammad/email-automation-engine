@@ -2,6 +2,7 @@ import { SendMessageBatchCommand, SendMessageCommand } from '@aws-sdk/client-sqs
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { AWS_REGION, AWS_SQS_ENDPOINT_URL } from '../config/config-keys';
 import { SqsQueueAdapter } from './sqs-queue.adapter';
 

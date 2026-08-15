@@ -1,14 +1,15 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Combobox } from '@headlessui/react';
 import { type PaginatedContactResponse, type TagResponse } from '@email-automation-engine/shared';
+import { Combobox } from '@headlessui/react';
+import { useQuery } from '@tanstack/react-query';
+import { Check, ChevronsUpDown, Search, UserPlus, Users, X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import EmptyState from '../../components/shared/EmptyState';
+import Pagination from '../../components/shared/Pagination';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 import { useLocalStorageState } from '../../lib/use-local-storage-state';
-import Pagination from '../../components/shared/Pagination';
-import EmptyState from '../../components/shared/EmptyState';
-import { Search, X, Users, UserPlus, Check, ChevronsUpDown } from 'lucide-react';
 
 const PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 

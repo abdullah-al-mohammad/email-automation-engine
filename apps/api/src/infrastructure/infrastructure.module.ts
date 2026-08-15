@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+
+import { CacheModule } from './cache/cache.module';
 import { ConfigAppModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { QueueModule } from './queue/queue.module';
-import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [ConfigAppModule, DatabaseModule, QueueModule, CacheModule],

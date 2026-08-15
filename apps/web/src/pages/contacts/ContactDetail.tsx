@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type ContactResponse, type TagResponse } from '@email-automation-engine/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Calendar, Check, Mail, Pencil, Tag, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { ArrowLeft, Trash2, Mail, Calendar, Tag, X, Pencil, Check } from 'lucide-react';
 
 export default function ContactDetailPage() {
   const { contactId } = useParams<{ contactId: string }>();
