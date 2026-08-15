@@ -83,8 +83,8 @@ function WorkflowBuilderContent() {
     draggingNodeId,
   );
 
-  const boundOnNodeDragStop = useCallback(
-    (e: MouseEvent | TouchEvent, node: Node) => {
+  const handleNodeDragStop = useCallback(
+    (_e: MouseEvent | TouchEvent, node: Node) => {
       return handleDragStop(node, nodes);
     },
     [nodes, handleDragStop],
@@ -120,6 +120,13 @@ function WorkflowBuilderContent() {
   if (isLoading) return <div className="p-8">Loading workflow...</div>;
   if (!workflow) return <div className="p-8">Workflow not found.</div>;
 
+  const visibleEdges = edges.map((edge) => ({
+    ...edge,
+    hidden: draggingNodeId
+      ? edge.source === draggingNodeId || edge.target === draggingNodeId
+      : false,
+  }));
+
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] -m-6">
       <BuilderHeader
@@ -132,16 +139,11 @@ function WorkflowBuilderContent() {
       <div className="flex-1 w-full h-full bg-gray-50/50 dark:bg-zinc-950/50 relative">
         <ReactFlow
           nodes={nodes}
-          edges={edges.map((e) => ({
-            ...e,
-            hidden: draggingNodeId
-              ? e.source === draggingNodeId || e.target === draggingNodeId
-              : false,
-          }))}
+          edges={visibleEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeDragStart={onNodeDragStart}
-          onNodeDragStop={boundOnNodeDragStop}
+          onNodeDragStop={handleNodeDragStop}
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           nodeTypes={NODE_TYPES}
