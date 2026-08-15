@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
 import { type TenantResponse } from '@email-automation-engine/shared';
-import { useAuth } from './AuthContext';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+
 import api from '../lib/api';
 import { STORAGE_KEYS } from '../lib/auth-storage';
+import { useAuth } from './AuthContext';
 
 interface TenantContextType {
   currentTenant: TenantResponse | null;
@@ -20,7 +21,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [currentTenant, setCurrentTenantState] = useState<TenantResponse | null>(null);
   const [isLoadingTenants, setIsLoadingTenants] = useState(true);
 
-  const fetchTenants = async () => {
+  const fetchTenants = useCallback(async () => {
     if (!isAuthenticated) {
       setIsLoadingTenants(false);
       return;
@@ -43,11 +44,11 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoadingTenants(false);
     }
-  };
+  }, [isAuthenticated]);
 
   useEffect(() => {
     void fetchTenants();
-  }, [isAuthenticated]);
+  }, [fetchTenants]);
 
   const setCurrentTenant = (tenant: TenantResponse | null) => {
     setCurrentTenantState(tenant);

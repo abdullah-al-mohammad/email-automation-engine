@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import { TriggerNode } from './TriggerNode';
 import { TRIGGER_EVENTS } from '@email-automation-engine/shared';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { TriggerNode } from './TriggerNode';
 
 vi.mock('@xyflow/react', () => ({
   Handle: () => <div data-testid="handle" />,

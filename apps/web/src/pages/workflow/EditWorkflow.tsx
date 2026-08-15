@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useParams } from 'react-router-dom';
 import {
-  CreateWorkflowSchema,
   type CreateWorkflowDto,
+  CreateWorkflowSchema,
   type WorkflowResponse,
 } from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
@@ -96,10 +97,14 @@ export default function EditWorkflow() {
 
       <form onSubmit={void handleSubmit(onSubmit)} className="space-y-4 max-w-md">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="edit-workflow-name"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Name
           </label>
           <input
+            id="edit-workflow-name"
             {...register('name')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             placeholder="Onboarding sequence"
@@ -109,10 +114,14 @@ export default function EditWorkflow() {
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+          <label
+            htmlFor="edit-workflow-description"
+            className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+          >
             Description (optional)
           </label>
           <textarea
+            id="edit-workflow-description"
             {...register('description')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
             rows={3}

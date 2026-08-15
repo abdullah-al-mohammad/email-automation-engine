@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+
 import { BCRYPT_SALT_ROUNDS } from '../../../../infrastructure/config/config-keys';
 
 @Injectable()

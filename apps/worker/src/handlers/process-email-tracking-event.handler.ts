@@ -1,15 +1,15 @@
+import type { EmailTrackingEventMessage } from '@email-automation-engine/shared';
+import {
+  EMAIL_TRACKING_EVENTS,
+  isEmailTrackingEventMessage,
+} from '@email-automation-engine/shared';
+import { v7 as uuidv7 } from 'uuid';
+
+import { workerConfig } from '../infrastructure/config/config';
+import { Logger } from '../infrastructure/logger/logger';
 import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import {
-  isEmailTrackingEventMessage,
-  EMAIL_TRACKING_EVENTS,
-} from '@email-automation-engine/shared';
-import type { EmailTrackingEventMessage } from '@email-automation-engine/shared';
 import type { WorkerDeps } from './start-workflows.handler';
-import { Logger } from '../infrastructure/logger/logger';
-
-import { v7 as uuidv7 } from 'uuid';
-import { workerConfig } from '../infrastructure/config/config';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<EmailTrackingEventMessage>(

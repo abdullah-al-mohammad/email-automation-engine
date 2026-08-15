@@ -1,4 +1,5 @@
-import { Entity, CreateDateColumn, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+
 import { Contact } from './contact.aggregate';
 import { Tag } from './tag.aggregate';
 

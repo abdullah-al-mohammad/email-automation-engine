@@ -1,19 +1,20 @@
-import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
-import { CONTACT_REPOSITORY, TAG_REPOSITORY, CONTACT_TAG_REPOSITORY } from '../../constants/tokens';
+import {
+  type ContactResponse,
+  type CreateContactDto,
+  type PaginatedContactResponse,
+  type UpdateContactDto,
+} from '@email-automation-engine/shared';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+
+import { CONTACT_REPOSITORY, CONTACT_TAG_REPOSITORY, TAG_REPOSITORY } from '../../constants/tokens';
+import { Contact } from '../../domain/aggregates/contact.aggregate';
+import { ContactTag } from '../../domain/aggregates/contact-tag.aggregate';
 import {
   ContactRepository,
   FindContactsOptions,
 } from '../../domain/repositories/contact.repository';
-import { TagRepository } from '../../domain/repositories/tag.repository';
 import { ContactTagRepository } from '../../domain/repositories/contact-tag.repository';
-import { Contact } from '../../domain/aggregates/contact.aggregate';
-import { ContactTag } from '../../domain/aggregates/contact-tag.aggregate';
-import {
-  type ContactResponse,
-  type PaginatedContactResponse,
-  type CreateContactDto,
-  type UpdateContactDto,
-} from '@email-automation-engine/shared';
+import { TagRepository } from '../../domain/repositories/tag.repository';
 
 @Injectable()
 export class ContactService {

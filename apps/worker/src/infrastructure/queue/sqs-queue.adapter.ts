@@ -1,10 +1,11 @@
 import {
-  type SQSClientConfig,
-  SQSClient,
   SendMessageBatchCommand,
   SendMessageCommand,
+  SQSClient,
+  type SQSClientConfig,
 } from '@aws-sdk/client-sqs';
 import { randomUUID } from 'crypto';
+
 import { Logger } from '../logger/logger';
 import { type QueueService, type SendMessageOptions } from './queue.interface';
 

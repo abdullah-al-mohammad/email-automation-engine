@@ -1,12 +1,13 @@
+import { type Permission } from '@email-automation-engine/shared';
 import {
   type CanActivate,
   type ExecutionContext,
-  Injectable,
-  Inject,
   ForbiddenException,
+  Inject,
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { type Permission } from '@email-automation-engine/shared';
+
 import { ROLE_REPOSITORY } from '../../constants/tokens';
 import { type RoleRepository } from '../../domain/repositories/role.repository';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';

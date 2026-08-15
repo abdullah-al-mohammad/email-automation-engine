@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, LessThanOrEqual } from 'typeorm';
+import { LessThanOrEqual, Not, Repository } from 'typeorm';
+
 import { ContactWorkflowStep } from '../../domain/aggregates/contact-workflow-step.aggregate';
 import { ContactWorkflowStepRepository } from '../../domain/repositories/contact-workflow-step.repository';
 

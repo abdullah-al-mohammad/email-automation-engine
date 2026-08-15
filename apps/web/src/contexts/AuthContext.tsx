@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
-  type UserResponse,
+  type AuthResponse,
   type SigninDto,
   type SignupDto,
-  type AuthResponse,
+  type UserResponse,
 } from '@email-automation-engine/shared';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import api from '../lib/api';
-import { AUTH_UNAUTHORIZED_EVENT, STORAGE_KEYS, clearStoredAuth } from '../lib/auth-storage';
+import { AUTH_UNAUTHORIZED_EVENT, clearStoredAuth, STORAGE_KEYS } from '../lib/auth-storage';
 
 interface AuthContextType {
   user: UserResponse | null;

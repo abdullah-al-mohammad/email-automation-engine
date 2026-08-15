@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type EmailTemplateResponse } from '@email-automation-engine/shared';
-import { useTenant } from '../../contexts/TenantContext';
-import api from '../../lib/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Mail } from 'lucide-react';
+import { useState } from 'react';
 
 import EmailTemplateHeader from '../../components/email-templates/EmailTemplateHeader';
 import EmailTemplateList from '../../components/email-templates/EmailTemplateList';
 import Confirm from '../../components/modals/Confirm';
 import EmptyState from '../../components/shared/EmptyState';
-import { Mail } from 'lucide-react';
+import { useTenant } from '../../contexts/TenantContext';
+import api from '../../lib/api';
 
 export default function EmailTemplates() {
   const { currentTenant } = useTenant();

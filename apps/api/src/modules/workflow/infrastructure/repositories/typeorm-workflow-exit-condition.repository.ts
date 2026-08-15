@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
 import { type WorkflowExitConditionRepository } from '../../domain/repositories/workflow-exit-condition.repository';
 

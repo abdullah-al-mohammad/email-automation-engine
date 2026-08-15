@@ -1,7 +1,8 @@
+import { ConfigService } from '@nestjs/config';
 import { type TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
 import { DATABASE_URL } from '../config/config-keys';
-import { ConfigService } from '@nestjs/config';
 
 export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
   inject: [ConfigService],

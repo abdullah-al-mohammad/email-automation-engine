@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "lint": "eslint src --ignore-pattern \"**/*.spec.ts\"",
+    "lint": "eslint src",
     "format:check": "prettier --check package.json tsconfig.json vitest.config.ts src",
     "test": "vitest run",
     "test:integration": "vitest run --passWithNoTests",

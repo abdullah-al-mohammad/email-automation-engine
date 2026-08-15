@@ -1,6 +1,7 @@
+import { TRIGGER_EVENTS, type WorkflowTriggerResponse } from '@email-automation-engine/shared';
 import { Handle, Position } from '@xyflow/react';
-import { type WorkflowTriggerResponse, TRIGGER_EVENTS } from '@email-automation-engine/shared';
 import { Zap } from 'lucide-react';
+
 import { useTags } from '../../../pages/workflow/hooks/useTags';
 
 export function TriggerNode({

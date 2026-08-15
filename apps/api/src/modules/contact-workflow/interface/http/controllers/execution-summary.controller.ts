@@ -1,14 +1,15 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
-import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
-import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
 import {
   type ContactWorkflowResponse,
   type ContactWorkflowStepResponse,
 } from '@email-automation-engine/shared';
-import { ContactWorkflowService } from '../../../application/services/contact-workflow.service';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+
+import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
+import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
 import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
+import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
 import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
+import { ContactWorkflowService } from '../../../application/services/contact-workflow.service';
 
 @Controller('tenants/:tenantId/workflows/:workflowId/execution')
 export class ExecutionSummaryController {

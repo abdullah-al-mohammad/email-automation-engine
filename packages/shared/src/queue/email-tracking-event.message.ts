@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { queueMessageEnvelopeSchema } from '../contracts/queue-message';
 
 export const EMAIL_TRACKING_EVENTS = {

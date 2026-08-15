@@ -1,9 +1,10 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { ICacheService } from '../../../../infrastructure/cache/cache.interface';
 import { CACHE_SERVICE } from '../../../../infrastructure/cache/cache.interface';
+import { WORKFLOW_TRIGGER_REPOSITORY } from '../../../workflow/constants/tokens';
 import { WorkflowTrigger } from '../../../workflow/domain/aggregates/workflow-trigger.aggregate';
 import { WorkflowTriggerRepository } from '../../../workflow/domain/repositories/workflow-trigger.repository';
-import { WORKFLOW_TRIGGER_REPOSITORY } from '../../../workflow/constants/tokens';
 
 interface CachedTrigger {
   id: string;

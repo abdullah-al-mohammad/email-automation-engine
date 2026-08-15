@@ -1,11 +1,12 @@
-import { Controller, Get, Delete, Param, UseGuards, HttpCode } from '@nestjs/common';
 import { type TenantMemberResponse } from '@email-automation-engine/shared';
+import { Controller, Delete, Get, HttpCode, Param, UseGuards } from '@nestjs/common';
+
 import { TenantMemberService } from '../../application/services/tenant-member.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
-import { PermissionsGuard } from '../guards/permissions.guard';
-import { RequirePermissions } from '../decorators/require-permissions.decorator';
 import { CurrentTenant } from '../decorators/current-tenant.decorator';
+import { RequirePermissions } from '../decorators/require-permissions.decorator';
+import { AuthGuard } from '../guards/auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 
 @Controller('tenants/:tenantId/members')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

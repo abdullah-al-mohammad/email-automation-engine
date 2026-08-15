@@ -1,42 +1,43 @@
 import {
-  Injectable,
-  Inject,
-  NotFoundException,
+  type CreateWorkflowDto,
+  STEP_ACTIONS,
+  type UpdateWorkflowDto,
+  type WorkflowExitConditionResponse,
+  type WorkflowResponse,
+  type WorkflowStepResponse,
+  type WorkflowTriggerResponse,
+} from '@email-automation-engine/shared';
+import {
   BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
   Optional,
 } from '@nestjs/common';
 import { lookup } from 'node:dns/promises';
-import { WORKFLOW_STEP_CONDITION_REPOSITORY } from '../../constants/tokens';
-import type { IWorkflowStepConditionRepository } from '../../domain/repositories/workflow-step-condition.repository';
-import { EmailTemplateService } from '../../../email/application/services/email-template.service';
+
 import {
   CACHE_SERVICE,
   type ICacheService,
 } from '../../../../infrastructure/cache/cache.interface';
-import {
-  type CreateWorkflowDto,
-  type UpdateWorkflowDto,
-  type WorkflowResponse,
-  type WorkflowTriggerResponse,
-  type WorkflowStepResponse,
-  type WorkflowExitConditionResponse,
-  STEP_ACTIONS,
-} from '@email-automation-engine/shared';
-import {
-  WORKFLOW_REPOSITORY,
-  WORKFLOW_TRIGGER_REPOSITORY,
-  WORKFLOW_STEP_REPOSITORY,
-  WORKFLOW_EXIT_CONDITION_REPOSITORY,
-} from '../../constants/tokens';
-import { type WorkflowRepository } from '../../domain/repositories/workflow.repository';
-import { type WorkflowTriggerRepository } from '../../domain/repositories/workflow-trigger.repository';
-import { type WorkflowStepRepository } from '../../domain/repositories/workflow-step.repository';
-import { type WorkflowExitConditionRepository } from '../../domain/repositories/workflow-exit-condition.repository';
-import { Workflow } from '../../domain/aggregates/workflow.aggregate';
-import { WorkflowTrigger } from '../../domain/aggregates/workflow-trigger.aggregate';
-import { WorkflowStep } from '../../domain/aggregates/workflow-step.aggregate';
-import { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
 import { TriggerCacheService } from '../../../automation-event/application/services/trigger-cache.service';
+import { EmailTemplateService } from '../../../email/application/services/email-template.service';
+import { WORKFLOW_STEP_CONDITION_REPOSITORY } from '../../constants/tokens';
+import {
+  WORKFLOW_EXIT_CONDITION_REPOSITORY,
+  WORKFLOW_REPOSITORY,
+  WORKFLOW_STEP_REPOSITORY,
+  WORKFLOW_TRIGGER_REPOSITORY,
+} from '../../constants/tokens';
+import { Workflow } from '../../domain/aggregates/workflow.aggregate';
+import { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
+import { WorkflowStep } from '../../domain/aggregates/workflow-step.aggregate';
+import { WorkflowTrigger } from '../../domain/aggregates/workflow-trigger.aggregate';
+import { type WorkflowRepository } from '../../domain/repositories/workflow.repository';
+import { type WorkflowExitConditionRepository } from '../../domain/repositories/workflow-exit-condition.repository';
+import { type WorkflowStepRepository } from '../../domain/repositories/workflow-step.repository';
+import type { IWorkflowStepConditionRepository } from '../../domain/repositories/workflow-step-condition.repository';
+import { type WorkflowTriggerRepository } from '../../domain/repositories/workflow-trigger.repository';
 
 @Injectable()
 export class WorkflowService {

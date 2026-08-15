@@ -1,17 +1,18 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
+  Entity,
   JoinColumn,
-  BeforeInsert,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
+
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
 import { Tag } from './tag.aggregate';
 

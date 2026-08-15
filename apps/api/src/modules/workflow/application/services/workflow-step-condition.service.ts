@@ -1,12 +1,13 @@
-import { Injectable, Inject } from '@nestjs/common';
-import type { IWorkflowStepConditionRepository } from '../../domain/repositories/workflow-step-condition.repository';
-import { WORKFLOW_STEP_CONDITION_REPOSITORY } from '../../constants/tokens';
-import { WorkflowService } from './workflow.service';
 import type {
-  WorkflowStepConditionResponse,
   CreateWorkflowStepConditionDto,
+  WorkflowStepConditionResponse,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { WORKFLOW_STEP_CONDITION_REPOSITORY } from '../../constants/tokens';
 import type { WorkflowStepCondition } from '../../domain/aggregates/workflow-step-condition.aggregate';
+import type { IWorkflowStepConditionRepository } from '../../domain/repositories/workflow-step-condition.repository';
+import { WorkflowService } from './workflow.service';
 
 @Injectable()
 export class WorkflowStepConditionService {

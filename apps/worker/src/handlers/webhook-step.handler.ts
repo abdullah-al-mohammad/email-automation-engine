@@ -1,15 +1,16 @@
-import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
-import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
+import type { WebhookStepMessage } from '@email-automation-engine/shared';
 import {
   isWebhookStepMessage,
   STEP_ACTIONS,
   WEBHOOK_DELIVERY_STATUS,
 } from '@email-automation-engine/shared';
-import type { WebhookStepMessage } from '@email-automation-engine/shared';
-import type { WorkerDeps } from './start-workflows.handler';
-import { Logger } from '../infrastructure/logger/logger';
 import { v7 as uuidv7 } from 'uuid';
+
 import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
+import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
+import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
+import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<WebhookStepMessage>(

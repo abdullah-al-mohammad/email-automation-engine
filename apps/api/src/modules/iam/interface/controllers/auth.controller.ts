@@ -1,16 +1,17 @@
-import { Controller, Post, Get, Body, UsePipes, UseGuards } from '@nestjs/common';
 import {
-  signupSchema,
+  type AuthResponse,
+  type SigninDto,
   signinSchema,
   type SignupDto,
-  type SigninDto,
-  type AuthResponse,
+  signupSchema,
   type UserResponse,
 } from '@email-automation-engine/shared';
-import { AuthService } from '../../application/services/auth.service';
+import { Body, Controller, Get, Post, UseGuards, UsePipes } from '@nestjs/common';
+
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthService } from '../../application/services/auth.service';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { AuthGuard } from '../guards/auth.guard';
 import { type AuthenticatedUser } from '../types';
 
 @Controller('auth')

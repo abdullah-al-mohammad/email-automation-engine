@@ -1,39 +1,40 @@
-import { Controller, Get, Post, Patch, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { z } from 'zod';
-import { WorkflowService } from '../application/services/workflow.service';
-import { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
-import { WorkflowStepService } from '../application/services/workflow-step.service';
-import { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
-import { AuthGuard } from '../../iam/interface/guards/auth.guard';
-import { TenantMembershipGuard } from '../../iam/interface/guards/tenant-membership.guard';
-import { PermissionsGuard } from '../../iam/interface/guards/permissions.guard';
-import { CurrentTenant } from '../../iam/interface/decorators/current-tenant.decorator';
-import { RequirePermissions } from '../../iam/interface/decorators/require-permissions.decorator';
 import {
   type CreateWorkflowDto,
-  CreateWorkflowSchema,
-  type UpdateWorkflowDto,
-  UpdateWorkflowSchema,
-  type WorkflowResponse,
-  type CreateWorkflowTriggerDto,
-  CreateWorkflowTriggerSchema,
-  type UpdateWorkflowTriggerDto,
-  UpdateWorkflowTriggerSchema,
-  type WorkflowTriggerResponse,
-  type CreateWorkflowStepDto,
-  CreateWorkflowStepSchema,
-  type UpdateWorkflowStepDto,
-  UpdateWorkflowStepSchema,
-  type ReorderWorkflowStepDto,
-  ReorderWorkflowStepSchema,
-  type WorkflowStepResponse,
   type CreateWorkflowExitConditionDto,
   CreateWorkflowExitConditionSchema,
+  CreateWorkflowSchema,
+  type CreateWorkflowStepDto,
+  CreateWorkflowStepSchema,
+  type CreateWorkflowTriggerDto,
+  CreateWorkflowTriggerSchema,
+  type ReorderWorkflowStepDto,
+  ReorderWorkflowStepSchema,
+  type UpdateWorkflowDto,
   type UpdateWorkflowExitConditionDto,
   UpdateWorkflowExitConditionSchema,
+  UpdateWorkflowSchema,
+  type UpdateWorkflowStepDto,
+  UpdateWorkflowStepSchema,
+  type UpdateWorkflowTriggerDto,
+  UpdateWorkflowTriggerSchema,
   type WorkflowExitConditionResponse,
+  type WorkflowResponse,
+  type WorkflowStepResponse,
+  type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { z } from 'zod';
+
 import { ZodValidationPipe } from '../../../infrastructure/pipes/zod-validation.pipe';
+import { CurrentTenant } from '../../iam/interface/decorators/current-tenant.decorator';
+import { RequirePermissions } from '../../iam/interface/decorators/require-permissions.decorator';
+import { AuthGuard } from '../../iam/interface/guards/auth.guard';
+import { PermissionsGuard } from '../../iam/interface/guards/permissions.guard';
+import { TenantMembershipGuard } from '../../iam/interface/guards/tenant-membership.guard';
+import { WorkflowService } from '../application/services/workflow.service';
+import { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
+import { WorkflowStepService } from '../application/services/workflow-step.service';
+import { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
 
 @Controller('tenants/:tenantId/workflows')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

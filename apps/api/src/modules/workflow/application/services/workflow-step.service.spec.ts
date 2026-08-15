@@ -1,8 +1,9 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
-import { WorkflowStepService } from './workflow-step.service';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import type { Workflow } from '../../domain/aggregates/workflow.aggregate';
 import type { WorkflowService } from './workflow.service';
+import { WorkflowStepService } from './workflow-step.service';
 
 describe('WorkflowStepService', () => {
   let service: WorkflowStepService;

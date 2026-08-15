@@ -1,14 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
 import {
-  type SQSClientConfig,
-  SQSClient,
-  SendMessageCommand,
   SendMessageBatchCommand,
+  SendMessageCommand,
+  SQSClient,
+  type SQSClientConfig,
 } from '@aws-sdk/client-sqs';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { IQueueService, SendMessageOptions } from './queue.interface';
 import { randomUUID } from 'crypto';
+
 import { AWS_REGION, AWS_SQS_ENDPOINT_URL } from '../config/config-keys';
+import type { IQueueService, SendMessageOptions } from './queue.interface';
 
 @Injectable()
 export class SqsQueueAdapter implements IQueueService {

@@ -1,5 +1,5 @@
-import { Table } from 'typeorm';
 import type { MigrationInterface, QueryRunner } from 'typeorm';
+import { Table } from 'typeorm';
 
 export class CreateContactWorkflowsTable1717500000004 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

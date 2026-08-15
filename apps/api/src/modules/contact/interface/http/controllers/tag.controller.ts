@@ -1,21 +1,22 @@
+import { type CreateTagDto, type TagResponse } from '@email-automation-engine/shared';
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
   Body,
-  UseGuards,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { type TagResponse, type CreateTagDto } from '@email-automation-engine/shared';
-import { TagService } from '../../../application/services/tag.service';
-import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
-import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
-import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
-import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
+
 import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
+import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
+import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
+import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
+import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
+import { TagService } from '../../../application/services/tag.service';
 
 @Controller('tenants/:tenantId/tags')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

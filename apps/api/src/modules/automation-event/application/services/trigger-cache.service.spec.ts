@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { TriggerCacheService } from './trigger-cache.service';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import type { ICacheService } from '../../../../infrastructure/cache/cache.interface';
 import type { WorkflowTriggerRepository } from '../../../workflow/domain/repositories/workflow-trigger.repository';
+import { TriggerCacheService } from './trigger-cache.service';
 
 describe('TriggerCacheService', () => {
   let service: TriggerCacheService;

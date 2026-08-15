@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryColumn,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  BeforeInsert,
+  Entity,
   Index,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
 

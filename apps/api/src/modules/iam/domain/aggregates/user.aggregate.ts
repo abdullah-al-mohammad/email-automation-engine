@@ -1,13 +1,13 @@
-import { v7 as uuidv7 } from 'uuid';
+import { USER_STATUS, type UserStatus } from '@email-automation-engine/shared';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  BeforeInsert,
+  Entity,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { type UserStatus, USER_STATUS } from '@email-automation-engine/shared';
+import { v7 as uuidv7 } from 'uuid';
 
 @Entity('users')
 export class User {

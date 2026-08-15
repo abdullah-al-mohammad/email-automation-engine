@@ -1,9 +1,11 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import type { Mocked } from 'vitest';
-import { EmailTemplateController } from './email-template.controller';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { EmailTemplateService } from '../../../application/services/email-template.service';
 import { EmailTemplate } from '../../../domain/aggregates/email-template.aggregate';
+import { EmailTemplateController } from './email-template.controller';
 
 describe('EmailTemplateController', () => {
   let controller: EmailTemplateController;

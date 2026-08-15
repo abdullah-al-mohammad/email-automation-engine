@@ -1,10 +1,10 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import EmailStepForm from './Email';
-
-import { useForm } from 'react-hook-form';
-import type { FieldErrors } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
+import { cleanup, render, screen } from '@testing-library/react';
+import type { FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import EmailStepForm from './Email';
 
 export function TestFormWrapper({
   children,

@@ -1,28 +1,29 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
+  type CreateTenantDto,
+  createTenantSchema,
+  type TenantResponse,
+  type UpdateTenantDto,
+  updateTenantSchema,
+} from '@email-automation-engine/shared';
+import {
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
+  Patch,
+  Post,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import {
-  createTenantSchema,
-  updateTenantSchema,
-  type CreateTenantDto,
-  type UpdateTenantDto,
-  type TenantResponse,
-} from '@email-automation-engine/shared';
-import { TenantService } from '../../application/services/tenant.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
-import { PermissionsGuard } from '../guards/permissions.guard';
-import { RequirePermissions } from '../decorators/require-permissions.decorator';
-import { CurrentUser } from '../decorators/current-user.decorator';
+
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
+import { TenantService } from '../../application/services/tenant.service';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { RequirePermissions } from '../decorators/require-permissions.decorator';
+import { AuthGuard } from '../guards/auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 
 @Controller('tenants')
 export class TenantController {

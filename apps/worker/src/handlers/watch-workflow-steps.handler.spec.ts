@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handler } from './watch-workflow-steps.handler';
-import type { Mocked } from 'vitest';
-import type { DataSource } from 'typeorm';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import type { DataSource } from 'typeorm';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { QueueService } from '../infrastructure/queue/queue.interface';
+import { handler } from './watch-workflow-steps.handler';
 
 describe('watch-workflow-steps.handler', () => {
   let queueService: Mocked<QueueService>;

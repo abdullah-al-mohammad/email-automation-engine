@@ -1,54 +1,40 @@
 import { type PaginatedContactResponse, type TagResponse } from '@email-automation-engine/shared';
-import { Combobox } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
-import { Check, ChevronsUpDown, Plus, Search, Users, X } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { Plus, Search, Users, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { useLocalStorageState } from '../../lib/use-local-storage-state';
-
-const PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
+import FilterPill from './components/FilterPill';
+import PerPageSelect from './components/PerPageSelect';
+import { useContactsFilters } from './hooks/useContactsFilters';
 
 export default function Contacts() {
   const { currentTenant } = useTenant();
   const navigate = useNavigate();
 
-  const key = (name: string) => `view:contacts:${currentTenant?.id}:${name}`;
-
-  const [page, setPage] = useLocalStorageState(key('page'), 1);
-  const [perPage, setPerPage] = useLocalStorageState(key('perPage'), 25);
-  const [query, setQuery] = useState('');
-  const [search, setSearch] = useLocalStorageState(key('search'), '');
-  const [searchInput, setSearchInput] = useLocalStorageState(key('searchInput'), '');
-  const [selectedTagIds, setSelectedTagIds] = useLocalStorageState<string[]>(key('tagIds'), []);
-  const [subscribedFilter, setSubscribedFilter] = useLocalStorageState<boolean | undefined>(
-    key('subscribed'),
-    undefined,
-  );
-
-  const buildQueryParams = useCallback(() => {
-    const params = new URLSearchParams();
-    params.set('page', String(page));
-    params.set('limit', String(perPage));
-    if (search) params.set('search', search);
-    if (selectedTagIds.length > 0) params.set('tagId', selectedTagIds.join(','));
-    if (subscribedFilter !== undefined) params.set('subscribed', String(subscribedFilter));
-    return params.toString();
-  }, [page, perPage, search, selectedTagIds, subscribedFilter]);
+  const {
+    filters,
+    page,
+    perPage,
+    search,
+    searchInput,
+    selectedTagIds,
+    subscribedFilter,
+    buildQueryParams,
+    handleSearch,
+    handleClearSearch,
+    handleTagToggle,
+    handleSubscribedToggle,
+    handlePerPageSelect,
+    handlePageChange,
+    handleSearchInputChange,
+  } = useContactsFilters(currentTenant?.id);
 
   const { data: contactsData, isLoading } = useQuery({
-    queryKey: [
-      'contacts',
-      currentTenant?.id,
-      page,
-      perPage,
-      search,
-      selectedTagIds,
-      subscribedFilter,
-    ],
+    queryKey: ['contacts', currentTenant?.id, filters],
     queryFn: async () => {
       const params = buildQueryParams();
       const res = await api.get<PaginatedContactResponse>(
@@ -68,51 +54,9 @@ export default function Contacts() {
     enabled: !!currentTenant,
   });
 
-  const handleSearch = () => {
-    setPage(1);
-    setSearch(searchInput);
-  };
-
-  const handleClearSearch = () => {
-    setSearchInput('');
-    setSearch('');
-    setPage(1);
-  };
-
-  const handleTagToggle = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
-    );
-    setPage(1);
-  };
-
-  const handleSubscribedToggle = () => {
-    setSubscribedFilter((prev) => {
-      if (prev === undefined) return true;
-      if (prev === true) return false;
-      return undefined;
-    });
-    setPage(1);
-  };
-
-  const handlePerPageSelect = (n: number | null) => {
-    if (n === null) return;
-    setPerPage(n);
-    setPage(1);
-    setQuery('');
-  };
-
   const contacts = contactsData?.data ?? [];
   const totalPages = contactsData?.totalPages ?? 0;
   const total = contactsData?.total ?? 0;
-
-  const normalizedQuery = query.trim();
-  const queryNumber = /^\d+$/.test(normalizedQuery) ? parseInt(normalizedQuery, 10) : null;
-  const filteredPresets = PER_PAGE_OPTIONS.filter((n) => String(n).includes(normalizedQuery));
-  const perPageOptions = [
-    ...(queryNumber !== null && !filteredPresets.includes(queryNumber) ? [queryNumber] : []),
-    ...filteredPresets,
-  ];
 
   return (
     <div className="space-y-6">
@@ -138,7 +82,7 @@ export default function Contacts() {
               type="text"
               placeholder="Search by email..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="w-full pl-10 pr-10 py-2 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
@@ -160,35 +104,31 @@ export default function Contacts() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
+          <FilterPill
             onClick={handleSubscribedToggle}
-            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+            variant={
               subscribedFilter === true
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                ? 'success'
                 : subscribedFilter === false
-                  ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                  : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'
-            }`}
+                  ? 'danger'
+                  : 'default'
+            }
           >
             {subscribedFilter === true
               ? 'Subscribed'
               : subscribedFilter === false
                 ? 'Unsubscribed'
                 : 'All statuses'}
-          </button>
+          </FilterPill>
 
           {tags.map((tag) => (
-            <button
+            <FilterPill
               key={tag.id}
               onClick={() => handleTagToggle(tag.id)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                selectedTagIds.includes(tag.id)
-                  ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
-                  : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-700'
-              }`}
+              variant={selectedTagIds.includes(tag.id) ? 'active' : 'default'}
             >
               {tag.name}
-            </button>
+            </FilterPill>
           ))}
         </div>
       </div>
@@ -290,65 +230,15 @@ export default function Contacts() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-zinc-400">
           View
-          <div className="relative w-20">
-            <Combobox value={perPage} onChange={handlePerPageSelect} immediate>
-              <div className="relative">
-                <Combobox.Input
-                  onChange={(e) => setQuery(e.target.value)}
-                  onBlur={() => {
-                    if (/^\d+$/.test(normalizedQuery) && parseInt(normalizedQuery, 10) > 0) {
-                      handlePerPageSelect(parseInt(normalizedQuery, 10));
-                    } else {
-                      setQuery('');
-                    }
-                  }}
-                  displayValue={(n: number) => String(n)}
-                  className="w-full pr-7 px-2 py-1 text-sm border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
-                  <ChevronsUpDown className="w-4 h-4" />
-                </Combobox.Button>
-              </div>
-              <Combobox.Options
-                anchor={{ to: 'bottom start', gap: 4, padding: 8 }}
-                className="z-50 w-[var(--input-width)] overflow-auto rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg"
-              >
-                {perPageOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-zinc-400">
-                    No matching options
-                  </div>
-                ) : (
-                  perPageOptions.map((n) => (
-                    <Combobox.Option
-                      key={n}
-                      value={n}
-                      className={({ active }) =>
-                        `flex items-center justify-between px-3 py-1.5 text-sm cursor-pointer ${
-                          active
-                            ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-900/30 dark:text-indigo-100'
-                            : 'text-gray-900 dark:text-zinc-200'
-                        }`
-                      }
-                    >
-                      {({ selected }) => (
-                        <>
-                          <span>
-                            {queryNumber !== null && !PER_PAGE_OPTIONS.includes(n) ? `Use ${n}` : n}
-                          </span>
-                          {selected && (
-                            <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                          )}
-                        </>
-                      )}
-                    </Combobox.Option>
-                  ))
-                )}
-              </Combobox.Options>
-            </Combobox>
-          </div>
+          <PerPageSelect perPage={perPage} onChange={handlePerPageSelect} />
           contacts
         </div>
-        <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

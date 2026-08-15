@@ -1,5 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import { NotFoundException } from '@nestjs/common';
+
 import type { WorkflowStep } from '../aggregates/workflow-step.aggregate';
 
 export class WorkflowTreeOperator {

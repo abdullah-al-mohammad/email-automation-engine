@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { AUTH_UNAUTHORIZED_EVENT, clearStoredAuth, STORAGE_KEYS } from './auth-storage';
 
 const api = axios.create({

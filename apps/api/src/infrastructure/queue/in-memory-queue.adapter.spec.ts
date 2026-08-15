@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { InMemoryQueueAdapter } from './in-memory-queue.adapter';
 
 describe('InMemoryQueueAdapter', () => {

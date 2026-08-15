@@ -1,6 +1,6 @@
+import { type SigninDto, type SignupDto } from '@email-automation-engine/shared';
 import { type FormEvent, type InputHTMLAttributes } from 'react';
 import { type FieldErrors, type UseFormRegister } from 'react-hook-form';
-import { type SigninDto, type SignupDto } from '@email-automation-engine/shared';
 
 interface CredentialsFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;

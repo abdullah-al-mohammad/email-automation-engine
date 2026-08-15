@@ -1,7 +1,8 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
-import { UnauthorizedException, ConflictException, ForbiddenException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import { User } from '../../domain/aggregates/user.aggregate';
+import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;

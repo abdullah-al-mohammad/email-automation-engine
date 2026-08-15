@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+
 import { type CacheService } from './cache.interface';
 
 export interface RedisCacheConfig {

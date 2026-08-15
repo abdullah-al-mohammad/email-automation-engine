@@ -1,12 +1,13 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import {
   type CreateWorkflowTriggerDto,
   type UpdateWorkflowTriggerDto,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { WORKFLOW_TRIGGER_REPOSITORY } from '../../constants/tokens';
-import { type WorkflowTriggerRepository } from '../../domain/repositories/workflow-trigger.repository';
 import { WorkflowTrigger } from '../../domain/aggregates/workflow-trigger.aggregate';
+import { type WorkflowTriggerRepository } from '../../domain/repositories/workflow-trigger.repository';
 import { WorkflowService } from './workflow.service';
 
 @Injectable()

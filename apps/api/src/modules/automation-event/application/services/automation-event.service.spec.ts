@@ -1,8 +1,9 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
+import type { ConfigService } from '@nestjs/config';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
+import type { IQueueService } from '../../../../infrastructure/queue/queue.interface';
 import { AutomationEventService } from './automation-event.service';
 import type { TriggerCacheService } from './trigger-cache.service';
-import type { ConfigService } from '@nestjs/config';
-import type { IQueueService } from '../../../../infrastructure/queue/queue.interface';
 
 describe('AutomationEventService', () => {
   let service: AutomationEventService;

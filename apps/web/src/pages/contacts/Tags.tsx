@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Tag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import EmptyState from '../../components/shared/EmptyState';
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';

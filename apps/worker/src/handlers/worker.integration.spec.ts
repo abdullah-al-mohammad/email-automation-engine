@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { DataSource } from 'typeorm';
-import { handler as startWorkflowStepsHandler } from './start-workflow-steps.handler';
-import { handler as conditionalSplitHandler } from './conditional-split.handler';
-import { handler as startWorkflowsHandler } from './start-workflows.handler';
-import { workerConfig } from '../infrastructure/config/config';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import { DataSource } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+
 import type { CacheService } from '../infrastructure/cache/cache.interface';
+import { workerConfig } from '../infrastructure/config/config';
 import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
+import { handler as conditionalSplitHandler } from './conditional-split.handler';
+import { handler as startWorkflowStepsHandler } from './start-workflow-steps.handler';
+import { handler as startWorkflowsHandler } from './start-workflows.handler';
 
 describe('Worker Integration Tests', () => {
   let dataSource: DataSource;

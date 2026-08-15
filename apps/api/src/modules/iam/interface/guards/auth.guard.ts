@@ -1,11 +1,12 @@
 import {
   type CanActivate,
   type ExecutionContext,
-  Injectable,
-  UnauthorizedException,
   Inject,
+  Injectable,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
+
 import { TOKEN_SERVICE } from '../../constants/tokens';
 import { TokenService } from '../../infrastructure/security/token.service';
 import { type AuthenticatedRequest } from '../types';

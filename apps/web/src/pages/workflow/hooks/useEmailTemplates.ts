@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
 import { type EmailTemplateResponse } from '@email-automation-engine/shared';
+import { useQuery } from '@tanstack/react-query';
+
 import { useTenant } from '../../../contexts/TenantContext';
 import api from '../../../lib/api';
 

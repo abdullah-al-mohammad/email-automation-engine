@@ -1,8 +1,9 @@
-import type { QueueService } from '../infrastructure/queue/queue.interface';
-import type { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { Logger } from '../infrastructure/logger/logger';
+import type { DataSource } from 'typeorm';
+
 import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
+import type { QueueService } from '../infrastructure/queue/queue.interface';
 
 export interface SchedulerDeps {
   queueService: QueueService;
