@@ -42,7 +42,7 @@ export default function CreateWorkflow() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create workflow</h1>
       </div>
 
-      <form onSubmit={void handleSubmit(onSubmit)} className="space-y-4 max-w-md">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
             Name
