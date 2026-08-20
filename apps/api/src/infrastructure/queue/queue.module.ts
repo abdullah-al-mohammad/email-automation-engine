@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+import { QUEUE_TYPE } from '../config/config-keys';
+import { InMemoryQueueAdapter } from './in-memory-queue.adapter';
 import { QUEUE_SERVICE } from './queue.interface';
 import { SqsQueueAdapter } from './sqs-queue.adapter';
-import { InMemoryQueueAdapter } from './in-memory-queue.adapter';
-import { QUEUE_TYPE } from '../config/config-keys';
 
 @Global()
 @Module({

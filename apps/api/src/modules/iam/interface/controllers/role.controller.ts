@@ -1,29 +1,30 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
+  type CreateRoleDto,
+  createRoleSchema,
+  type RoleResponse,
+  type UpdateRoleDto,
+  updateRoleSchema,
+} from '@email-automation-engine/shared';
+import {
   Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
   Param,
+  Patch,
+  Post,
   UseGuards,
   UsePipes,
-  HttpCode,
 } from '@nestjs/common';
-import {
-  createRoleSchema,
-  updateRoleSchema,
-  type CreateRoleDto,
-  type UpdateRoleDto,
-  type RoleResponse,
-} from '@email-automation-engine/shared';
-import { RoleService } from '../../application/services/role.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
-import { PermissionsGuard } from '../guards/permissions.guard';
-import { RequirePermissions } from '../decorators/require-permissions.decorator';
-import { CurrentTenant } from '../decorators/current-tenant.decorator';
+
 import { ZodValidationPipe } from '../../../../infrastructure/pipes/zod-validation.pipe';
+import { RoleService } from '../../application/services/role.service';
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
+import { RequirePermissions } from '../decorators/require-permissions.decorator';
+import { AuthGuard } from '../guards/auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { TenantMembershipGuard } from '../guards/tenant-membership.guard';
 
 @Controller('tenants/:tenantId/roles')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

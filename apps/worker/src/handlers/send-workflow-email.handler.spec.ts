@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
-import type { Mocked } from 'vitest';
-import type { DataSource } from 'typeorm';
-import type { QueueService } from '../infrastructure/queue/queue.interface';
-import type { CacheService } from '../infrastructure/cache/cache.interface';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import type { DataSource } from 'typeorm';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { CacheService } from '../infrastructure/cache/cache.interface';
+import type { QueueService } from '../infrastructure/queue/queue.interface';
+import type { SqsBatchEvent } from '../infrastructure/queue/sqs-record.parser';
 
 const { mockSend } = vi.hoisted(() => {
   return { mockSend: vi.fn() };

@@ -1,12 +1,12 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  BeforeInsert,
+  Entity,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
 
 @Entity('workflows')
 export class Workflow {

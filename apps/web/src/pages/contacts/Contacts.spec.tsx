@@ -1,13 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ContactResponse, type TagResponse } from '@email-automation-engine/shared';
-import Contacts from './Contacts';
-import api from '../../lib/api';
 
-const { initialContacts, tagsMock, state } = vi.hoisted(() => {
+import { type ContactResponse, type TagResponse } from '@email-automation-engine/shared';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import api from '../../lib/api';
+import Contacts from './Contacts';
+
+const { initialContacts, state } = vi.hoisted(() => {
   const now = '2025-01-01T00:00:00.000Z';
   const tagsMock: TagResponse[] = [
     { id: 't1', tenantId: 'tenant-1', name: 'VIP', createdAt: now, updatedAt: now },

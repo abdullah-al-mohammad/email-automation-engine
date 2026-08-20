@@ -1,9 +1,10 @@
+import type { WebhookDeliveryMessage } from '@email-automation-engine/shared';
+import { isWebhookDeliveryMessage, WEBHOOK_DELIVERY_STATUS } from '@email-automation-engine/shared';
+
+import { Logger } from '../infrastructure/logger/logger';
 import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import { isWebhookDeliveryMessage, WEBHOOK_DELIVERY_STATUS } from '@email-automation-engine/shared';
-import type { WebhookDeliveryMessage } from '@email-automation-engine/shared';
 import type { WorkerDeps } from './start-workflows.handler';
-import { Logger } from '../infrastructure/logger/logger';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<WebhookDeliveryMessage>(

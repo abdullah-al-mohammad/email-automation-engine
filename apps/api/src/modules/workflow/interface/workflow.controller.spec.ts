@@ -1,19 +1,20 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
-import { WorkflowController } from './workflow.controller';
-import type { WorkflowService } from '../application/services/workflow.service';
-import type { WorkflowStepService } from '../application/services/workflow-step.service';
-import type { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
-import type { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
 import type {
-  WorkflowResponse,
   CreateWorkflowExitConditionDto,
+  WorkflowResponse,
 } from '@email-automation-engine/shared';
 import {
-  STEP_ACTIONS,
-  LOGICAL_OPERATORS,
-  CONDITION_TYPES,
   CONDITION_OPERATORS,
+  CONDITION_TYPES,
+  LOGICAL_OPERATORS,
+  STEP_ACTIONS,
 } from '@email-automation-engine/shared';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
+import type { WorkflowService } from '../application/services/workflow.service';
+import type { WorkflowExitConditionService } from '../application/services/workflow-exit-condition.service';
+import type { WorkflowStepService } from '../application/services/workflow-step.service';
+import type { WorkflowTriggerService } from '../application/services/workflow-trigger.service';
+import { WorkflowController } from './workflow.controller';
 
 describe('WorkflowController', () => {
   let controller: WorkflowController;

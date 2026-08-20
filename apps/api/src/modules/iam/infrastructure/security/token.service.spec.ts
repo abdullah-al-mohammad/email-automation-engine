@@ -1,8 +1,9 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
-import { TokenService } from './token.service';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import { EncryptionService } from './encryption.service';
+import { TokenService } from './token.service';
 
 describe('TokenService', () => {
   let service: TokenService;

@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import BuilderHeader from './BuilderHeader';
-import { BrowserRouter } from 'react-router-dom';
+
 import { type WorkflowResponse } from '@email-automation-engine/shared';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import BuilderHeader from './BuilderHeader';
 
 const mockWorkflow: WorkflowResponse = {
   id: '123',

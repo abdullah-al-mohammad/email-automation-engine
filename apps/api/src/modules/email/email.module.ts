@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { IamModule } from '../iam/iam.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EmailTemplate } from './domain/aggregates/email-template.aggregate';
-import { EmailMessage } from './domain/aggregates/email-message.aggregate';
-import { EmailEvent } from './domain/aggregates/email-event.aggregate';
-import { EMAIL_TEMPLATE_REPOSITORY } from './constants/tokens';
-import { TypeOrmEmailTemplateRepository } from './infrastructure/repositories/typeorm-email-template.repository';
-import { EmailTemplateService } from './application/services/email-template.service';
-import { EmailTemplateController } from './interface/http/controllers/email-template.controller';
+
+import { IamModule } from '../iam/iam.module';
 import { EmailMessageService } from './application/services/email-message.service';
+import { EmailTemplateService } from './application/services/email-template.service';
+import { EMAIL_TEMPLATE_REPOSITORY } from './constants/tokens';
+import { EmailEvent } from './domain/aggregates/email-event.aggregate';
+import { EmailMessage } from './domain/aggregates/email-message.aggregate';
+import { EmailTemplate } from './domain/aggregates/email-template.aggregate';
+import { TypeOrmEmailTemplateRepository } from './infrastructure/repositories/typeorm-email-template.repository';
+import { EmailTemplateController } from './interface/http/controllers/email-template.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([EmailTemplate, EmailMessage, EmailEvent]), IamModule],

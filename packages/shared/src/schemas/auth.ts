@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { USER_STATUSES } from '../constants/user-status.constants';
 
 const emailField = z

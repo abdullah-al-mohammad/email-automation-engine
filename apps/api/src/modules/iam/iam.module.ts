@@ -8,14 +8,11 @@ import {
   JWT_EXPIRES_IN,
   JWT_SECRET,
 } from '../../infrastructure/config/config-keys';
-
-import { Role } from './domain/aggregates/role.aggregate';
-import { RolePermission } from './domain/aggregates/role-permission.aggregate';
-import { Tenant } from './domain/aggregates/tenant.aggregate';
-import { TenantInvitation } from './domain/aggregates/tenant-invitation.aggregate';
-import { TenantMembership } from './domain/aggregates/tenant-membership.aggregate';
-import { User } from './domain/aggregates/user.aggregate';
-
+import { AuthService } from './application/services/auth.service';
+import { RoleService } from './application/services/role.service';
+import { TenantService } from './application/services/tenant.service';
+import { TenantInvitationService } from './application/services/tenant-invitation.service';
+import { TenantMemberService } from './application/services/tenant-member.service';
 import {
   ENCRYPTION_SERVICE,
   JWT_ENCRYPTION_KEY_VALUE,
@@ -27,29 +24,25 @@ import {
   TOKEN_SERVICE,
   USER_REPOSITORY,
 } from './constants/tokens';
-
+import { Role } from './domain/aggregates/role.aggregate';
+import { RolePermission } from './domain/aggregates/role-permission.aggregate';
+import { Tenant } from './domain/aggregates/tenant.aggregate';
+import { TenantInvitation } from './domain/aggregates/tenant-invitation.aggregate';
+import { TenantMembership } from './domain/aggregates/tenant-membership.aggregate';
+import { User } from './domain/aggregates/user.aggregate';
 import { TypeOrmRoleRepository } from './infrastructure/repositories/typeorm-role.repository';
+import { TypeOrmTenantRepository } from './infrastructure/repositories/typeorm-tenant.repository';
 import { TypeOrmTenantInvitationRepository } from './infrastructure/repositories/typeorm-tenant-invitation.repository';
 import { TypeOrmTenantMembershipRepository } from './infrastructure/repositories/typeorm-tenant-membership.repository';
-import { TypeOrmTenantRepository } from './infrastructure/repositories/typeorm-tenant.repository';
 import { TypeOrmUserRepository } from './infrastructure/repositories/typeorm-user.repository';
-
 import { EncryptionService } from './infrastructure/security/encryption.service';
 import { PasswordHasher } from './infrastructure/security/password-hasher.service';
 import { TokenService } from './infrastructure/security/token.service';
-
-import { AuthService } from './application/services/auth.service';
-import { RoleService } from './application/services/role.service';
-import { TenantInvitationService } from './application/services/tenant-invitation.service';
-import { TenantMemberService } from './application/services/tenant-member.service';
-import { TenantService } from './application/services/tenant.service';
-
 import { AuthController } from './interface/controllers/auth.controller';
 import { RoleController } from './interface/controllers/role.controller';
 import { TenantController } from './interface/controllers/tenant.controller';
 import { TenantInvitationController } from './interface/controllers/tenant-invitation.controller';
 import { TenantMemberController } from './interface/controllers/tenant-member.controller';
-
 import { AuthGuard } from './interface/guards/auth.guard';
 import { PermissionsGuard } from './interface/guards/permissions.guard';
 import { TenantMembershipGuard } from './interface/guards/tenant-membership.guard';

@@ -1,5 +1,5 @@
-import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { type StepFormData } from '@email-automation-engine/shared';
+import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 
 interface WebhookProps {
   register: UseFormRegister<StepFormData>;
@@ -10,10 +10,14 @@ interface WebhookProps {
 export default function Webhook({ register, errors, isActive }: WebhookProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+      <label
+        htmlFor="webhook-config"
+        className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+      >
         Configuration (JSON)
       </label>
       <textarea
+        id="webhook-config"
         {...register('configString')}
         disabled={isActive}
         rows={10}

@@ -1,18 +1,19 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
-  BeforeInsert,
+  ManyToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
+
+import { Contact } from '../../../contact/domain/aggregates/contact.aggregate';
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
 import { Workflow } from '../../../workflow/domain/aggregates/workflow.aggregate';
 import { WorkflowTrigger } from '../../../workflow/domain/aggregates/workflow-trigger.aggregate';
-import { Contact } from '../../../contact/domain/aggregates/contact.aggregate';
 
 @Entity('contact_workflows')
 export class ContactWorkflow {

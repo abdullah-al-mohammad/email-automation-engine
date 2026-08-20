@@ -1,14 +1,15 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import type { AxiosError } from 'axios';
-import { useNodesState, useEdgesState, MarkerType, type Node, type Edge } from '@xyflow/react';
 import {
   type WorkflowResponse,
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import api from '../../../lib/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { type Edge, MarkerType, type Node, useEdgesState, useNodesState } from '@xyflow/react';
+import type { AxiosError } from 'axios';
+import { useCallback, useEffect, useState } from 'react';
+
 import { generateWorkflowGraph } from '../../../components/workflow/utils/graph-transformer';
+import api from '../../../lib/api';
 
 export function useWorkflowGraphSync(
   workflow: WorkflowResponse | undefined,

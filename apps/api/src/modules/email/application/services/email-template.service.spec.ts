@@ -1,10 +1,12 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { Mocked } from 'vitest';
-import { EmailTemplateService } from './email-template.service';
-import { EmailTemplate } from '../../domain/aggregates/email-template.aggregate';
+
 import { NotFoundException } from '@nestjs/common';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { EmailTemplate } from '../../domain/aggregates/email-template.aggregate';
 import type { IEmailTemplateRepository } from '../../domain/repositories/email-template.repository';
+import { EmailTemplateService } from './email-template.service';
 
 describe('EmailTemplateService', () => {
   let service: EmailTemplateService;

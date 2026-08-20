@@ -1,8 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { type TenantMemberResponse } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { TENANT_MEMBERSHIP_REPOSITORY, USER_REPOSITORY } from '../../constants/tokens';
 import { TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
 import { UserRepository } from '../../domain/repositories/user.repository';
-import { type TenantMemberResponse } from '@email-automation-engine/shared';
 
 @Injectable()
 export class TenantMemberService {

@@ -1,14 +1,15 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
-  BeforeInsert,
+  ManyToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
+
 import { Workflow } from './workflow.aggregate';
 
 @Entity('workflow_triggers')

@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { webhookStepMessageSchema, isWebhookStepMessage } from './webhook-step.message';
+import { describe, expect, it } from 'vitest';
+
+import { isWebhookStepMessage, webhookStepMessageSchema } from './webhook-step.message';
 
 describe('webhookStepMessageSchema', () => {
   const validMessage = {

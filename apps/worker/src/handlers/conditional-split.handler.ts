@@ -1,16 +1,17 @@
-import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
-import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
+import type { ConditionalSplitMessage } from '@email-automation-engine/shared';
 import {
+  CONDITION_OPERATORS,
+  CONDITION_TYPES,
   isConditionalSplitMessage,
   LOGICAL_OPERATORS,
-  CONDITION_TYPES,
-  CONDITION_OPERATORS,
   STEP_ACTIONS,
 } from '@email-automation-engine/shared';
-import type { ConditionalSplitMessage } from '@email-automation-engine/shared';
-import type { WorkerDeps } from './start-workflows.handler';
-import { Logger } from '../infrastructure/logger/logger';
+
 import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
+import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
+import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
+import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {
   const { records: validRecords, failures } = parseSqsRecords<ConditionalSplitMessage>(

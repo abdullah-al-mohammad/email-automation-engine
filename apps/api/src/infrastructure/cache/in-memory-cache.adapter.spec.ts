@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { InMemoryCacheAdapter } from './in-memory-cache.adapter';
 
 describe('InMemoryCacheAdapter', () => {

@@ -1,11 +1,12 @@
+import { type SignupDto, signupSchema } from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { signupSchema, type SignupDto } from '@email-automation-engine/shared';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { CredentialsForm } from '../../components/auth/CredentialsForm';
+import { useAuth } from '../../contexts/AuthContext';
 import { getErrorMessage } from '../../lib/errors';
 
 export default function Signup() {

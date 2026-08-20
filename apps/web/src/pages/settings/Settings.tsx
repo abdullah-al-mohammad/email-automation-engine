@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as Tabs from '@radix-ui/react-tabs';
-import { useTenant } from '../../contexts/TenantContext';
-import api from '../../lib/api';
 import {
-  type TenantMemberResponse,
-  type TenantInvitationResponse,
   type RoleResponse,
+  type TenantInvitationResponse,
+  type TenantMemberResponse,
   type TenantResponse,
 } from '@email-automation-engine/shared';
-import InviteMember from '../../components/modals/InviteMember';
+import * as Tabs from '@radix-ui/react-tabs';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+
 import Confirm from '../../components/modals/Confirm';
-import Members from '../../components/settings/Members';
+import InviteMember from '../../components/modals/InviteMember';
 import Invitations from '../../components/settings/Invitations';
+import Members from '../../components/settings/Members';
+import { useTenant } from '../../contexts/TenantContext';
+import api from '../../lib/api';
 
 export default function Settings() {
   const { currentTenant } = useTenant();

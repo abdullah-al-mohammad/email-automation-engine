@@ -1,9 +1,11 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { Mocked } from 'vitest';
-import { EmailMessageService } from './email-message.service';
+
 import type { Repository } from 'typeorm';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { EmailMessage } from '../../domain/aggregates/email-message.aggregate';
+import { EmailMessageService } from './email-message.service';
 
 describe('EmailMessageService', () => {
   let service: EmailMessageService;

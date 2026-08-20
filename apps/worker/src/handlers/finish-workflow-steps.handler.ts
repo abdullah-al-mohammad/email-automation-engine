@@ -1,12 +1,12 @@
+import type { FinishedStepMessage } from '@email-automation-engine/shared';
+import { isFinishedStepMessage } from '@email-automation-engine/shared';
+import { CONDITION_TYPES, LOGICAL_OPERATORS, STEP_ACTIONS } from '@email-automation-engine/shared';
+import { randomUUID } from 'crypto';
+
+import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
 import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import { isFinishedStepMessage } from '@email-automation-engine/shared';
-import type { FinishedStepMessage } from '@email-automation-engine/shared';
-import { LOGICAL_OPERATORS, CONDITION_TYPES, STEP_ACTIONS } from '@email-automation-engine/shared';
-import { randomUUID } from 'crypto';
-import { Logger } from '../infrastructure/logger/logger';
-import { workerConfig } from '../infrastructure';
-
 import type { WorkerDeps } from './start-workflows.handler';
 
 export async function handler(event: SqsBatchEvent, deps: WorkerDeps): Promise<SqsBatchResponse> {

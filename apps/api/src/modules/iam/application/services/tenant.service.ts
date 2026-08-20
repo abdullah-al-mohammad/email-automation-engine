@@ -1,29 +1,30 @@
 import {
-  Injectable,
-  Inject,
-  NotFoundException,
+  type CreateTenantDto,
+  permissionsCatalog,
+  type TenantResponse,
+  type UpdateTenantDto,
+} from '@email-automation-engine/shared';
+import {
   ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
   Optional,
 } from '@nestjs/common';
-import {
-  type CreateTenantDto,
-  type UpdateTenantDto,
-  type TenantResponse,
-  permissionsCatalog,
-} from '@email-automation-engine/shared';
 import { DataSource } from 'typeorm';
+
 import {
-  TENANT_REPOSITORY,
   ROLE_REPOSITORY,
   TENANT_MEMBERSHIP_REPOSITORY,
+  TENANT_REPOSITORY,
 } from '../../constants/tokens';
-import { type TenantRepository } from '../../domain/repositories/tenant.repository';
-import { type RoleRepository } from '../../domain/repositories/role.repository';
-import { type TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
-import { Tenant } from '../../domain/aggregates/tenant.aggregate';
 import { Role } from '../../domain/aggregates/role.aggregate';
 import { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
+import { Tenant } from '../../domain/aggregates/tenant.aggregate';
 import { TenantMembership } from '../../domain/aggregates/tenant-membership.aggregate';
+import { type RoleRepository } from '../../domain/repositories/role.repository';
+import { type TenantRepository } from '../../domain/repositories/tenant.repository';
+import { type TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
 
 @Injectable()
 export class TenantService {

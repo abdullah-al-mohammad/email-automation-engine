@@ -1,6 +1,7 @@
-import { describe, expect, it, beforeEach } from 'vitest';
-import { EncryptionService } from './encryption.service';
 import * as crypto from 'crypto';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { EncryptionService } from './encryption.service';
 
 describe('EncryptionService', () => {
   let service: EncryptionService;

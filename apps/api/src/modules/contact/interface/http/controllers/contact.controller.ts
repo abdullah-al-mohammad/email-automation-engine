@@ -1,36 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import {
   type ContactResponse,
-  type PaginatedContactResponse,
-  type ImportContactsResult,
   type CreateContactDto,
+  type ImportContactsResult,
+  type PaginatedContactResponse,
   type UpdateContactDto,
 } from '@email-automation-engine/shared';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
+import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
+import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
+import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
+import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
 import { ContactService } from '../../../application/services/contact.service';
 import {
   ContactImportService,
   type CsvPreview,
 } from '../../../application/services/contact-import.service';
-import { AuthGuard } from '../../../../iam/interface/guards/auth.guard';
-import { TenantMembershipGuard } from '../../../../iam/interface/guards/tenant-membership.guard';
-import { PermissionsGuard } from '../../../../iam/interface/guards/permissions.guard';
-import { RequirePermissions } from '../../../../iam/interface/decorators/require-permissions.decorator';
-import { CurrentTenant } from '../../../../iam/interface/decorators/current-tenant.decorator';
 
 @Controller('tenants/:tenantId/contacts')
 @UseGuards(AuthGuard, TenantMembershipGuard, PermissionsGuard)

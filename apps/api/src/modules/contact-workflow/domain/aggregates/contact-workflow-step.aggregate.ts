@@ -1,17 +1,18 @@
-import { v7 as uuidv7 } from 'uuid';
 import {
-  Entity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
-  BeforeInsert,
+  ManyToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
+
 import { Tenant } from '../../../iam/domain/aggregates/tenant.aggregate';
-import { ContactWorkflow } from './contact-workflow.aggregate';
 import { WorkflowStep } from '../../../workflow/domain/aggregates/workflow-step.aggregate';
+import { ContactWorkflow } from './contact-workflow.aggregate';
 
 @Entity('contact_workflow_steps')
 export class ContactWorkflowStep {

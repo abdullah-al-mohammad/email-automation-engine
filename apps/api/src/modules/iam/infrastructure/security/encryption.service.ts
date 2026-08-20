@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
+
 import { JWT_ENCRYPTION_KEY } from '../../../../infrastructure/config/config-keys';
 import { JWT_ENCRYPTION_KEY_VALUE } from '../../constants/tokens';
 

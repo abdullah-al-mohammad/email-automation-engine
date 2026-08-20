@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, In } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
+
 import { ContactWorkflow } from '../../domain/aggregates/contact-workflow.aggregate';
 import { ContactWorkflowRepository } from '../../domain/repositories/contact-workflow.repository';
 

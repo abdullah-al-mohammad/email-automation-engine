@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { SUPPORTED_TRIGGER_EVENTS } from './workflow';
 
 export const AutomationEventSchema = z.object({

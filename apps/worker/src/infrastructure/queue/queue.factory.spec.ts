@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { InMemoryQueueAdapter } from './in-memory-queue.adapter';
 import { createQueueService } from './queue.factory';
 import { SqsQueueAdapter } from './sqs-queue.adapter';

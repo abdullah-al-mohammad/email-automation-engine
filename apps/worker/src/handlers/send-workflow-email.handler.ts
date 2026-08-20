@@ -1,12 +1,13 @@
+import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
+import type { EmailStepMessage } from '@email-automation-engine/shared';
+import { isEmailStepMessage, STEP_ACTIONS } from '@email-automation-engine/shared';
+import { v7 as uuidv7 } from 'uuid';
+
+import { workerConfig } from '../infrastructure';
+import { Logger } from '../infrastructure/logger/logger';
 import type { SqsBatchEvent, SqsBatchResponse } from '../infrastructure/queue/sqs-record.parser';
 import { parseSqsRecords } from '../infrastructure/queue/sqs-record.parser';
-import { isEmailStepMessage, STEP_ACTIONS } from '@email-automation-engine/shared';
-import type { EmailStepMessage } from '@email-automation-engine/shared';
 import type { WorkerDeps } from './start-workflows.handler';
-import { Logger } from '../infrastructure/logger/logger';
-import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
-import { v7 as uuidv7 } from 'uuid';
-import { workerConfig } from '../infrastructure';
 
 const ses = new SESClient({ region: workerConfig.AWS_REGION });
 

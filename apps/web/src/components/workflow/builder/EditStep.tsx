@@ -1,19 +1,20 @@
+import {
+  STEP_ACTIONS,
+  type StepFormData,
+  StepFormSchema,
+  TIME_UNITS,
+  type WorkflowStepResponse,
+} from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  type WorkflowStepResponse,
-  STEP_ACTIONS,
-  StepFormSchema,
-  type StepFormData,
-  TIME_UNITS,
-} from '@email-automation-engine/shared';
+
 import { useWorkflowSteps } from '../../../pages/workflow/hooks/useWorkflowSteps';
+import StepConditionsEditor, { type StepConditionsEditorRef } from './StepConditionsEditor';
 import Delay from './steps/Delay';
 import Email from './steps/Email';
 import Tag from './steps/Tag';
 import Webhook from './steps/Webhook';
-import StepConditionsEditor, { type StepConditionsEditorRef } from './StepConditionsEditor';
 
 interface StepConfigPayload {
   amount?: number;

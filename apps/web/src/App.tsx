@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
 import Sidebar from './components/layout/Sidebar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
@@ -7,8 +8,10 @@ import Signin from './pages/auth/Signin';
 import Signup from './pages/auth/Signup';
 import ContactDetailPage from './pages/contacts/ContactDetail';
 import Contacts from './pages/contacts/Contacts';
+import CreateTag from './pages/contacts/CreateTag';
 import NewContact from './pages/contacts/NewContact';
 import Tags from './pages/contacts/Tags';
+import CreateEmailTemplate from './pages/email-templates/CreateEmailTemplate';
 import EmailTemplates from './pages/email-templates/EmailTemplates';
 import Settings from './pages/settings/Settings';
 import Tenants from './pages/tenant/Tenants';
@@ -18,9 +21,6 @@ import ExecutionSummary from './pages/workflow/ExecutionSummary';
 import WorkflowBuilder from './pages/workflow/WorkflowBuilder';
 import WorkflowContacts from './pages/workflow/WorkflowContacts';
 import Workflows from './pages/workflow/Workflows';
-
-import CreateTag from './pages/contacts/CreateTag';
-import CreateEmailTemplate from './pages/email-templates/CreateEmailTemplate';
 
 const appRoutes = [
   { path: '*', element: <Navigate to="/workflows" /> },

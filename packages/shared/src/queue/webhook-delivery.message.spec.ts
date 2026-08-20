@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { webhookDeliveryMessageSchema, isWebhookDeliveryMessage } from './webhook-delivery.message';
+import { describe, expect, it } from 'vitest';
+
+import { isWebhookDeliveryMessage, webhookDeliveryMessageSchema } from './webhook-delivery.message';
 
 describe('webhookDeliveryMessageSchema', () => {
   const validMessage = {

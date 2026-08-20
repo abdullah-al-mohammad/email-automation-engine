@@ -1,5 +1,5 @@
-import type { UseFormRegister, UseFormWatch, FieldErrors } from 'react-hook-form';
 import { type StepFormData, TIME_UNITS } from '@email-automation-engine/shared';
+import type { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
 
 interface DelayProps {
   register: UseFormRegister<StepFormData>;
@@ -12,10 +12,14 @@ export default function Delay({ register, watch, errors, isActive }: DelayProps)
   return (
     <div className="flex gap-2">
       <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+        <label
+          htmlFor="delay-amount"
+          className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+        >
           Wait for
         </label>
         <input
+          id="delay-amount"
           type="number"
           {...register('config.amount')}
           min={watch('config.unit') === TIME_UNITS.MINUTES ? 15 : 1}
@@ -32,10 +36,14 @@ export default function Delay({ register, watch, errors, isActive }: DelayProps)
         )}
       </div>
       <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+        <label
+          htmlFor="delay-unit"
+          className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+        >
           Time unit
         </label>
         <select
+          id="delay-unit"
           {...register('config.unit')}
           disabled={isActive}
           className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50"

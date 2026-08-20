@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import TagStepForm from './Tag';
-
-import { useForm } from 'react-hook-form';
 import type { StepFormData } from '@email-automation-engine/shared';
+import { cleanup, render, screen } from '@testing-library/react';
+import type { FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import TagStepForm from './Tag';
 
 export function TestFormWrapper({
   children,
@@ -50,7 +51,9 @@ describe('TagStepForm', () => {
   });
 
   it('renders validation errors', () => {
-    const mockErrors = { config: { tagId: { type: 'manual', message: 'Tag is required' } } } as any;
+    const mockErrors = {
+      config: { tagId: { type: 'manual', message: 'Tag is required' } },
+    } as FieldErrors<StepFormData>;
     render(
       <TestFormWrapper defaultValues={{ config: { tagId: 'tag-1' } }}>
         {({ register }) => <TagStepForm register={register} errors={mockErrors} isActive={false} />}

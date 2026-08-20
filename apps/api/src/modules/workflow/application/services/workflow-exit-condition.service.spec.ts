@@ -1,9 +1,10 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
-import { WorkflowExitConditionService } from './workflow-exit-condition.service';
-import type { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import type { Workflow } from '../../domain/aggregates/workflow.aggregate';
+import type { WorkflowExitCondition } from '../../domain/aggregates/workflow-exit-condition.aggregate';
 import type { WorkflowService } from './workflow.service';
+import { WorkflowExitConditionService } from './workflow-exit-condition.service';
 
 describe('WorkflowExitConditionService', () => {
   let service: WorkflowExitConditionService;

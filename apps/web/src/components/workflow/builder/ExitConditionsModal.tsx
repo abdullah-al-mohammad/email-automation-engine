@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useWorkflowExitConditions } from '../../../pages/workflow/hooks/useWorkflowExitConditions';
-import { X, Plus, Trash2 } from 'lucide-react';
-import { useTags } from '../../../pages/workflow/hooks/useTags';
 import {
+  CONDITION_OPERATORS,
+  CONDITION_TYPES,
   LOGICAL_OPERATORS,
   type LogicalOperator,
-  CONDITION_TYPES,
-  CONDITION_OPERATORS,
 } from '@email-automation-engine/shared';
+import { Plus, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { useTags } from '../../../pages/workflow/hooks/useTags';
+import { useWorkflowExitConditions } from '../../../pages/workflow/hooks/useWorkflowExitConditions';
 
 interface ExitConditionsModalProps {
   isOpen: boolean;
@@ -158,10 +159,14 @@ export default function ExitConditionsModal({
               >
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
+                    <label
+                      htmlFor={`condition-type-${index}`}
+                      className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
+                    >
                       Type
                     </label>
                     <select
+                      id={`condition-type-${index}`}
                       value={condition.type}
                       onChange={(e) => handleChange(index, 'type', e.target.value)}
                       disabled={isActive}
@@ -173,11 +178,15 @@ export default function ExitConditionsModal({
                     </select>
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
+                    <label
+                      htmlFor={`condition-resource-${index}`}
+                      className="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1"
+                    >
                       {condition.type.startsWith('tag_') ? 'Select Tag' : 'Field Name'}
                     </label>
                     {condition.type.startsWith('tag_') ? (
                       <select
+                        id={`condition-resource-${index}`}
                         value={condition.resource}
                         onChange={(e) => handleChange(index, 'resource', e.target.value)}
                         disabled={isActive}
@@ -193,6 +202,7 @@ export default function ExitConditionsModal({
                     ) : (
                       <div className="flex gap-2">
                         <input
+                          id={`condition-resource-${index}`}
                           type="text"
                           value={condition.resource}
                           onChange={(e) => handleChange(index, 'resource', e.target.value)}

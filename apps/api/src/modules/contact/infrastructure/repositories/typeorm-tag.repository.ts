@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Tag } from '../../domain/aggregates/tag.aggregate';
 import { TagRepository } from '../../domain/repositories/tag.repository';
 

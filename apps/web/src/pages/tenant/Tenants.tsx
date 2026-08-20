@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
 import {
-  createTenantSchema,
   type CreateTenantDto,
+  createTenantSchema,
   type TenantResponse,
 } from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
-import { Plus, ChevronRight, Building, LogOut, Mail } from 'lucide-react';
+import { Building, ChevronRight, LogOut, Mail, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
-import { useTenant } from '../../contexts/TenantContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
 export default function Tenants() {

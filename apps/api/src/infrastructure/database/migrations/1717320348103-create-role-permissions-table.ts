@@ -1,5 +1,5 @@
-import { Table, TableForeignKey, TableIndex } from 'typeorm';
 import type { MigrationInterface, QueryRunner } from 'typeorm';
+import { Table, TableForeignKey, TableIndex } from 'typeorm';
 
 export class CreateRolePermissionsTable1717320348103 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

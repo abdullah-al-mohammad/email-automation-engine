@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -11,6 +12,9 @@ export default tseslint.config(
   {
     files: ['**/*.ts', '**/*.tsx'],
     extends: [...tseslint.configs.recommendedTypeChecked],
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+    },
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -24,6 +28,13 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [['^\\u0000'], ['^@?\\w'], ['^\\.']],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
     },
   },
   {

@@ -1,32 +1,31 @@
-import { useParams } from 'react-router-dom';
-import type { AxiosError } from 'axios';
-import { useTenant } from '../../contexts/TenantContext';
+import '@xyflow/react/dist/style.css';
+
 import {
   type WorkflowStepResponse,
   type WorkflowTriggerResponse,
 } from '@email-automation-engine/shared';
-import { ReactFlow, ReactFlowProvider, Background, Controls, type Node } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import { useState, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
+import { Background, Controls, type Node, ReactFlow, ReactFlowProvider } from '@xyflow/react';
+import type { AxiosError } from 'axios';
+import { type MouseEvent as ReactMouseEvent, useCallback, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-import { useWorkflowGraphSync, useDragAndDropReorder } from './hooks/useWorkflowBuilder';
-import { useWorkflow } from './hooks/useWorkflow';
-import { useWorkflowSteps } from './hooks/useWorkflowSteps';
-import { useWorkflowTriggers } from './hooks/useWorkflowTriggers';
-
-import { StepNode } from '../../components/workflow/builder/StepNode';
-import { TriggerNode } from '../../components/workflow/builder/TriggerNode';
-import { AddTrigger as AddTriggerNode } from '../../components/workflow/builder/AddTrigger';
-import { AddStep as AddStepNode } from '../../components/workflow/builder/AddStep';
-import { Exit as ExitNode } from '../../components/workflow/builder/Exit';
-
-import Sidebar from '../../components/workflow/builder/Sidebar';
-import BuilderHeader from '../../components/workflow/builder/BuilderHeader';
 import AddNode from '../../components/modals/AddNode';
 import AddTrigger from '../../components/modals/AddTrigger';
-import EmptyCanvas from '../../components/workflow/builder/EmptyCanvas';
 import Alert from '../../components/modals/Alert';
+import { AddStep as AddStepNode } from '../../components/workflow/builder/AddStep';
+import { AddTrigger as AddTriggerNode } from '../../components/workflow/builder/AddTrigger';
+import BuilderHeader from '../../components/workflow/builder/BuilderHeader';
+import EmptyCanvas from '../../components/workflow/builder/EmptyCanvas';
+import { Exit as ExitNode } from '../../components/workflow/builder/Exit';
 import ExitConditionsModal from '../../components/workflow/builder/ExitConditionsModal';
+import Sidebar from '../../components/workflow/builder/Sidebar';
+import { StepNode } from '../../components/workflow/builder/StepNode';
+import { TriggerNode } from '../../components/workflow/builder/TriggerNode';
+import { useTenant } from '../../contexts/TenantContext';
+import { useWorkflow } from './hooks/useWorkflow';
+import { useDragAndDropReorder, useWorkflowGraphSync } from './hooks/useWorkflowBuilder';
+import { useWorkflowSteps } from './hooks/useWorkflowSteps';
+import { useWorkflowTriggers } from './hooks/useWorkflowTriggers';
 
 const NODE_TYPES = {
   triggerNode: TriggerNode,
@@ -84,8 +83,8 @@ function WorkflowBuilderContent() {
     draggingNodeId,
   );
 
-  const boundOnNodeDragStop = useCallback(
-    (e: MouseEvent | TouchEvent, node: Node) => {
+  const handleNodeDragStop = useCallback(
+    (_e: MouseEvent | TouchEvent, node: Node) => {
       return handleDragStop(node, nodes);
     },
     [nodes, handleDragStop],
@@ -121,6 +120,13 @@ function WorkflowBuilderContent() {
   if (isLoading) return <div className="p-8">Loading workflow...</div>;
   if (!workflow) return <div className="p-8">Workflow not found.</div>;
 
+  const visibleEdges = edges.map((edge) => ({
+    ...edge,
+    hidden: draggingNodeId
+      ? edge.source === draggingNodeId || edge.target === draggingNodeId
+      : false,
+  }));
+
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] -m-6">
       <BuilderHeader
@@ -133,16 +139,11 @@ function WorkflowBuilderContent() {
       <div className="flex-1 w-full h-full bg-gray-50/50 dark:bg-zinc-950/50 relative">
         <ReactFlow
           nodes={nodes}
-          edges={edges.map((e) => ({
-            ...e,
-            hidden: draggingNodeId
-              ? e.source === draggingNodeId || e.target === draggingNodeId
-              : false,
-          }))}
+          edges={visibleEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeDragStart={onNodeDragStart}
-          onNodeDragStop={boundOnNodeDragStop}
+          onNodeDragStop={handleNodeDragStop}
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           nodeTypes={NODE_TYPES}

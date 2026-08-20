@@ -1,5 +1,6 @@
-import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { type StepFormData } from '@email-automation-engine/shared';
+import type { FieldErrors, UseFormRegister } from 'react-hook-form';
+
 import { useTags } from '../../../../pages/workflow/hooks/useTags';
 
 interface TagProps {
@@ -13,10 +14,14 @@ export default function Tag({ register, errors, isActive }: TagProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+      <label
+        htmlFor="tag-select"
+        className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+      >
         Select tag
       </label>
       <select
+        id="tag-select"
         {...register('config.tagId')}
         disabled={isActive}
         className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 ${

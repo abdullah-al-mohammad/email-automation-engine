@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { TenantMembership } from '../../domain/aggregates/tenant-membership.aggregate';
 import { type TenantMembershipRepository } from '../../domain/repositories/tenant-membership.repository';
 

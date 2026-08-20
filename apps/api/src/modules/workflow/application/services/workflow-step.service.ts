@@ -1,15 +1,16 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import {
   type CreateWorkflowStepDto,
+  type ReorderWorkflowStepDto,
   type UpdateWorkflowStepDto,
   type WorkflowStepResponse,
-  type ReorderWorkflowStepDto,
 } from '@email-automation-engine/shared';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+
 import { WORKFLOW_STEP_REPOSITORY } from '../../constants/tokens';
-import { type WorkflowStepRepository } from '../../domain/repositories/workflow-step.repository';
 import { WorkflowStep } from '../../domain/aggregates/workflow-step.aggregate';
-import { WorkflowService } from './workflow.service';
+import { type WorkflowStepRepository } from '../../domain/repositories/workflow-step.repository';
 import { WorkflowTreeOperator } from '../../domain/services/workflow-tree.operator';
+import { WorkflowService } from './workflow.service';
 
 @Injectable()
 export class WorkflowStepService {

@@ -1,16 +1,17 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  createTenantInvitationSchema,
   type CreateTenantInvitationDto,
+  createTenantInvitationSchema,
   type RoleResponse,
   type TenantInvitationResponse,
 } from '@email-automation-engine/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import * as Dialog from '@radix-ui/react-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type AxiosError } from 'axios';
+import { useForm } from 'react-hook-form';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
-import { type AxiosError } from 'axios';
 
 interface InviteMemberProps {
   isOpen: boolean;
@@ -66,10 +67,14 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
 
           <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              <label
+                htmlFor="invite-email"
+                className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+              >
                 Email address
               </label>
               <input
+                id="invite-email"
                 type="email"
                 {...register('email')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
@@ -79,10 +84,14 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              <label
+                htmlFor="invite-role"
+                className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+              >
                 Role
               </label>
               <select
+                id="invite-role"
                 {...register('roleId')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
               >
@@ -99,10 +108,14 @@ export default function InviteMember({ isOpen, onClose, roles }: InviteMemberPro
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
+              <label
+                htmlFor="invite-message"
+                className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1"
+              >
                 Personal message (optional)
               </label>
               <textarea
+                id="invite-message"
                 {...register('message')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                 placeholder="Join us on the Email Engine!"

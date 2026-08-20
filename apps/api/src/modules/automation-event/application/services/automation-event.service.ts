@@ -1,10 +1,11 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { AutomationEventDto, AutomationEventMessage } from '@email-automation-engine/shared';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v7 as uuidv7 } from 'uuid';
-import { AutomationEventDto, AutomationEventMessage } from '@email-automation-engine/shared';
-import { QUEUE_SERVICE, IQueueService } from '../../../../infrastructure/queue/queue.interface';
-import { TriggerCacheService } from './trigger-cache.service';
+
 import { AUTOMATION_EVENTS_QUEUE_URL } from '../../../../infrastructure/config/config-keys';
+import { IQueueService, QUEUE_SERVICE } from '../../../../infrastructure/queue/queue.interface';
+import { TriggerCacheService } from './trigger-cache.service';
 
 @Injectable()
 export class AutomationEventService {

@@ -1,6 +1,7 @@
-import { describe, expect, it, beforeEach, vi, type Mock } from 'vitest';
-import { AutomationEventController } from './automation-event.controller';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
 import type { AutomationEventService } from '../../../application/services/automation-event.service';
+import { AutomationEventController } from './automation-event.controller';
 
 describe('AutomationEventController', () => {
   let controller: AutomationEventController;

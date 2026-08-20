@@ -1,14 +1,15 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { ROLE_REPOSITORY } from '../../constants/tokens';
-import { RoleRepository } from '../../domain/repositories/role.repository';
-import { Role } from '../../domain/aggregates/role.aggregate';
-import { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
 import {
-  type RoleResponse,
   type CreateRoleDto,
+  type RoleResponse,
   type UpdateRoleDto,
 } from '@email-automation-engine/shared';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+
+import { ROLE_REPOSITORY } from '../../constants/tokens';
+import { Role } from '../../domain/aggregates/role.aggregate';
+import { RolePermission } from '../../domain/aggregates/role-permission.aggregate';
+import { RoleRepository } from '../../domain/repositories/role.repository';
 
 @Injectable()
 export class RoleService {

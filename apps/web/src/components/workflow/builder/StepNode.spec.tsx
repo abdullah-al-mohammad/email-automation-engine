@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import { StepNode } from './StepNode';
 import { STEP_ACTIONS } from '@email-automation-engine/shared';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { StepNode } from './StepNode';
 
 vi.mock('@xyflow/react', () => ({
   Handle: () => <div data-testid="handle" />,

@@ -1,7 +1,8 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest';
 import type { ConfigService } from '@nestjs/config';
-import { PasswordHasher } from './password-hasher.service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { BCRYPT_SALT_ROUNDS } from '../../../../infrastructure/config/config-keys';
+import { PasswordHasher } from './password-hasher.service';
 
 describe('PasswordHasher', () => {
   let service: PasswordHasher;

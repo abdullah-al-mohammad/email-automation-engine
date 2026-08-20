@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useTenant } from '../../contexts/TenantContext';
 import api from '../../lib/api';
 
@@ -54,7 +55,6 @@ export default function CreateTag() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder=""
             autoFocus
             className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />

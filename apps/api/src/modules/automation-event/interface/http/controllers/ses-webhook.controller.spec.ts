@@ -1,12 +1,14 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+import { Logger } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 import type { Mocked } from 'vitest';
-import { SesWebhookController } from './ses-webhook.controller';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { IQueueService } from '../../../../../infrastructure/queue/queue.interface';
 import type { EmailMessageService } from '../../../../email/application/services/email-message.service';
 import { EmailMessage } from '../../../../email/domain/aggregates/email-message.aggregate';
-import type { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
+import { SesWebhookController } from './ses-webhook.controller';
 
 vi.mock('sns-validator', () => {
   return {

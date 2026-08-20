@@ -1,9 +1,11 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { Mocked } from 'vitest';
-import { TypeOrmEmailTemplateRepository } from './typeorm-email-template.repository';
+
 import type { Repository } from 'typeorm';
+import type { Mocked } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { EmailTemplate } from '../../domain/aggregates/email-template.aggregate';
+import { TypeOrmEmailTemplateRepository } from './typeorm-email-template.repository';
 
 describe('TypeOrmEmailTemplateRepository', () => {
   let repository: TypeOrmEmailTemplateRepository;
