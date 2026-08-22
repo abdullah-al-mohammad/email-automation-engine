@@ -131,7 +131,9 @@ export default function Sidebar() {
   const { logout } = useAuth();
   const { currentTenant, tenants, setCurrentTenant } = useTenant();
   const navigate = useNavigate();
-  const [openGroup, setOpenGroup] = useState<string | null>('/contacts');
+  const [openGroup, setOpenGroup] = useState<string | null>(
+    () => findActiveGroupPath(location.pathname) ?? '/contacts',
+  );
 
   const tenantDropdownItems = currentTenant
     ? [
